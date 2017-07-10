@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+
+<html lang='en'>
+
+<head>
+    <title>poker app</title>
+    <link rel='stylesheet' href='./css/style.css'></link>
+    <link rel='stylesheet' href='./css/lobby.css'></link>
+</head>
+
+
+<body>
+    <div id='content'>
+        <div class='grid-container' id='main-grid'>
+            <div class='grid-cell-section' id='grid-section-banner'>
+                <div class='grid-cell-section-header'>banner</div>
+            </div>
+            <div class='grid-cell-section' id='grid-section-info'>
+                <div class='grid-cell-section-header'>info</div>
+                <div id='app-portal-account-login'>APP PORTAL ACCOUNT LOGIN</div>
+            </div>
+            <div class='grid-cell-section' id='grid-section-nav'>
+                <div class='grid-cell-section-header'>nav</div>
+
+            </div>
+            <div class='grid-container' id='grid-section-lobby'>
+                <div class='grid-cell-section' id='section-lobby-left'>
+                    <div class='grid-cell-section-header'>lobby left</div>
+
+                </div>
+                <div class='grid-cell-section' id='section-lobby-right'>
+                    <div class='grid-cell-section-header'>lobby right</div>
+
+                </div>
+                <div class='grid-cell-section' id='section-lobby-game'>
+                    <div class='grid-cell-section-header'>lobby game</div>
+
+                </div>
+            </div>
+        </div>
+
+        <!--<div id='room'></div>
+        <div id='room-list'></div>
+        <div id='messages'></div>
+
+        <form id='send-form'>
+            <input id='send-message' />
+            <input id='send-button' type='submit' value='send' />
+
+            <div id='help'>
+                Chat Commands:
+                <ul>
+                    <li>Change Nickname: <code>/nick [username]</code></li>
+                    <li>Join/Create Lobby: <code>/join [room name]</code></li>
+                </ul>
+            </div>
+        </form>-->
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js' type='text/javascript'></script>
+    <script src='./js/chat.js' type='text/javascript'></script>
+    <script src='./js/chat_ui.js' type='text/javascript'></script>
+</body>
+
+</html>

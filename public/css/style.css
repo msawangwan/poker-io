@@ -1,0 +1,108 @@
+/* globals and variables */
+
+:root {
+    /* globals */
+    
+    box-sizing: border-box;
+
+    /* variables */
+
+    /* available color palettes. the last one
+     * is the active palette. change the active
+     * palette definitions to change the site colors.
+     */
+
+    /* elegant-sinister */
+
+    --bg-screen:         #c5c1c0;
+    --accent-dark-steel: #0a1612;
+    --fg-dark-denim:     #1a2930;
+    --fg-light-marigold: #f7ce3e;
+
+    /* expertise */
+
+    --bg-navy-blue:         #0f1626;
+    --accent-tone-leather:  #ab987a;
+    --accent-tone-coral:    #ff533d;
+    --accent-tone-eggshell: #f5f5f5;
+
+    /* digital modern */
+
+    --bg-crimson-sky:          #cf6766;
+    --accent-tone-indigo:      #30415d;
+    --accent-tone-ultramarine: #30415d;
+    --accent-tone-light-blue:  #8eaebd;
+
+    /* all-star */
+
+    --accent-tone-ochre:        #c06014;
+    --accent-tone-pastel-peach: #edd8cd;
+    --accent-tone-black:        #000000;
+    --accent-tone-cool-grey:    #cdcdcd;
+
+    /* active color palette */
+
+    --color-scheme-bg: var(--bg-crimson-sky);
+    --color-scheme-bg-secondary: var(--bg-crimson-sky);
+    --color-scheme-tone-light: var(--accent-tone-ultramarine);
+    --color-scheme-tone-dark: var(--accent-tone-indigo);
+    --color-scheme-shade-light: var(--accent-tone-light-blue);
+    --color-scheme-shade-dark: var(--accent-tone-light-blue);
+
+    /* font colors */
+
+    --font-light: white;
+    --font-dark:  black;
+
+    /* borders */
+
+    --border-light: 1px solid white;
+    --border-dark: 1px solid black;
+}
+
+body {
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+.color-bg-primary { background: var(--color-scheme-bg); }
+.color-bg-secondary { background: var(--color-scheme-bg-secondary); }
+.color-tone-light { background: var(--color-scheme-tone-light); }
+.color-tone-dark { background: var(--color-scheme-tone-dark); }
+.color-shade-light { background: var(--color-scheme-shade-light); }
+.color-shade-dark { background: var(--color-scheme-shade-dark); }
+
+.font-light { color: var(--font-light); }
+.font-dark { color: var(--font-dark); }
+
+.border-light-thin { border: 1px solid white; }
+.border-dark-thin { border: 1px solid black; }
+
+.main-content {
+    display: grid;
+
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: auto;
+
+    grid-template-areas:
+        "sidebar canvas canvas canvas canvas"
+        "sidebar canvas canvas canvas canvas"
+        "input input input input input";
+}
+
+.main-content-subsection:nth-child(1) {
+    grid-area: canvas;
+    background: var(--color-scheme-bg);
+}
+
+.main-content-subsection:nth-child(2) {
+    grid-area: input;
+    background: var(--color-scheme-tone-dark);
+    width: 100%;
+    height: 200px;
+}
+
+.main-content-subsection:nth-child(3) {
+    grid-area: sidebar;
+    background: var(--color-scheme-shade-light);
+}

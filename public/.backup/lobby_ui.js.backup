@@ -1,0 +1,362 @@
+const log = (...s) => console.log(`${s.map(m => `${m}\n`).join('')}`);
+
+
+function divEscapedContentElement(message) {
+    return $('<div></div>').text(message);
+}
+
+function divSystemContentElement(message) {
+    return $('<div></div>').html('<i>' + message + '</i>');
+}
+
+function processUserInput(chatApp, socket) {
+    var message = $('#send-message').val();
+    var systemMessage = false;
+
+    if (message.charAt(0) === '/') {
+        systemMessage = chatApp.processCommand(message);
+
+        if (systemMessage) {
+            $('#messages').append(divSystemContentElement(systemMessage));
+        }
+    } else {
+        chatApp.sendMessage(
+            $('#room').text(),
+            message
+        );
+
+        $('#messages').append(divEscapedContentElement(message));
+        $('#messages').scrollTop($('#messages').prop('scrollHeight'));
+    }
+
+    $('#send-message').val('');
+}
+
+const slowFade = (out, selector) => out ? $(selector).fadeOut('slow') : $(selector).fadeIn('slow');
+const div = text => $('<div></div>').html(text);
+const txt = text => $('<div></div>').text(text);
+
+const selector = {
+    banner: '#grid-section-banner',
+    info: {
+        container: '#grid-section-info',
+        loginprompt: {
+            container: '#cell-content-prompt-account-login',
+            form: {
+                container: '#form-account-login-prompt',
+                name: '#send-name',
+                password: '#send-pw'
+            }
+        },
+        account: {
+            container: '#player-profile',
+            header: '#player-profile-header',
+            name: '#profile-account-username',
+            balance: '#profile-account-balance'
+        }
+    },
+    nav: '#grid-section-nav',
+    lobby: {
+        container: '#grid-section-lobby',
+        left: {
+            container: '#section-lobby-left',
+            chatroom: {
+                container: '#cell-content-lobby-chatroom',
+                header: '#lobby-chatroom-header',
+                messages: {
+                    container: '#lobby-chatroom-messages',
+                    roomname: '#lobby-chatroom-messages-room-header',
+                    chatmessages: '#lobby-chatroom-messages-chat-messages'
+                },
+                rooms: '#lobby-chatroom-roomlist',
+                input: {
+                    container: '#lobby-chatroom-text-input-container',
+                    form: {
+                        container: '#lobby-chatroom-form',
+                        text: '#lobby-chatroom-message-input',
+                        send: '#lobby-chatroom-send-message'
+                    }
+                }
+            }
+        },
+        right: {
+            container: '#section-lobby-right',
+            tablelist: {
+                container: '#cell-content-lobby-table-list'
+            }
+        },
+        game: '#section-lobby-game'
+    }
+};
+
+const event = {
+    prompt: {
+        accountlogin: 'prompt-user-for-login-credentials'
+    },
+    validate: {
+        credentials: 'user-validate-cred'
+    },
+    chat: {
+        joinedroom: 'user-joined-chatroom',
+        sentmessage: 'user-sent-chat-message',
+        roomlistrefresh: 'server-refreshed-room-list'
+    }
+};
+
+const content = {
+    accountloginform: '/account-login-form.html',
+    accountdetail: '/account-info-display.html',
+    lobbychat: '/lobby-chat-ui.html',
+    tablelist: '/lobby-table-list.html'
+};
+
+// warning: all time releated functions should be server-side
+const timestamp = () => new Date().getTime().toString(); // todo: don't think it's best create a 'new' date object each invocation
+
+$(document).ready(function () {
+    var url = window.location.origin;
+    var socket = io.connect(url);
+    var chatApp = new Chat(socket);
+
+    /*
+    * custom code
+    */
+
+    log('connected', `host ${url}`);
+
+    socket.on('prompt-user-login', () => {
+        $(selector.lobby.container).fadeOut('slow');
+    });
+
+    socket.on('user-login-complete', (e) => {
+        if (e.isvalid) {
+            $('#cell-content-prompt-account-login').fadeOut('slow'); // todo: or '#form-account-login-prompt'
+            $('#grid-section-lobby').fadeIn('slow');
+
+            $('#grid-section-info').load('/account-info-display.html', () => {
+                div(`${e.user.name}`).insertAfter('#profile-account-username');
+                div(`${e.user.balance}`).insertAfter('#profile-account-balance');
+            });
+
+            const $lobbywindow = $('#cell-content-lobby-chatroom');
+
+            $lobbywindow.load('/lobby-chat-ui.html', () => {
+                $lobbywindow.on('submit', '#lobby-chatroom-form', () => {
+                    const inputbox = $('#lobby-chatroom-message-input');
+                    const messages = $('#lobby-chatroom-send-message');
+
+                    const message = inputbox.val();
+
+                    messages.append(div(`[${timestamp}]`));
+                    messages.append(div(`${name}: ${message}`));
+                    messages.scrollTop(messages.prop('scrollHeight')); // todo: don't scroll when manually scrolling
+
+                    inputbox.val('');
+
+                    return false; // todo: should we use 'event.preventDefault()'?
+                });
+            });
+
+            $tablelistwindow = $('#cell-content-lobby-table-list');
+
+            $tablelistwindow.load(content.tablelist, () => {
+
+            });
+
+            const panelHeight = $('#section-lobby-left').height();
+
+            const initScrollWindows = setInterval(() => {
+                const chatmessageWindow = $('#lobby-chatroom-messages-chat-messages');
+                const tablelistingWingow = $('#lobby-table-list-content');
+
+                if (chatmessageWindow.length && tablelistingWingow.length) {
+                    chatmessageWindow.height(panelHeight);
+                    tablelistingWingow.height(panelHeight);
+                    clearInterval(initScrollWindows);
+                }
+            }, 1000);
+
+            // socket.emit('user-joined-lobby', { lobbyname: 'default', ns: '', user: e.user });
+            let lobbysocket = io('/main-lobby');
+            lobbysocket.on('lobby-conn-request', () => {
+                lobbysocket.emit('lobby-conn-response', { user: e.user.name });
+            });
+
+            lobbysocket.on('notify-all', (e) => {
+                for (const t of e.texts) {
+                    $('#lobby-chatroom-messages-chat-messages').append(div(`${t}`));
+                }
+            });
+        } else {
+            log('invalid login (handle this case)');
+        }
+    });
+
+    // TODO LEFT OF WITH JUST GETTING THIS TO WORK AND REPLACING THE ONES UNDER IT
+    socket.on('user-joined-lobby-success', (e) => {
+        const updateHeader = setInterval(() => {
+            const chatroomheader = $('#lobby-chatroom-messages-room-header');
+            if (chatroomheader.length) {
+                chatroomheader.text(e.lobbyname);
+                clearInterval(updateHeader);
+            }
+        }, 1000);
+
+        const updateRoomList = setInterval(() => {
+            const roomlist = $('#lobby-chatroom-roomlist-list');
+            if (roomlist.length) {
+                roomlist.append(div(e.lobbyname));
+                clearInterval(updateRoomList);
+            }
+        }, 1000);
+    });
+
+    socket.on('notify-lobby-user-joined', (e) => {
+        const writeMessage = setInterval(() => {
+            const messages = $('#lobby-chatroom-messages-chat-messages');
+            if (messages.length) {
+                for (const t of e.texts) {
+                    messages.append(div(`${t}`));
+                }
+                clearInterval(writeMessage);
+            }
+        }, 1000);
+    });
+
+    socket.on('user-sent-chat-message', (e) => {
+        const writeMessage = setInterval(() => {
+            const messages = $('#lobby-chatroom-messages-chat-messages');
+            if (messages.length) {
+                messages.append(div(`${e.text}`));
+                clearInterval(writeMessage);
+            }
+        }, 1000);
+    });
+
+    socket.on('refresh-room-list-panel', (e) => {
+        const refreshRoomList = setInterval(() => {
+            console.log(e);
+        }, 2500);
+    });
+
+
+    const loginprompt = $(selector.info.loginprompt.container);
+
+    loginprompt.load(content.accountloginform, () => {
+        loginprompt.on('submit', selector.info.loginprompt.form.container, () => {
+            const name = $(selector.info.loginprompt.form.name).val();
+            const pw = $(selector.info.loginprompt.form.password).val();
+
+            socket.emit('user-login-submit', { name: name, password: pw }, (valid) => {
+                // if (valid) {
+                //     $(selector.info.loginprompt.prompt).fadeOut('slow');
+                //     $(selector.lobby.container).fadeIn('slow');
+
+                //     $(selector.info.container).load(content.accountdetail, () => {
+                //         div(`${name}`).insertAfter(selector.info.account.name);
+                //         div('10k chips').insertAfter(selector.info.account.balance);
+                //     });
+
+                //     const chatroomContainer = selector.lobby.left.chatroom;
+                //     const chatroom = $(chatroomContainer.container);
+
+                //     chatroom.load(content.lobbychat, () => {
+                //         chatroom.on('submit', chatroomContainer.input.form.container, () => {
+
+                //             const inputbox = $(chatroomContainer.input.form.text);
+                //             const messages = $(chatroomContainer.messages.chatmessages);
+
+                //             const message = inputbox.val();
+
+                //             messages.append(div(`${name}: ${message}`));
+                //             messages.scrollTop(messages.prop('scrollHeight')); // todo: don't scroll when manually scrolling
+
+                //             inputbox.val('');
+
+                //             return false;
+                //         });
+                //     });
+
+                //     const tablelistContainer = selector.lobby.right.tablelist;
+                //     const tablelist = $(tablelistContainer.container);
+
+                //     tablelist.load(content.tablelist, () => { });
+
+                //     const panelHeight = $('#section-lobby-left').height();
+
+                //     const initScrollWindows = setInterval(() => {
+                //         const msgWindow = $('#lobby-chatroom-messages-chat-messages');
+                //         const tableListWindow = $('#lobby-table-list-content-header');
+
+                //         if (msgWindow.length && tableListWindow.length) {
+                //             msgWindow.height(panelHeight);
+                //             tableListWindow.height(panelHeight);
+                //             clearInterval(initScrollWindows);
+                //         }
+                //     }, 1000);
+                // } else {
+                //     log('um,invalid login details ... idk bro');
+                // }
+            });
+
+            return false;
+        });
+    });
+
+
+    /*
+    * original code
+    */
+
+    // socket.on('nameResult', function (result) {
+    //     var message;
+
+    //     if (result.success) {
+    //         message = 'You are now known as ' + result.name + ' ...';
+    //     } else {
+    //         message = result.message;
+    //     }
+
+    //     $('#messages').append(divSystemContentElement(message));
+    // });
+
+    // socket.on('joinResult', function (result) {
+    //     $('#room').text(result.room);
+    //     $('#messages').append(divSystemContentElement('Room changed.'));
+    // });
+
+    // socket.on('message', function (message) {
+    //     $('#messages').append(
+    //         $('<div></div>').text(message.text)
+    //     );
+    // });
+
+    // socket.on('rooms', function (rooms) {
+    //     $('#room-list').empty();
+
+    //     for (var room in rooms) {
+    //         room = room.substring(1, room.length);
+
+    //         if (room !== '') {
+    //             $('#room-list').append(divEscapedContentElement(room));
+    //         }
+    //     }
+
+    //     $('#room-list div').click(function () {
+    //         chatApp.processCommand('/join ' + $(this).text());
+    //         $('#send-message').focus();
+    //     });
+    // });
+
+    // setInterval(function () {
+    //     socket.emit('rooms');
+    // }, 1000);
+
+    // $('#send-message').focus();
+    // $('#send-form').submit(function () {
+    //     processUserInput(chatApp, socket);
+    //     return false;
+    // });
+
+    log('loaded lobby ui.')
+});

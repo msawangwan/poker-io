@@ -1,0 +1,15 @@
+{
+    "name": "tyrantpoker",
+    "version": "0.0.1",
+    "description": "shutup and deal the cards",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/msawangwan/tyrant-poker.git"
+    },
+    "dependencies": {
+        "mime": "^1.3.6",
+        "socket.io": "^2.0.3"
+    },
+    "author": "misha sawangwan",
+    "license": "MIT"
+}

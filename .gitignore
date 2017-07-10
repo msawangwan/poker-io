@@ -1,0 +1,33 @@
+# logs
+logs
+*.log
+npm-debug.log
+
+# runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# some optional files
+.npm
+.eslintcache
+.node_repl_history
+*.tgz
+
+# dependency directories
+node_modules/
+
+# vscode config
+.vscode/*
+.vscode
+
+# local scripts
+.local/
+.local/*
+
+# tmp directories and files
+tmp
+tmp/*
+.tmp/
+.tmp/*
