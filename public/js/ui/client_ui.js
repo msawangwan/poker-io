@@ -2,15 +2,13 @@ const div = content => $('<div></div>').text(content);
 
 const toRadians = theta => theta * (Math.PI / 180);
 
-// const increment = 20;
-// const step = () => 2 * Math.PI / increment;
+const cardbackpair = './asset/cards-hand-back-of-cards.jpg'
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
 
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
-
 
     const drawCircle = () => {
         const rect = canvas.parentNode.getBoundingClientRect();
@@ -22,24 +20,36 @@ $(document).ready(() => {
         const canvasHeight = canvas.height;
 
         const canvasCenter = [canvasWidth / 2, canvasHeight / 2];
-        const tableradius = 100;
+        const tableradius = 200;
 
-        ctx.beginPath();
+        const img_cardback = new Image();
 
-        const step = 40;
+        img_cardback.onload = () => {
+            ctx.beginPath();
 
-        // for (let theta = 0; theta < 2 * Math.PI; theta += step()) {
-        for (let theta = 0; theta < 360; theta += step) {
-            const rads = toRadians(theta);
+            const imgw = img_cardback.width;
+            const imgh = img_cardback.height;
+            const offsetx = imgw / 2;
+            const offsety = imgh / 2;
 
-            const x = canvasCenter[0] + tableradius * Math.cos(rads);
-            const y = canvasCenter[1] + tableradius * Math.sin(rads);
+            const step = 40;
 
-            ctx.lineTo(x, y);
-        }
+            for (let theta = 0; theta < 360; theta += step) {
+                const rads = toRadians(theta);
 
-        ctx.closePath();
-        ctx.stroke();
+                const x = (canvasCenter[0] + tableradius * Math.cos(rads)) - offsetx;
+                const y = (canvasCenter[1] + tableradius * Math.sin(rads)) - offsety;
+
+                ctx.drawImage(img_cardback, x, y, imgw, imgh);
+
+                ctx.lineTo(x, y);
+            }
+
+            ctx.closePath();
+            ctx.stroke();
+        };
+
+        img_cardback.src = cardbackpair;
     };
 
     socket.on('update-ui-display-table', state => {
