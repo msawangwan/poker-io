@@ -1,59 +1,90 @@
+const toRadians = theta => theta * (Math.PI / 180);
 const div = content => $('<div></div>').text(content);
 
-const toRadians = theta => theta * (Math.PI / 180);
+const tableDimensions = {
+    radius: 150,
+    itemScale: 0.25
+};
 
-const cardbackpair = './asset/cards-hand-back-of-cards.jpg'
+const table = {
+    dimensions: {
+        radius: 150,
+        scale: 0.25,
+        spacing: 40 // 360 / 40 === 9 seats
+    },
+    seating: {
+        positions: new Map()
+    }
+}
+
+const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
-
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
-    const drawCircle = () => {
+    const canvasAxis = {
+        width: 0,
+        height: 0
+    };
+
+    const currentCanvasCenter = {
+        x: () => canvasAxis.width * 0.5,
+        y: () => canvasAxis.height * 0.5
+    };
+
+    const updateCanvasDimensions = () => {
         const rect = canvas.parentNode.getBoundingClientRect();
 
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        if (canvasAxis.width === canvas.width && canvasAxis.height === canvas.height) {
+            return false;
+        }
 
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
+        canvasAxis.width = rect.width;
+        canvasAxis.height = rect.height;
 
-        const canvasCenter = [canvasWidth / 2, canvasHeight / 2];
-        const tableradius = 200;
+        canvas.width = canvasAxis.width;
+        canvas.height = canvasAxis.height;
+
+        return true;
+    };
+
+    const drawTablePlayerPositions = () => {
+        const tableradius = table.dimensions.radius;
+
+        const originx = currentCanvasCenter.x();
+        const originy = currentCanvasCenter.y();
 
         const img_cardback = new Image();
 
         img_cardback.onload = () => {
-            ctx.beginPath();
+            const scale = table.dimensions.scale;
 
-            const imgw = img_cardback.width;
-            const imgh = img_cardback.height;
+            const imgw = img_cardback.width * scale;
+            const imgh = img_cardback.height * scale;
+
             const offsetx = imgw / 2;
             const offsety = imgh / 2;
 
-            const step = 40;
+            const step = table.dimensions.spacing;
 
             for (let theta = 0; theta < 360; theta += step) {
                 const rads = toRadians(theta);
 
-                const x = (canvasCenter[0] + tableradius * Math.cos(rads)) - offsetx;
-                const y = (canvasCenter[1] + tableradius * Math.sin(rads)) - offsety;
+                const x = (originx + tableradius * Math.cos(rads)) - offsetx;
+                const y = (originy + tableradius * Math.sin(rads)) - offsety;
 
                 ctx.drawImage(img_cardback, x, y, imgw, imgh);
-
-                ctx.lineTo(x, y);
             }
-
-            ctx.closePath();
-            ctx.stroke();
         };
 
         img_cardback.src = cardbackpair;
     };
 
     socket.on('update-ui-display-table', state => {
-        drawCircle();
+        updateCanvasDimensions();
+        drawTablePlayerPositions();
         for (const s of state.tableState) {
             if (s === 'empty seat') {
                 // seat is empty
@@ -64,6 +95,7 @@ $(document).ready(() => {
     });
 
     $(window).on('resize', () => {
-        drawCircle();
+        updateCanvasDimensions();
+        drawTablePlayerPositions();
     });
 });
