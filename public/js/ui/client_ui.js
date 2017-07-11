@@ -71,23 +71,30 @@ $(document).ready(() => {
         return true;
     };
 
-    const drawTable = (radius, armlength) => {
+    const drawTable = (radius, focuilength) => {
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
 
-        const tableradius = radius;
-        const focui = armlength;
+        const focuileft = originx - focuilength;
+        const focuiright = originx + focuilength;
 
-        const focuileft = originx - armlength;
-        const focuiright = originx + armlength;
+        // const armlength =
+        // const tableradius = radius;
+        // const focui = armlength;
+
 
         ctx.beginPath();
 
-        ctx.arc(focuileft, originy, tableradius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        ctx.arc(focuiright, originy, tableradius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+        // ctx.arc(focuileft, originy, tableradius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        // ctx.arc(focuiright, originy, tableradius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
 
-        ctx.moveTo(focuiright, originy + tableradius);
-        ctx.lineTo(focuileft, originy + tableradius);
+        // ctx.moveTo(focuiright, originy + tableradius);
+        // ctx.lineTo(focuileft, originy + tableradius);
+        ctx.arc(focuileft, originy, radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        ctx.arc(focuiright, originy, radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+
+        ctx.moveTo(focuiright, originy + radius);
+        ctx.lineTo(focuileft, originy + radius);
 
         ctx.stroke();
         ctx.fillStyle = 'green';
@@ -99,8 +106,8 @@ $(document).ready(() => {
                 x: originx,
                 y: originy
             },
-            radius: tableradius,
-            focui: armlength
+            radius: radius,
+            focui: focuilength
         }
     };
 
@@ -113,53 +120,76 @@ $(document).ready(() => {
         const offset = f / 2;
 
         const seating = {
-            // centerupper: [0, [ox, oy - radius]],
-            // rightupper: [1, [focuiright, oy - radius]],
-            // right: [2, [focuiright + radius, oy]],
-            // rightlower: [3, [focuiright, oy + radius]],
-            // centerrightlower: [4, [ox + offset, oy + radius]],
-            // centerlower: [5, [ox, oy + radius]],
-            // centerleftlower: [6, [ox - offset, oy + radius]],
-            // leftlower: [7, [focuileft, oy + radius]],
-            // left: [8, [focuileft - radius, oy]],
-            // leftupper: [9, [focuileft, oy - radius]],
-            center: { pos: -1, x: ox, y: oy },
-            centerupper: { pos: 0, x: ox, y: oy - radius },
-            rightupper: { pos: 1, x: focuiright, y: oy - radius },
-            right: { pos: 2, x: focuiright + radius, y: oy },
-            rightlower: { pos: 3, x: focuiright, y: oy + radius },
-            centerrightlower: { pos: 4, x: ox + offset, y: oy + radius },
-            centerlower: { pos: 5, x: ox, y: oy + radius },
-            centerleftlower: { pos: 6, x: ox - offset, y: oy + radius },
-            leftlower: { pos: 7, x: focuileft, y: oy + radius },
-            left: { pos: 8, x: focuileft - radius, y: oy },
-            leftupper: { pos: 9, x: focuileft, y: oy - radius },
+            center: {
+                pos: -1,
+                x: ox,
+                y: oy
+            },
+            centerupper: {
+                pos: 0,
+                x: ox,
+                y: oy - radius
+            },
+            rightupper: {
+                pos: 1,
+                x: focuiright,
+                y: oy - radius
+            },
+            right: {
+                pos: 2,
+                x: focuiright + radius,
+                y: oy
+            },
+            rightlower: {
+                pos: 3,
+                x: focuiright,
+                y: oy + radius
+            },
+            centerrightlower: {
+                pos: 4,
+                x: ox + offset,
+                y: oy + radius
+            },
+            centerlower: {
+                pos: 5,
+                x: ox,
+                y: oy + radius
+            },
+            centerleftlower: {
+                pos: 6,
+                x: ox - offset,
+                y: oy + radius
+            },
+            leftlower: {
+                pos: 7,
+                x: focuileft,
+                y: oy + radius
+            },
+            left: {
+                pos: 8,
+                x: focuileft - radius,
+                y: oy
+            },
+            leftupper: {
+                pos: 9,
+                x: focuileft,
+                y: oy - radius
+            },
         }
 
         ctx.font = '44px serif';
 
-        // ctx.fillText('center', ox, oy);              // center, -1
-        // ctx.fillText('0', focuiright, oy - radius);  // rightupper, 0
-        // ctx.fillText('0', focuiright + radius, oy);  // right, 1
-        // ctx.fillText('0', focuiright, oy + radius);  // rightlower, 2
-        // ctx.fillText('0', ox + offset, oy + radius); // centerrightlower, 3
-        // ctx.fillText('0', ox, oy + radius);          // centerlower, 4
-        // ctx.fillText('0', ox - offset, oy + radius); // centerleftlower, 5
-        // ctx.fillText('0', focuileft, oy + radius);   // leftlower, 6
-        // ctx.fillText('0', focuileft - radius, oy);   // left, 7
-        // ctx.fillText('0', focuileft, oy - radius);   // leftupper, 8 
-        // ctx.fillText('0', ox, oy - radius);          // centerupper, 10
-        ctx.fillText('center', seating.center.x, seating.center.y);              // center, -1
-        ctx.fillText('0', seating.rightupper.x, seating.rightupper.y);  // rightupper, 0
-        ctx.fillText('0', seating.right.x, seating.right.y);  // right, 1
-        ctx.fillText('0', seating.rightlower.x, seating.rightlower.y);  // rightlower, 2
-        ctx.fillText('0', seating.centerrightlower.x, seating.centerrightlower.y); // centerrightlower, 3
-        ctx.fillText('0', seating.centerlower.x, seating.centerlower.y);          // centerlower, 4
-        ctx.fillText('0', seating.centerleftlower.x, seating.centerleftlower.y); // centerleftlower, 5
-        ctx.fillText('0', seating.leftlower.x, seating.leftlower.y);   // leftlower, 6
-        ctx.fillText('0', seating.left.x, seating.left.y);   // left, 7
-        ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);   // leftupper, 8 
-        ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);          // centerupper, 10
+        ctx.fillText('center', seating.center.x, seating.center.y);
+        ctx.fillText('0', seating.rightupper.x, seating.rightupper.y);
+        ctx.fillText('0', seating.right.x, seating.right.y);
+        ctx.fillText('0', seating.rightlower.x, seating.rightlower.y);
+        ctx.fillText('0', seating.centerrightlower.x, seating.centerrightlower.y);
+        ctx.fillText('0', seating.centerlower.x, seating.centerlower.y);
+        ctx.fillText('0', seating.centerleftlower.x, seating.centerleftlower.y);
+        ctx.fillText('0', seating.leftlower.x, seating.leftlower.y);
+        ctx.fillText('0', seating.left.x, seating.left.y);
+        ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);
+        ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);
 
         return seating;
     };
