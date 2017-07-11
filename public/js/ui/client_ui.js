@@ -18,11 +18,17 @@ const table = {
 }
 
 const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
+const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+const cardpixelwidth = 72.15;
+const cardpixelheight = 83.25;
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
+
+    const img_cardback = new Image();
+    const img_cardsheet = new Image();
 
     const canvasAxis = {
         width: 0,
@@ -56,8 +62,6 @@ $(document).ready(() => {
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
 
-        const img_cardback = new Image();
-
         img_cardback.onload = () => {
             const scale = table.dimensions.scale;
 
@@ -81,6 +85,33 @@ $(document).ready(() => {
 
         img_cardback.src = cardbackpair;
     };
+
+    img_cardsheet.onload = () => {
+        imgsrc = {
+            img: img_cardsheet,
+            sourcex: 0, // frame index * frame width
+            sourcey: 1, // the row?
+            sourcew: cardpixelwidth, // frame width
+            sourceh: cardpixelheight, // frame h
+            destx: 0,
+            desty: 0,
+            destw: cardpixelwidth,
+            desty: cardpixelheight
+        }
+        ctx.drawImage(
+            imgsrc.img,
+            imgsrc.sourcex,
+            imgsrc.sourcey,
+            imgsrc.sourcew,
+            imgsrc.sourceh,
+            imgsrc.destx,
+            imgsrc.desty,
+            imgsrc.destw,
+            imgsrc.desty
+        );
+    };
+
+    img_cardsheet.src = cardspritesheet;
 
     socket.on('update-ui-display-table', state => {
         updateCanvasDimensions();
