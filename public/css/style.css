@@ -97,6 +97,7 @@ body {
 
 .main-content-subsection:nth-child(2) {
     grid-area: input;
+    
     background: var(--color-scheme-tone-dark);
     width: 100%;
     height: 200px;
@@ -105,4 +106,29 @@ body {
 .main-content-subsection:nth-child(3) {
     grid-area: sidebar;
     background: var(--color-scheme-shade-light);
+}
+
+#table-input {
+    display: grid;
+    
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 1fr;
+    
+    grid-template-areas:
+      "leftpanel rightpanel rightpanel rightpanel rightpanel";
+}
+
+input-subdivision {
+    display: flex;
+    
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.input-subdivision:nth-child(1) {
+    grid-area: leftpanel;
+}
+
+.input-subdivision:nth-child(2) {
+    grid-area: rightpanel;
 }

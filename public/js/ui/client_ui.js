@@ -1,11 +1,6 @@
 const toRadians = theta => theta * (Math.PI / 180);
 const div = content => $('<div></div>').text(content);
 
-const tableDimensions = {
-    radius: 150,
-    itemScale: 0.25
-};
-
 const table = {
     dimensions: {
         radius: 150,
@@ -15,12 +10,45 @@ const table = {
     seating: {
         positions: new Map()
     }
-}
+};
 
 const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
 const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 const cardpixelwidth = 72.15;
 const cardpixelheight = 83.25;
+
+function ImageCache() {
+    this.store = new Map();
+}
+
+ImageCache.prototype.load = function(assetpath) {
+    if (this.store.has(assetpath)) {
+        return this.store.get(assetpath);
+    }
+    
+    const img = new Image();
+    
+    img.onload = () => {}
+    img.src = assetpath;
+    
+    this.store.set(assetpath, img);
+};
+
+// sheet = parent spritesheet
+// framedata = frame width, frame height, frame index start, frame index end
+function Sprite(sheet, framedata) {
+    this.src = sheet;
+    
+    const {w, h, s, e } = framedate;
+    
+    this.frame = {
+        width: w, height: h, start: s, end: e
+    }
+}
+
+function Sprite.prototype.load = function() {
+    
+}
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
