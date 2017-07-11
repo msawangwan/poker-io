@@ -112,18 +112,36 @@ $(document).ready(() => {
 
         const offset = f / 2;
 
+        const seating = {
+            center: { pos: -1, x: ox, y: oy },
+            centerupper: [0, [ox, oy - radius]],
+            rightupper: [1, [focuiright, oy - radius]],
+            right: [2, [focuiright + radius, oy]],
+            rightlower: [3, [focuiright, oy + radius]],
+            centerrightlower: [4, [ox + offset, oy + radius]],
+            centerlower: [5, [ox, oy + radius]],
+            centerleftlower: [6, [ox - offset, oy + radius]],
+            leftlower: [7, [focuileft, oy + radius]],
+            left: [8, [focuileft - radius, oy]],
+            leftupper: [9, [focuileft, oy - radius]],
+        }
+
         ctx.font = '44px serif';
 
-        ctx.fillText('center', ox, oy);                   // center
-        ctx.fillText('0', focuileft - radius, oy);        // left
-        ctx.fillText('0', focuiright + radius, oy);       // right
-        ctx.fillText('0', ox, oy - radius);          // centerupper
-        ctx.fillText('0', focuileft, oy - radius);        // leftupper
-        ctx.fillText('0', focuiright, oy - radius);       // rightupper
-        ctx.fillText('0', ox - offset, oy + radius); // centerleftlower
-        ctx.fillText('0', ox + offset, oy + radius); // centerrightlower
-        ctx.fillText('0', focuileft, oy + radius);        // leftlower
-        ctx.fillText('0', focuiright, oy + radius);       // rightlower
+        // ctx.fillText('center', ox, oy);              // center, -1
+        ctx.fillText('center', seating.center.x, seating.center.y);              // center, -1
+        ctx.fillText('0', focuiright, oy - radius);  // rightupper, 0
+        ctx.fillText('0', focuiright + radius, oy);  // right, 1
+        ctx.fillText('0', focuiright, oy + radius);  // rightlower, 2
+        ctx.fillText('0', ox + offset, oy + radius); // centerrightlower, 3
+        ctx.fillText('0', ox, oy + radius);          // centerlower, 4
+        ctx.fillText('0', ox - offset, oy + radius); // centerleftlower, 5
+        ctx.fillText('0', focuileft, oy + radius);   // leftlower, 6
+        ctx.fillText('0', focuileft - radius, oy);   // left, 7
+        ctx.fillText('0', focuileft, oy - radius);   // leftupper, 8 
+        ctx.fillText('0', ox, oy - radius);          // centerupper, 10
+
+        return seating;
     };
 
     const player = {
