@@ -86,29 +86,46 @@ $(document).ready(() => {
         img_cardback.src = cardbackpair;
     };
 
-    img_cardsheet.onload = () => {
-        imgsrc = {
-            img: img_cardsheet,
-            sourcex: 0, // frame index * frame width
-            sourcey: 1, // the row?
-            sourcew: cardpixelwidth, // frame width
-            sourceh: cardpixelheight, // frame h
-            destx: 0,
-            desty: 0,
-            destw: cardpixelwidth,
-            desty: cardpixelheight
+    const createCard = (spritesheet, w, h) => {
+        return {
+            img: spritesheet,
+            width: w,
+            height: h,
         }
+    };
+
+    const getCardAtIndex = (s, v) => {
+        console.log(s + ' ' + v);
         ctx.drawImage(
-            imgsrc.img,
-            imgsrc.sourcex,
-            imgsrc.sourcey,
-            imgsrc.sourcew,
-            imgsrc.sourceh,
-            imgsrc.destx,
-            imgsrc.desty,
-            imgsrc.destw,
-            imgsrc.desty
+            img_cardsheet,
+            v * cardpixelwidth, // frame index * frame width
+            s * cardpixelheight, // frame row?
+            cardpixelwidth, // frame width
+            cardpixelheight, // frame height
+            s * v, // dest x
+            s, // dest y
+            cardpixelwidth, // frame width on draw (same as input usually)
+            cardpixelheight // frame height on draw (same as input usually)
         );
+    };
+
+    let suite = 0;
+    let v = 0;
+
+    img_cardsheet.onload = () => {
+        setInterval(() => {
+            if (suite >= 4) {
+                suite = 0;
+            }
+
+            if (v >= 13) {
+                v = 0;
+            }
+
+            getCardAtIndex(suite, v);
+            suite += 1;
+            v += 1;
+        }, 750);
     };
 
     img_cardsheet.src = cardspritesheet;
