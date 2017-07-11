@@ -92,39 +92,6 @@ $(document).ready(() => {
         const tableradius = radius;
         const focui = armlength;
 
-        // seatingCoordinates.set(-1, {
-        //     x: originx,
-        //     y: originy - tableradius
-        // });
-
-        // seatingCoordinates.set(0, {
-        //     x: originx + focui,
-        //     y: tableradius
-        // });
-
-        // const leftoriginx = originx + focui;
-        // const leftoriginy = originy + focui;
-
-        // seatingCoordinates.set(1, {
-        //     x: leftoriginx + tableradius * Math.cos(toRadians(45)),
-        //     y: leftoriginy + tableradius * Math.sin(toRadians(45))
-        // });
-
-        // seatingCoordinates.set(2, {
-        //     x: leftoriginx + tableradius,
-        //     y: leftoriginy + tableradius
-        // });
-
-        // seatingCoordinates.set(3, {
-        //     x: originx - focui,
-        //     y: originy + tableradius
-        // });
-
-        // seatingCoordinates.set(4, {
-        //     x: originx - focui,
-        //     y: originy + tableradius
-        // });
-
         ctx.beginPath();
 
         ctx.arc(originx + focui * -1, originy, tableradius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
@@ -135,30 +102,22 @@ $(document).ready(() => {
 
         ctx.stroke();
 
-        // ctx.fillStyle = 'green';
-        // ctx.fill();
-
-        // for (const [index, pos] in seatingCoordinates.entries()) {
-        //     ctx.font = '44px serif';
-        //     ctx.fillText('gg', pos.x + tableradius, pos.y + tableradius);
-        // }
-
         const focuileft = originx - focui;
         const focuiright = originx + focui;
-        const offset = focui / 8;
+        const offset = focui / 2;
 
         ctx.font = '44px serif';
 
-        ctx.fillText('center', originx, originy); // center
-        ctx.fillText('0', focuileft - tableradius, originy); // left
-        ctx.fillText('0', focuiright + tableradius, originy); // right
-        ctx.fillText('0', originx, originy - tableradius); // centerupper
-        ctx.fillText('0', focuileft, originy - tableradius); // leftupper
-        ctx.fillText('0', focuiright, originy - tableradius); // rightupper
-        ctx.fillText('0', originx - 50, originy + tableradius); // centerleftlower
-        ctx.fillText('0', originx + 50, originy + tableradius); // centerrightlower
-        ctx.fillText('0', focuileft, originy + tableradius); // leftlower
-        ctx.fillText('0', focuiright, originy + tableradius); // rightlower
+        ctx.fillText('center', originx, originy);                   // center
+        ctx.fillText('0', focuileft - tableradius, originy);        // left
+        ctx.fillText('0', focuiright + tableradius, originy);       // right
+        ctx.fillText('0', originx, originy - tableradius);          // centerupper
+        ctx.fillText('0', focuileft, originy - tableradius);        // leftupper
+        ctx.fillText('0', focuiright, originy - tableradius);       // rightupper
+        ctx.fillText('0', originx - offset, originy + tableradius); // centerleftlower
+        ctx.fillText('0', originx + offset, originy + tableradius); // centerrightlower
+        ctx.fillText('0', focuileft, originy + tableradius);        // leftlower
+        ctx.fillText('0', focuiright, originy + tableradius);       // rightlower
 
         return seatingCoordinates;
     };
@@ -180,12 +139,12 @@ $(document).ready(() => {
     socket.on('server-response-seating-update', e => {
         console.log(e.seatingstate);
         updateCanvasDimensions();
-        drawTable(150, 300);
+        drawTable(canvas.height / 4, canvas.width / 8);
     });
 
     $(window).on('resize', () => {
         updateCanvasDimensions();
-        drawTable(150, 300);
+        drawTable(canvas.height / 4, canvas.width / 8);
     });
 
     // const img_cardback = new Image();
