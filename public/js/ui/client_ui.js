@@ -83,52 +83,23 @@ $(document).ready(() => {
     };
 
     const drawTableSeating = seatedAt => {
-        const tableradius = table.dimensions.radius;
-
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
 
-        const seatw = 64;
-        const seath = 64;
+        const tableradius = 150; // aka radius
+        const focui = 300;
 
-        const scaledseatw = seatw * table.dimensions.scale;
-        const scaledseath = seath * table.dimensions.scale;
-
-        const offsetx = scaledseatw / 2;
-        const offsety = scaledseath / 2;
-
-        const scalewidth = 0.85;
-        const scaleheight = 0.35;
-
-        const step = table.dimensions.spacing;
-
-        const start = { x: 0, y: 0 };
-        const tableoffset = 50; // aka radius
-
-        ctx.fillStyle = 'green';
         ctx.beginPath();
 
-        ctx.arc(originx, originy, tableoffset, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        ctx.moveTo(originx, originy + tableoffset);
-        ctx.lineTo(originx + 100, originy + tableoffset);
+        ctx.arc(originx + focui * -1, originy, tableradius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        ctx.arc(originx + focui, originy, tableradius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+        ctx.moveTo(originx + focui, originy + tableradius);
+        ctx.lineTo(originx - focui, originy + tableradius);
 
-        // for (let theta = 0; theta < 360; theta += step) {
-        //     const rads = toRadians(theta);
-
-        //     const x = (originx + tableradius * scalewidth * Math.cos(rads)) - offsetx;
-        //     const y = (originy + tableradius * scaleheight * Math.sin(rads)) - offsety;
-
-        //     if (theta === 0) {
-        //         start.x = x;
-        //         start.y = y;
-        //     }
-
-        //     ctx.lineTo(x, y);
-        // }
-
-        // ctx.lineTo(start.x, start.y);
         ctx.stroke();
-        // ctx.fill();
+
+        ctx.fillStyle = 'green';
+        ctx.fill();
     };
 
     const player = {
