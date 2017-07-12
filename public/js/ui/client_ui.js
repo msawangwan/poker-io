@@ -155,20 +155,6 @@ $(document).ready(() => {
             },
         }
 
-        // ctx.font = '44px serif';
-
-        // ctx.fillText('center', seating.center.x, seating.center.y);
-        // ctx.fillText('0', seating.rightupper.x, seating.rightupper.y);
-        // ctx.fillText('0', seating.right.x, seating.right.y);
-        // ctx.fillText('0', seating.rightlower.x, seating.rightlower.y);
-        // ctx.fillText('0', seating.centerrightlower.x, seating.centerrightlower.y);
-        // ctx.fillText('0', seating.centerlower.x, seating.centerlower.y);
-        // ctx.fillText('0', seating.centerleftlower.x, seating.centerleftlower.y);
-        // ctx.fillText('0', seating.leftlower.x, seating.leftlower.y);
-        // ctx.fillText('0', seating.left.x, seating.left.y);
-        // ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);
-        // ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);
-
         return seating;
     };
 
@@ -190,20 +176,27 @@ $(document).ready(() => {
     };
 
     const drawSeats = seating => {
-        ctx.fillStyle = 'white';
-        ctx.font = '44px serif';
+        const size = 35;
+        const circle = Math.PI * 2;
 
-        ctx.fillText('center', seating.center.x, seating.center.y);
-        ctx.fillText('0', seating.rightupper.x, seating.rightupper.y);
-        ctx.fillText('0', seating.right.x, seating.right.y);
-        ctx.fillText('0', seating.rightlower.x, seating.rightlower.y);
-        ctx.fillText('0', seating.centerrightlower.x, seating.centerrightlower.y);
-        ctx.fillText('0', seating.centerlower.x, seating.centerlower.y);
-        ctx.fillText('0', seating.centerleftlower.x, seating.centerleftlower.y);
-        ctx.fillText('0', seating.leftlower.x, seating.leftlower.y);
-        ctx.fillText('0', seating.left.x, seating.left.y);
-        ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);
-        ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);
+        ctx.beginPath();
+        ctx.moveTo(seating.rightupper.x, seating.rightupper.y);
+        ctx.arc(seating.rightupper.x, seating.rightupper.y, size, circle, false);
+        ctx.stroke();
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        // ctx.font = '44px serif';
+        // ctx.fillText('center', seating.center.x, seating.center.y);
+        // ctx.fillText('0', seating.rightupper.x, seating.rightupper.y);
+        // ctx.fillText('0', seating.right.x, seating.right.y);
+        // ctx.fillText('0', seating.rightlower.x, seating.rightlower.y);
+        // ctx.fillText('0', seating.centerrightlower.x, seating.centerrightlower.y);
+        // ctx.fillText('0', seating.centerlower.x, seating.centerlower.y);
+        // ctx.fillText('0', seating.centerleftlower.x, seating.centerleftlower.y);
+        // ctx.fillText('0', seating.leftlower.x, seating.leftlower.y);
+        // ctx.fillText('0', seating.left.x, seating.left.y);
+        // ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);
+        // ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);
     };
 
     const player = {
