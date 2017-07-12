@@ -71,25 +71,15 @@ $(document).ready(() => {
         return true;
     };
 
-    const drawTable = (radius, focuilength) => {
+    const calcTableDimensions = (radius, focuilength) => {
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
 
         const focuileft = originx - focuilength;
         const focuiright = originx + focuilength;
 
-        // const armlength =
-        // const tableradius = radius;
-        // const focui = armlength;
-
-
         ctx.beginPath();
 
-        // ctx.arc(focuileft, originy, tableradius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        // ctx.arc(focuiright, originy, tableradius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
-
-        // ctx.moveTo(focuiright, originy + tableradius);
-        // ctx.lineTo(focuileft, originy + tableradius);
         ctx.arc(focuileft, originy, radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
         ctx.arc(focuiright, originy, radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
 
@@ -97,6 +87,7 @@ $(document).ready(() => {
         ctx.lineTo(focuileft, originy + radius);
 
         ctx.stroke();
+
         ctx.fillStyle = 'green';
         ctx.fill();
         ctx.fillStyle = 'white';
@@ -111,7 +102,7 @@ $(document).ready(() => {
         }
     };
 
-    const drawSeating = (o, radius, f) => {
+    const calcSeatCoordinates = (o, radius, f) => {
         const { x: ox, y: oy } = o;
 
         const focuileft = ox - f;
@@ -212,14 +203,15 @@ $(document).ready(() => {
         console.log(e.seatingstate);
         updateCanvasDimensions();
 
-        const tableDimensions = drawTable(canvas.height / 4, canvas.width / 8);
-        drawSeating(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui);
+        const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
+        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui);
     });
 
     $(window).on('resize', () => {
         updateCanvasDimensions();
-        const tableDimensions = drawTable(canvas.height / 4, canvas.width / 8);
-        drawSeating(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui);
+
+        const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
+        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui);
     });
 
     // const img_cardback = new Image();
