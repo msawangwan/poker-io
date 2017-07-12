@@ -214,6 +214,10 @@ $(document).ready(() => {
         drawSeats(seatCoords, state.seating);
     });
     
+    socket.on('game-started', () => {
+       // deal em 
+    });
+    
     
 
     $(window).on('resize', () => {
