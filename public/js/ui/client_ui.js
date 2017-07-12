@@ -273,7 +273,7 @@ $(document).ready(() => {
         drawSeats(seatCoords, state.seating);
     });
     
-    socket.on('game-started', () => {
+    socket.on('game-started', state => {
        // deal em 
     });
     
