@@ -239,11 +239,23 @@ $(document).ready(() => {
 
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
-    socket.on('update-table-seating', seating => {
-        tableState.playerseat = seating.state;
-        tableState.allseats = seating.seating;
+    socket.on('player-assigned-seat', data => {
+        tableState.playerseat = data.seat;
+    });
 
-        drawAll(seating.seat, seating.seating);
+    socket.on('table-seating-state', data => {
+        tableState.allseats = data.seating;
+
+        const updateui = setInterval(() => {
+            if (tableState.playerseat && tableState.allseats) {
+                drawAll(tableState.playerseat, tableState.allseats);
+                clearInterval(updateui);
+            }
+        }, 300);
+    });
+
+    socket.on('game-state', data => {
+
     });
 
     socket.on('connect_error', () => {
