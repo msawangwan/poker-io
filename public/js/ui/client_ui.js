@@ -99,75 +99,31 @@ $(document).ready(() => {
 
         // [[posindex, 'label'], [coordx, coordy]]
         const seating = new Map([
-            [[-1, 'pot'], [ox, oy]],
-            [[0, 'dealer'], [ox, oy - radius]],
-            [[1, 'right-upper'], [focuiright, oy - radius]],
-            [[2, 'right'], [focuiright + radius, oy]],
-            [[3, 'right-lower'], [focuiright, oy + radius]],
-            [[4, 'center-right-lower'], [ox + offset, oy + radius]],
-            [[5, 'center-lower'], [ox, oy + radius]],
-            [[6, 'center-left-lower'], [ox - offset, oy + radius]],
-            [[7, 'left-lower'], [focuileft, oy + radius]],
-            [[8, 'left'], [focuileft - radius, oy]],
-            [[9, 'left-upper'], [focuileft, oy - radius]],
+            [-1, { label: 'pot', x: ox, y: oy }],
+            [0, { label: 'dealer', x: ox, y: oy - radius }],
+            [1, { label: 'right-upper', x: focuiright, y: oy - radius }],
+            [2, { label: 'right', x: focuiright + radius, y: oy }],
+            [3, { label: 'right-lower', x: focuiright, y: oy + radius }],
+            [4, { label: 'center-right-lower', x: ox + offset, y: oy + radius }],
+            [5, { label: 'center-lower', x: ox, y: oy + radius }],
+            [6, { label: 'center-left-lower', x: ox - offset, y: oy + radius }],
+            [7, { label: 'left-lower', x: focuileft, y: oy + radius }],
+            [8, { label: 'left', x: focuileft - radius, y: oy }],
+            [9, { label: 'left-upper', x: focuileft, y: oy - radius }],
         ]);
-        // const seating = {
-        //     center: {
-        //         pos: -1,
-        //         x: ox,
-        //         y: oy
-        //     },
-        //     centerupper: {
-        //         pos: 0,
-        //         x: ox,
-        //         y: oy - radius
-        //     },
-        //     rightupper: {
-        //         pos: 1,
-        //         x: focuiright,
-        //         y: oy - radius
-        //     },
-        //     right: {
-        //         pos: 2,
-        //         x: focuiright + radius,
-        //         y: oy
-        //     },
-        //     rightlower: {
-        //         pos: 3,
-        //         x: focuiright,
-        //         y: oy + radius
-        //     },
-        //     centerrightlower: {
-        //         pos: 4,
-        //         x: ox + offset,
-        //         y: oy + radius
-        //     },
-        //     centerlower: {
-        //         pos: 5,
-        //         x: ox,
-        //         y: oy + radius
-        //     },
-        //     centerleftlower: {
-        //         pos: 6,
-        //         x: ox - offset,
-        //         y: oy + radius
-        //     },
-        //     leftlower: {
-        //         pos: 7,
-        //         x: focuileft,
-        //         y: oy + radius
-        //     },
-        //     left: {
-        //         pos: 8,
-        //         x: focuileft - radius,
-        //         y: oy
-        //     },
-        //     leftupper: {
-        //         pos: 9,
-        //         x: focuileft,
-        //         y: oy - radius
-        //     },
-        // }
+        // const seating = new Map([
+        //     [[-1, 'pot'], [ox, oy]],
+        //     [[0, 'dealer'], [ox, oy - radius]],
+        //     [[1, 'right-upper'], [focuiright, oy - radius]],
+        //     [[2, 'right'], [focuiright + radius, oy]],
+        //     [[3, 'right-lower'], [focuiright, oy + radius]],
+        //     [[4, 'center-right-lower'], [ox + offset, oy + radius]],
+        //     [[5, 'center-lower'], [ox, oy + radius]],
+        //     [[6, 'center-left-lower'], [ox - offset, oy + radius]],
+        //     [[7, 'left-lower'], [focuileft, oy + radius]],
+        //     [[8, 'left'], [focuileft - radius, oy]],
+        //     [[9, 'left-upper'], [focuileft, oy - radius]],
+        // ]);
 
         return seating;
     };
