@@ -237,6 +237,19 @@ $(document).ready(() => {
     const state = {
         seating: undefined
     };
+    
+    const drawall = () => {
+        updateCanvasDimensions();
+        
+        player.seat = testdata.seat;
+        state.seating = testdata.seatingstate;
+        
+        const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
+        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
+
+        drawTable(tableDimensions);
+        drawSeats(seatCoords, state.seating);
+    }
 
     socket.on('ack-client-connect-success', e => {
         player.seat = e.assignedseat;
@@ -264,6 +277,15 @@ $(document).ready(() => {
        // deal em 
     });
     
+    let drew = false;
+    
+    socket.on('connect_error', () => {
+        if (!drew) {
+            console.log('this is a temp solution for offline debugging of the ui')
+            drew = true;
+            drawall();
+        }
+    });
     
 
     $(window).on('resize', () => {
