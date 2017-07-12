@@ -75,23 +75,6 @@ $(document).ready(() => {
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
 
-        // const focuileft = originx - focuilength;
-        // const focuiright = originx + focuilength;
-
-        // ctx.beginPath();
-
-        // ctx.arc(focuileft, originy, radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        // ctx.arc(focuiright, originy, radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
-
-        // ctx.moveTo(focuiright, originy + radius);
-        // ctx.lineTo(focuileft, originy + radius);
-
-        // ctx.stroke();
-
-        // ctx.fillStyle = 'green';
-        // ctx.fill();
-        // ctx.fillStyle = 'white';
-
         return {
             origin: {
                 x: originx,
@@ -172,6 +155,42 @@ $(document).ready(() => {
             },
         }
 
+        // ctx.font = '44px serif';
+
+        // ctx.fillText('center', seating.center.x, seating.center.y);
+        // ctx.fillText('0', seating.rightupper.x, seating.rightupper.y);
+        // ctx.fillText('0', seating.right.x, seating.right.y);
+        // ctx.fillText('0', seating.rightlower.x, seating.rightlower.y);
+        // ctx.fillText('0', seating.centerrightlower.x, seating.centerrightlower.y);
+        // ctx.fillText('0', seating.centerlower.x, seating.centerlower.y);
+        // ctx.fillText('0', seating.centerleftlower.x, seating.centerleftlower.y);
+        // ctx.fillText('0', seating.leftlower.x, seating.leftlower.y);
+        // ctx.fillText('0', seating.left.x, seating.left.y);
+        // ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);
+        // ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);
+
+        return seating;
+    };
+
+    const drawTable = table => {
+        ctx.beginPath();
+
+        ctx.arc(table.focui.left, table.origin.y, table.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        ctx.arc(table.focui.right, table.origin.y, table.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+
+        const yoffset = table.origin.y + table.radius;
+
+        ctx.moveTo(table.focui.right, yoffset);
+        ctx.lineTo(table.focui.left, yoffset);
+
+        ctx.stroke();
+
+        ctx.fillStyle = 'green';
+        ctx.fill();
+    };
+
+    const drawSeats = seating => {
+        ctx.fillStyle = 'white';
         ctx.font = '44px serif';
 
         ctx.fillText('center', seating.center.x, seating.center.y);
@@ -185,27 +204,7 @@ $(document).ready(() => {
         ctx.fillText('0', seating.left.x, seating.left.y);
         ctx.fillText('0', seating.leftupper.x, seating.leftupper.y);
         ctx.fillText('0', seating.centerupper.x, seating.centerupper.y);
-
-        return seating;
     };
-
-    const drawTable = (tableDimensions) => {
-        ctx.beginPath();
-
-        ctx.arc(tableDimensions.focui.left, tableDimensions.origin.y, tableDimensions.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        ctx.arc(tableDimensions.focui.right, tableDimensions.origin.y, tableDimensions.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
-
-        const yoffset = tableDimensions.origin.y + tableDimensions.radius;
-
-        ctx.moveTo(tableDimensions.focui.right, yoffset);
-        ctx.lineTo(tableDimensions.focui.left, yoffset);
-
-        ctx.stroke();
-
-        ctx.fillStyle = 'green';
-        ctx.fill();
-        ctx.fillStyle = 'white';
-    }
 
     const player = {
         seat: -1
@@ -226,18 +225,20 @@ $(document).ready(() => {
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        drawTable(tableDimensions);
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
+        drawTable(tableDimensions);
+        drawSeats(seatCoords);
     });
 
     $(window).on('resize', () => {
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        drawTable(tableDimensions);
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
+        drawTable(tableDimensions);
+        drawSeats(seatCoords);
     });
 
     // const img_cardback = new Image();
