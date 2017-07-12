@@ -97,63 +97,77 @@ $(document).ready(() => {
 
         const offset = f / 2;
 
-        const seating = {
-            center: {
-                pos: -1,
-                x: ox,
-                y: oy
-            },
-            centerupper: {
-                pos: 0,
-                x: ox,
-                y: oy - radius
-            },
-            rightupper: {
-                pos: 1,
-                x: focuiright,
-                y: oy - radius
-            },
-            right: {
-                pos: 2,
-                x: focuiright + radius,
-                y: oy
-            },
-            rightlower: {
-                pos: 3,
-                x: focuiright,
-                y: oy + radius
-            },
-            centerrightlower: {
-                pos: 4,
-                x: ox + offset,
-                y: oy + radius
-            },
-            centerlower: {
-                pos: 5,
-                x: ox,
-                y: oy + radius
-            },
-            centerleftlower: {
-                pos: 6,
-                x: ox - offset,
-                y: oy + radius
-            },
-            leftlower: {
-                pos: 7,
-                x: focuileft,
-                y: oy + radius
-            },
-            left: {
-                pos: 8,
-                x: focuileft - radius,
-                y: oy
-            },
-            leftupper: {
-                pos: 9,
-                x: focuileft,
-                y: oy - radius
-            },
-        }
+        // [[posindex, 'label'], [coordx, coordy]]
+        const seating = new Map([
+            [[-1, 'pot'], [ox, oy]],
+            [[0, 'dealer'], [ox, oy - radius]],
+            [[1, 'right-upper'], [focuiright, oy - radius]],
+            [[2, 'right'], [focuiright + radius, oy]],
+            [[3, 'right-lower'], [focuiright, oy + radius]],
+            [[4, 'center-right-lower'], [ox + offset, oy + radius]],
+            [[5, 'center-lower'], [ox, oy + radius]],
+            [[6, 'center-left-lower'], [ox - offset, oy + radius]],
+            [[7, 'left-lower'], [focuileft, oy + radius]],
+            [[8, 'left'], [focuileft - radius, oy]],
+            [[9, 'left-upper'], [focuileft, oy - radius]],
+        ]);
+        // const seating = {
+        //     center: {
+        //         pos: -1,
+        //         x: ox,
+        //         y: oy
+        //     },
+        //     centerupper: {
+        //         pos: 0,
+        //         x: ox,
+        //         y: oy - radius
+        //     },
+        //     rightupper: {
+        //         pos: 1,
+        //         x: focuiright,
+        //         y: oy - radius
+        //     },
+        //     right: {
+        //         pos: 2,
+        //         x: focuiright + radius,
+        //         y: oy
+        //     },
+        //     rightlower: {
+        //         pos: 3,
+        //         x: focuiright,
+        //         y: oy + radius
+        //     },
+        //     centerrightlower: {
+        //         pos: 4,
+        //         x: ox + offset,
+        //         y: oy + radius
+        //     },
+        //     centerlower: {
+        //         pos: 5,
+        //         x: ox,
+        //         y: oy + radius
+        //     },
+        //     centerleftlower: {
+        //         pos: 6,
+        //         x: ox - offset,
+        //         y: oy + radius
+        //     },
+        //     leftlower: {
+        //         pos: 7,
+        //         x: focuileft,
+        //         y: oy + radius
+        //     },
+        //     left: {
+        //         pos: 8,
+        //         x: focuileft - radius,
+        //         y: oy
+        //     },
+        //     leftupper: {
+        //         pos: 9,
+        //         x: focuileft,
+        //         y: oy - radius
+        //     },
+        // }
 
         return seating;
     };
@@ -179,67 +193,77 @@ $(document).ready(() => {
         const size = 35;
         const circle = Math.PI * 2;
 
-        ctx.beginPath();
-        ctx.moveTo(seating.rightupper.x, seating.rightupper.y);
-        ctx.arc(seating.rightupper.x, seating.rightupper.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'yellow';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.right.x, seating.right.y);
-        ctx.arc(seating.right.x, seating.right.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'red';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.rightlower.x, seating.rightlower.y);
-        ctx.arc(seating.rightlower.x, seating.rightlower.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'orange';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.centerrightlower.x, seating.centerrightlower.y);
-        ctx.arc(seating.centerrightlower.x, seating.centerrightlower.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'yellow';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.centerlower.x, seating.centerlower.y);
-        ctx.arc(seating.centerlower.x, seating.centerlower.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'purple';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.centerleftlower.x, seating.centerleftlower.y);
-        ctx.arc(seating.centerleftlower.x, seating.centerleftlower.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'orange';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.leftlower.x, seating.leftlower.y);
-        ctx.arc(seating.leftlower.x, seating.leftlower.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'yellow';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.left.x, seating.left.y);
-        ctx.arc(seating.left.x, seating.left.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'purple';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(seating.leftupper.x, seating.leftupper.y);
-        ctx.arc(seating.leftupper.x, seating.leftupper.y, size, circle, false);
-        ctx.stroke();
-        ctx.fillStyle = 'red';
-        ctx.fill();
+        // [[posindex, 'label'], [coordx, coordy]]
+        for (const [position, coord] of seating.entries()) {
+            ctx.beginPath();
+            ctx.moveTo(coord[0], coord[1]);
+            ctx.arc(coord[0], coord[1], size, circle, false);
+            ctx.stroke();
+            ctx.fillStyle = 'yellow';
+            ctx.fill();
+        }
+
+        // ctx.beginPath();
+        // ctx.moveTo(seating.rightupper.x, seating.rightupper.y);
+        // ctx.arc(seating.rightupper.x, seating.rightupper.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'yellow';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.right.x, seating.right.y);
+        // ctx.arc(seating.right.x, seating.right.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'red';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.rightlower.x, seating.rightlower.y);
+        // ctx.arc(seating.rightlower.x, seating.rightlower.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'orange';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.centerrightlower.x, seating.centerrightlower.y);
+        // ctx.arc(seating.centerrightlower.x, seating.centerrightlower.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'yellow';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.centerlower.x, seating.centerlower.y);
+        // ctx.arc(seating.centerlower.x, seating.centerlower.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'purple';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.centerleftlower.x, seating.centerleftlower.y);
+        // ctx.arc(seating.centerleftlower.x, seating.centerleftlower.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'orange';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.leftlower.x, seating.leftlower.y);
+        // ctx.arc(seating.leftlower.x, seating.leftlower.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'yellow';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.left.x, seating.left.y);
+        // ctx.arc(seating.left.x, seating.left.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'purple';
+        // ctx.fill();
+        // ctx.beginPath();
+        // ctx.moveTo(seating.leftupper.x, seating.leftupper.y);
+        // ctx.arc(seating.leftupper.x, seating.leftupper.y, size, circle, false);
+        // ctx.stroke();
+        // ctx.fillStyle = 'red';
+        // ctx.fill();
 
         const text = ctx.measureText('pot size: 0');
 
         ctx.beginPath();
         ctx.font = '24px serif';
         ctx.fillStyle = 'white';
-        ctx.fillText('pot size: 0', seating.center.x - text.width, seating.center.y);
+        ctx.fillText('pot size: 0', seating.get([-1, 'pot'])[0] - text.width, seating.get([-1, 'pot'])[1]);
     };
 
     const player = {
