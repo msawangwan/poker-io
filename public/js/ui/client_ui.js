@@ -97,10 +97,9 @@ $(document).ready(() => {
 
         const offset = f / 2;
 
-        // [[posindex, 'label'], [coordx, coordy]]
         const seating = new Map([
             [-1, { label: 'pot', x: ox, y: oy }],
-            [0, { label: 'dealer', x: ox, y: oy - radius }],
+            [0, { label: 'house', x: ox, y: oy - radius }],
             [1, { label: 'right-upper', x: focuiright, y: oy - radius }],
             [2, { label: 'right', x: focuiright + radius, y: oy }],
             [3, { label: 'right-lower', x: focuiright, y: oy + radius }],
@@ -111,19 +110,6 @@ $(document).ready(() => {
             [8, { label: 'left', x: focuileft - radius, y: oy }],
             [9, { label: 'left-upper', x: focuileft, y: oy - radius }],
         ]);
-        // const seating = new Map([
-        //     [[-1, 'pot'], [ox, oy]],
-        //     [[0, 'dealer'], [ox, oy - radius]],
-        //     [[1, 'right-upper'], [focuiright, oy - radius]],
-        //     [[2, 'right'], [focuiright + radius, oy]],
-        //     [[3, 'right-lower'], [focuiright, oy + radius]],
-        //     [[4, 'center-right-lower'], [ox + offset, oy + radius]],
-        //     [[5, 'center-lower'], [ox, oy + radius]],
-        //     [[6, 'center-left-lower'], [ox - offset, oy + radius]],
-        //     [[7, 'left-lower'], [focuileft, oy + radius]],
-        //     [[8, 'left'], [focuileft - radius, oy]],
-        //     [[9, 'left-upper'], [focuileft, oy - radius]],
-        // ]);
 
         return seating;
     };
@@ -145,85 +131,48 @@ $(document).ready(() => {
         ctx.fill();
     };
 
-    const drawSeats = seating => {
+    const drawSeats = (seating, seatingState) => {
         const size = 35;
-        const circle = Math.PI * 2;
-
-        // [[posindex, 'label'], [coordx, coordy]]
-        for (const [position, coord] of seating.entries()) {
-            ctx.beginPath();
-            ctx.moveTo(coord.x, coord.y);
-            ctx.arc(coord.x, coord.y, size, circle, false);
-            ctx.stroke();
-            ctx.fillStyle = 'yellow';
-            ctx.fill();
+        
+        if (!seatingState) {
+            seatingState = ['empty','empty','empty','empty','empty','empty','empty','empty','empty'];
         }
 
-        // ctx.beginPath();
-        // ctx.moveTo(seating.rightupper.x, seating.rightupper.y);
-        // ctx.arc(seating.rightupper.x, seating.rightupper.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'yellow';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.right.x, seating.right.y);
-        // ctx.arc(seating.right.x, seating.right.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'red';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.rightlower.x, seating.rightlower.y);
-        // ctx.arc(seating.rightlower.x, seating.rightlower.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'orange';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.centerrightlower.x, seating.centerrightlower.y);
-        // ctx.arc(seating.centerrightlower.x, seating.centerrightlower.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'yellow';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.centerlower.x, seating.centerlower.y);
-        // ctx.arc(seating.centerlower.x, seating.centerlower.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'purple';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.centerleftlower.x, seating.centerleftlower.y);
-        // ctx.arc(seating.centerleftlower.x, seating.centerleftlower.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'orange';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.leftlower.x, seating.leftlower.y);
-        // ctx.arc(seating.leftlower.x, seating.leftlower.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'yellow';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.left.x, seating.left.y);
-        // ctx.arc(seating.left.x, seating.left.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'purple';
-        // ctx.fill();
-        // ctx.beginPath();
-        // ctx.moveTo(seating.leftupper.x, seating.leftupper.y);
-        // ctx.arc(seating.leftupper.x, seating.leftupper.y, size, circle, false);
-        // ctx.stroke();
-        // ctx.fillStyle = 'red';
-        // ctx.fill();
+        for (const [position, coord] of seating.entries()) {
+            if (position < 1) {
+                continue;
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(coord.x, coord.y);
+            ctx.arc(coord.x, coord.y, size, Math.PI * 2, false);
+            ctx.stroke();
+            
+            let label = seatingState[position] || 'empty';
+            let color = 'yellow'
+            
+            if (label === 'empty') {
+                color = 'black';
+            }
+            
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
 
         const text = ctx.measureText('pot size: 0');
 
         ctx.beginPath();
         ctx.font = '24px serif';
         ctx.fillStyle = 'white';
-        ctx.fillText('pot size: 0', seating.get([-1, 'pot'])[0] - text.width, seating.get([-1, 'pot'])[1]);
+        ctx.fillText('pot size: 0', seating.get(-1).x - text.width, seating.get(-1).y);
     };
 
     const player = {
         seat: -1
+    };
+      
+    const state = {
+        seating: undefined
     };
 
     socket.on('ack-client-connect-success', e => {
@@ -237,14 +186,15 @@ $(document).ready(() => {
     });
 
     socket.on('server-response-seating-update', e => {
-        console.log(e.seatingstate);
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
+        state.seating = e.seatingstate;
+
         drawTable(tableDimensions);
-        drawSeats(seatCoords);
+        drawSeats(seatCoords, state.seating);
     });
 
     $(window).on('resize', () => {
@@ -254,7 +204,7 @@ $(document).ready(() => {
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
         drawTable(tableDimensions);
-        drawSeats(seatCoords);
+        drawSeats(seatCoords, state.seating);
     });
 
     // const img_cardback = new Image();
