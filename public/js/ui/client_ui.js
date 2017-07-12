@@ -96,20 +96,45 @@ $(document).ready(() => {
         const focuiright = ox + f;
 
         const offset = f / 2;
+        const theta = 25
+        const thetalower = 45;
 
         const seating = new Map([
             [-1, { label: 'pot', x: ox, y: oy }],
             [0, { label: 'house', x: ox, y: oy - radius }],
             [1, { label: 'right-upper', x: focuiright, y: oy - radius }],
-            [2, { label: 'right', x: focuiright + radius, y: oy }],
+            // [2, { label: 'right', x: focuiright + radius, y: oy }],
             [3, { label: 'right-lower', x: focuiright, y: oy + radius }],
-            [4, { label: 'center-right-lower', x: ox + offset, y: oy + radius }],
+            // [4, { label: 'center-right-lower', x: ox + offset, y: oy + radius }],
             [5, { label: 'center-lower', x: ox, y: oy + radius }],
-            [6, { label: 'center-left-lower', x: ox - offset, y: oy + radius }],
+            // [6, { label: 'center-left-lower', x: ox - offset, y: oy + radius }],
             [7, { label: 'left-lower', x: focuileft, y: oy + radius }],
-            [8, { label: 'left', x: focuileft - radius, y: oy }],
+            // [8, { label: 'left', x: focuileft - radius, y: oy }],
             [9, { label: 'left-upper', x: focuileft, y: oy - radius }],
+            [10, {
+                label: 'upper-left-45',
+                x: focuileft - radius * Math.cos(toRadians(theta)),
+                y: oy - radius * Math.sin(toRadians(theta))
+            }],
+            [11, {
+                label: 'lower-left-45',
+                x: focuileft - radius * Math.cos(toRadians(thetalower)),
+                y: ox - radius * Math.sin(toRadians(thetalower))
+            }],
+            [12, {
+                label: 'lower-right-45',
+                x: focuiright + radius * Math.cos(toRadians(thetalower)),
+                y: ox - radius * Math.sin(toRadians(thetalower))
+            }],
+            [13, {
+                label: 'upper-right-45',
+                x: focuiright + radius * Math.cos(toRadians(theta)),
+                y: oy - radius * Math.sin(toRadians(theta))
+            }],
         ]);
+        
+        console.log(('ox: ' + ox));
+        console.log(('oy: ' + oy));
 
         return seating;
     };
