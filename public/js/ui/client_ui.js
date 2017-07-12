@@ -3,43 +3,6 @@ const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
-const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
-const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
-const cardpixelwidth = 72.15;
-const cardpixelheight = 83.25;
-
-function ImageCache() {
-    this.store = new Map();
-}
-
-ImageCache.prototype.load = function (assetpath) {
-    if (this.store.has(assetpath)) {
-        return this.store.get(assetpath);
-    }
-
-    const img = new Image();
-
-    img.onload = () => { }
-    img.src = assetpath;
-
-    this.store.set(assetpath, img);
-};
-
-// sheet = parent spritesheet
-// framedata = frame width, frame height, frame index start, frame index end
-function Sprite(sheet, framedata, onload) {
-    this.src = sheet;
-
-    const { w, h, s, e } = framedate;
-
-    this.frame = {
-        width: w, height: h, start: s, end: e
-    }
-}
-
-Sprite.prototype.load = function () {
-
-};
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
@@ -251,11 +214,27 @@ $(document).ready(() => {
         },
         player: {
             seating: undefined
+        },
+        conn: {
+            connected: false
+        },
+        update: {
+            tick: undefined,
+            phase: ''
         }
     };
 
     socket.on('ack-client-connect-success', state => {
         gamestate.player.seating = state.assignedseat;
+
+        if (!gamestate.conn.connected) {
+            gamestate.conn.connected = true;
+            gamestate.update.tick = setInterval(() => {
+                socket.emit('update-gamestate', {
+                    playerAtSeat: gamestate.player.seating,
+                });
+            }, 1200);
+        }
 
         socket.emit('client-request-seating-update', { playerseatindex: gamestate.player.seating });
     });
@@ -361,3 +340,41 @@ $(document).ready(() => {
 
     // img_cardsheet.src = cardspritesheet;
 });
+
+// const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
+// const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+// const cardpixelwidth = 72.15;
+// const cardpixelheight = 83.25;
+
+// function ImageCache() {
+//     this.store = new Map();
+// }
+
+// ImageCache.prototype.load = function (assetpath) {
+//     if (this.store.has(assetpath)) {
+//         return this.store.get(assetpath);
+//     }
+
+//     const img = new Image();
+
+//     img.onload = () => { }
+//     img.src = assetpath;
+
+//     this.store.set(assetpath, img);
+// };
+
+// // sheet = parent spritesheet
+// // framedata = frame width, frame height, frame index start, frame index end
+// function Sprite(sheet, framedata, onload) {
+//     this.src = sheet;
+
+//     const { w, h, s, e } = framedate;
+
+//     this.frame = {
+//         width: w, height: h, start: s, end: e
+//     }
+// }
+
+// Sprite.prototype.load = function () {
+
+// };
