@@ -1,6 +1,8 @@
 const toRadians = theta => theta * (Math.PI / 180);
 const div = content => $('<div></div>').text(content);
 
+const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
+
 const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
 const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 const cardpixelwidth = 72.15;
@@ -220,13 +222,6 @@ $(document).ready(() => {
             ctx.fillStyle = 'white';
             ctx.fillText(label, coord.x - labelsize.width / 2, coord.y);
         }
-
-        // const text = ctx.measureText('pot size: 0');
-
-        // ctx.beginPath();
-        // ctx.font = '24px serif';
-        // ctx.fillStyle = 'white';
-        // ctx.fillText('pot size: 0', seatingCoordinates.get(-1).x - text.width, seatingCoordinates.get(-1).y);
     };
 
     const drawPotSize = (tableCenterx, tableCentery, potsize) => {
@@ -250,10 +245,6 @@ $(document).ready(() => {
         drawPotSize(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
     };
 
-    // const player = {
-    //     seat: -1
-    // };
-
     const gamestate = {
         table: {
             seating: undefined
@@ -261,11 +252,9 @@ $(document).ready(() => {
         player: {
             seating: undefined
         }
-        // seating: undefined
     };
 
     socket.on('ack-client-connect-success', state => {
-        // player.seat = e.assignedseat;
         gamestate.player.seating = state.assignedseat;
 
         socket.emit('client-request-seating-update', { playerseatindex: gamestate.player.seating });
@@ -279,14 +268,6 @@ $(document).ready(() => {
         gamestate.table.seating = state.seatingstate;
 
         drawAll(gamestate.player.seating, gamestate.table.seating);
-        // updateCanvasDimensions();
-
-        // const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        // const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
-
-
-        // drawTable(tableDimensions);
-        // drawSeats(seatCoords, gamestate.table.seating);
     });
 
     socket.on('game-started', state => {
@@ -299,16 +280,6 @@ $(document).ready(() => {
 
 
     $(window).on('resize', () => {
-        // updateCanvasDimensions();
-
-        // // player.seat = testdata.seat;
-        // // state.seating = testdata.seatingstate;
-
-        // const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        // const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
-
-        // drawTable(tableDimensions);
-        // drawSeats(seatCoords, state.seating);
         drawAll(gamestate.player.seating, gamestate.table.seating);
     });
 

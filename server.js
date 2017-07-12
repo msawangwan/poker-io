@@ -1,7 +1,5 @@
 const config = require('./config');
 
-const logctr = require('./lib/logger')('server');
-
 const http = require('http');
 const path = require('path');
 const mime = require('mime');
@@ -9,8 +7,6 @@ const fs = require('fs');
 
 const addr = config.network.hostAddr;
 const port = config.network.hostPort;
-
-const debug = (a, ...b) => logctr.log(a, ...b);
 
 const createContentTypeHeader = contentType => {
     return { 'content-type': contentType };
@@ -33,7 +29,7 @@ const logRequest = request => {
     return (req, res) => {
         [req, res, next] = request;
 
-        debug('incoming request', `${req.url}`);
+        console.log(`handling incoming request: ${req.url}`)
 
         next(req, res);
     };
