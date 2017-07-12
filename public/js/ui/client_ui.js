@@ -152,8 +152,8 @@ $(document).ready(() => {
         // [[posindex, 'label'], [coordx, coordy]]
         for (const [position, coord] of seating.entries()) {
             ctx.beginPath();
-            ctx.moveTo(coord[0], coord[1]);
-            ctx.arc(coord[0], coord[1], size, circle, false);
+            ctx.moveTo(coord.x, coord.y);
+            ctx.arc(coord.x, coord.y, size, circle, false);
             ctx.stroke();
             ctx.fillStyle = 'yellow';
             ctx.fill();
