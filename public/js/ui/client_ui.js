@@ -114,6 +114,12 @@ $(document).ready(() => {
         return seating;
     };
 
+
+    const testdata = {
+        seat: 4,
+        seatingstate: ['empty','joe','barney','me','empty','empty','hump','empty','empty']
+    };
+    
     const drawTable = table => {
         ctx.beginPath();
 
@@ -148,11 +154,15 @@ $(document).ready(() => {
             ctx.arc(coord.x, coord.y, size, Math.PI * 2, false);
             ctx.stroke();
             
-            let label = seatingState[position] || 'empty';
-            let color = 'yellow'
+            let label = seatingState[position-1] || 'empty';
+            let color = 'lightblue'
             
             if (label === 'empty') {
                 color = 'black';
+            } 
+            
+            if (player.seat === position) {
+                color = 'red';
             }
             
             ctx.fillStyle = color;
@@ -163,7 +173,6 @@ $(document).ready(() => {
             ctx.beginPath();
             ctx.font = '12px serif';
             ctx.fillStyle = 'white';
-            // ctx.fillText(label, coord.x, coord.y);
             ctx.fillText(label, coord.x - labelsize.width/2, coord.y);
         }
 
@@ -204,10 +213,15 @@ $(document).ready(() => {
         drawTable(tableDimensions);
         drawSeats(seatCoords, state.seating);
     });
+    
+    
 
     $(window).on('resize', () => {
         updateCanvasDimensions();
-
+        
+        player.seat = testdata.seat;
+        state.seating = testdata.seatingstate;
+        
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
