@@ -36,6 +36,10 @@ $(document).ready(() => {
         return true;
     };
 
+    const fixedTableDimensions = {
+        seatSize: 35
+    };
+
     const calcTableDimensions = (radius, focuilength) => {
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
@@ -125,11 +129,6 @@ $(document).ready(() => {
         return seating;
     };
 
-    // const testdata = {
-    //     seat: 4,
-    //     seatingstate: ['empty', 'joe', 'barney', 'me', 'empty', 'empty', 'hump', 'empty', 'empty']
-    // };
-
     const drawTable = table => {
         ctx.beginPath();
 
@@ -147,12 +146,35 @@ $(document).ready(() => {
         ctx.fill();
     };
 
-    const drawSeats = (seatingCoordinates, playerSeat, seatingState) => {
-        const size = 35;
+    const drawSeat = (x, y, seatSize, seatColor) => {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.arc(x, y, seatSize, Math.PI * 2, false);
+        ctx.stroke();
+        ctx.fillStyle = seatColor;
+        ctx.fill();
+    };
 
-        if (!seatingState || seatingState === 'undefined') {
-            seatingState = ['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'];
-        }
+    const drawEmptySeat = (x, y, seatSize) => {
+        drawSeat(x, y, seatSize, 'black');
+        drawSeatLabel(x, y, 'empty');
+    };
+
+    const drawPlayerSeat = (x, y, player, seatSize, seatColor) => {
+        drawSeat(x, y, seatSize, seatColor);
+        drawSeatLabel(x, y, player.name);
+    };
+
+    const drawSeatLabel = (x, y, labeltxt) => {
+        ctx.beginPath();
+        ctx.font = '12px serif';
+        ctx.fillStyle = 'white';
+        ctx.fillText(labeltxt, x - ctx.measureText(labeltxt).width / 2, y);
+    };
+
+    const drawSeats = (seatingCoordinates, playerSeat, otherSeats) => {
+        const size = 35;
+        const seatingState = otherSeats;
 
         for (const [position, coord] of seatingCoordinates.entries()) {
             if (position < 1) {
@@ -164,8 +186,15 @@ $(document).ready(() => {
             ctx.arc(coord.x, coord.y, size, Math.PI * 2, false);
             ctx.stroke();
 
-            let label = seatingState[position - 1] || 'empty';
+            let label = 'empty';
             let color = 'lightblue'
+
+            const seat = seatingState[position - 1]; // [a, b]
+            console.log(seat);
+
+            if (!seat[1].vacant) {
+                label = seat[1].player.name;
+            }
 
             if (label === 'empty') {
                 color = 'black';
@@ -224,34 +253,44 @@ $(document).ready(() => {
         }
     };
 
-    socket.on('ack-client-connect-success', state => {
-        gamestate.player.seating = state.assignedseat;
+    socket.emit('joined-table', { name: 'hi-mi-me-o', balance: 10000 });
 
-        if (!gamestate.conn.connected) {
-            gamestate.conn.connected = true;
-            gamestate.update.tick = setInterval(() => {
-                socket.emit('update-gamestate', {
-                    playerAtSeat: gamestate.player.seating,
-                });
-            }, 1200);
-        }
-
-        socket.emit('client-request-seating-update', { playerseatindex: gamestate.player.seating });
+    socket.on('update-table-seating', seating => {
+        drawAll(seating.seat, seating.seating);
     });
 
-    socket.on('ack-client-connect-fail', state => {
-        alert(state.reason);
-    });
+    // socket.on('ack-client-connect-success', state => {
+    //     gamestate.player.seating = state.assignedseat;
 
-    socket.on('server-response-seating-update', state => {
-        gamestate.table.seating = state.seatingstate;
+    //     if (!gamestate.conn.connected) {
+    //         gamestate.conn.connected = true;
+    //         gamestate.update.tick = setInterval(() => {
+    //             socket.emit('update-gamestate-request', {
+    //                 playerAtSeat: gamestate.player.seating,
+    //             });
+    //         }, 1200);
+    //     }
 
-        drawAll(gamestate.player.seating, gamestate.table.seating);
-    });
+    //     socket.emit('player-joined-table');
 
-    socket.on('game-started', state => {
-        // deal em 
-    });
+    //     // socket.emit('client-request-seating-update', { playerseatindex: gamestate.player.seating });
+    // });
+
+    // socket.on('ack-client-connect-fail', state => {
+    //     alert(state.reason);
+    // });
+
+    // socket.on('update-gamestate-response', state => {
+
+
+    //     drawAll();
+    // });
+
+    // socket.on('server-response-seating-update', state => {
+    //     gamestate.table.seating = state.seatingstate;
+
+    //     drawAll(gamestate.player.seating, gamestate.table.seating);
+    // });
 
     socket.on('connect_error', () => {
         // do something
