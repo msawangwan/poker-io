@@ -211,6 +211,9 @@ $(document).ready(() => {
     }
 
     const drawAll = (playerSeat, seatingState) => {
+        if (!playerSeat || !seatingState) {
+            return false;
+        }
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
@@ -221,10 +224,12 @@ $(document).ready(() => {
         const seatDrawResult = drawSeating(seatCoords, seatingState);
 
         if (!seatDrawResult) {
-            alert('error drawing seats');
+            return false;
         }
 
         drawPotLabel(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
+
+        return true;
     };
 
     const playerState = {
@@ -234,28 +239,30 @@ $(document).ready(() => {
 
     const tableState = {
         playerseat: undefined,
-        allseats: undefined
+        allseats: undefined,
+        drawn: false
     };
 
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
+        drawAll(tableState.playerseat, tableState.allseats);
     });
 
     socket.on('table-seating-state', data => {
         tableState.allseats = data.seating;
-
-        const updateui = setInterval(() => {
-            if (tableState.playerseat && tableState.allseats) {
-                drawAll(tableState.playerseat, tableState.allseats);
-                clearInterval(updateui);
-            }
-        }, 300);
+        drawAll(tableState.playerseat, tableState.allseats);
     });
 
     socket.on('game-state', data => {
-
+        const currentStateIndex = data.state[0];
+        console.log(data.state);
+        if (currentStateIndex === -1) {
+            socket.emit('waiting-for-players');
+        } else if (currentStateIndex === 0) {
+            socket.emit('deal');
+        }
     });
 
     socket.on('connect_error', () => {
