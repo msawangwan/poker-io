@@ -92,80 +92,84 @@ $(document).ready(() => {
     const calcSeatCoordinates = (o, radius, f) => {
         const { x: ox, y: oy } = o;
 
-        const focuileft = ox - f;
-        const focuiright = ox + f;
+        const offsetOriginLeft = ox - f;
+        const offsetOriginRight = ox + f;
 
         const offset = f / 2;
-        const thetaupper = 25
-        const thetalower = 45;
+        const thetaUpper = 25;
+        const thetaLower = 325;
 
         const seating = new Map([
-            [-1, { 
-                label: 'pot', 
-                x: ox, 
-                y: oy 
+            [-1, {
+                label: 'pot',
+                x: ox,
+                y: oy
             }],
-            [0, { 
-                label: 'house', 
-                x: ox, 
-                y: oy - radius 
+            [0, {
+                label: 'house',
+                x: ox,
+                y: oy - radius
             }],
-            [1, { 
+            [1, {
                 label: 'right-upper',
-                x: focuiright,
+                x: offsetOriginRight,
                 y: oy - radius
             }],
             [2, {
                 label: 'right-theta-upper',
-                x: focuiright + radius * Math.cos(toRadians(thetaupper)),
-                y: oy - radius * Math.sin(toRadians(thetaupper))
+                x: offsetOriginRight + radius * Math.cos(toRadians(thetaUpper)),
+                y: oy - radius * Math.sin(toRadians(thetaUpper))
             }],
             [3, {
                 label: 'right-theta-lower',
-                x: focuiright + radius * Math.cos(toRadians(thetalower)),
-                y: ox - radius * Math.sin(toRadians(thetalower))
+                x: offsetOriginRight + radius * Math.cos(toRadians(thetaLower)),
+                y: oy - radius * Math.sin(toRadians(thetaLower))
+                // x: offsetOriginRight + radius * Math.cos(toRadians(thetaLower)),
+                // y: ox - radius * Math.sin(toRadians(thetaLower))
             }],
-            [4, { 
-                label: 'right-lower', 
-                x: focuiright, 
+            [4, {
+                label: 'right-lower',
+                x: offsetOriginRight,
                 y: oy + radius
             }],
-            [5, { 
-                label: 'center-lower', 
-                x: ox, 
+            [5, {
+                label: 'center-lower',
+                x: ox,
                 y: oy + radius
             }],
-            [6, { 
-                label: 'left-lower', 
-                x: focuileft, 
+            [6, {
+                label: 'left-lower',
+                x: offsetOriginLeft,
                 y: oy + radius
             }],
             [7, {
                 label: 'left-theta-lower',
-                x: focuileft - radius * Math.cos(toRadians(thetalower)),
-                y: ox - radius * Math.sin(toRadians(thetalower))
+                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaLower)),
+                y: oy - radius * Math.sin(toRadians(thetaLower))
+                // x: offsetOriginLeft - radius * Math.cos(toRadians(thetaLower)),
+                // y: ox - radius * Math.sin(toRadians(thetaLower))
             }],
             [8, {
                 label: 'left-theta-upper',
-                x: focuileft - radius * Math.cos(toRadians(thetaupper)),
-                y: oy - radius * Math.sin(toRadians(thetaupper))
+                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaUpper)),
+                y: oy - radius * Math.sin(toRadians(thetaUpper))
             }],
-            [9, { 
-                label: 'left-upper', 
-                x: focuileft, 
-                y: oy - radius 
+            [9, {
+                label: 'left-upper',
+                x: offsetOriginLeft,
+                y: oy - radius
             }],
         ]);
-        
+
         return seating;
     };
 
 
     const testdata = {
         seat: 4,
-        seatingstate: ['empty','joe','barney','me','empty','empty','hump','empty','empty']
+        seatingstate: ['empty', 'joe', 'barney', 'me', 'empty', 'empty', 'hump', 'empty', 'empty']
     };
-    
+
     const drawTable = table => {
         ctx.beginPath();
 
@@ -185,41 +189,41 @@ $(document).ready(() => {
 
     const drawSeats = (seating, seatingState) => {
         const size = 35;
-        
+
         if (!seatingState) {
-            seatingState = ['empty','empty','empty','empty','empty','empty','empty','empty','empty'];
+            seatingState = ['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'];
         }
 
         for (const [position, coord] of seating.entries()) {
             if (position < 1) {
                 continue;
             }
-            
+
             ctx.beginPath();
             ctx.moveTo(coord.x, coord.y);
             ctx.arc(coord.x, coord.y, size, Math.PI * 2, false);
             ctx.stroke();
-            
-            let label = seatingState[position-1] || 'empty';
+
+            let label = seatingState[position - 1] || 'empty';
             let color = 'lightblue'
-            
+
             if (label === 'empty') {
                 color = 'black';
-            } 
-            
+            }
+
             if (player.seat === position) {
                 color = 'red';
             }
-            
+
             ctx.fillStyle = color;
             ctx.fill();
-            
+
             const labelsize = ctx.measureText(label);
-            
+
             ctx.beginPath();
             ctx.font = '12px serif';
             ctx.fillStyle = 'white';
-            ctx.fillText(label, coord.x - labelsize.width/2, coord.y);
+            ctx.fillText(label, coord.x - labelsize.width / 2, coord.y);
         }
 
         const text = ctx.measureText('pot size: 0');
@@ -233,17 +237,17 @@ $(document).ready(() => {
     const player = {
         seat: -1
     };
-      
+
     const state = {
         seating: undefined
     };
-    
+
     const drawall = () => {
         updateCanvasDimensions();
-        
+
         player.seat = testdata.seat;
         state.seating = testdata.seatingstate;
-        
+
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
@@ -272,13 +276,13 @@ $(document).ready(() => {
         drawTable(tableDimensions);
         drawSeats(seatCoords, state.seating);
     });
-    
+
     socket.on('game-started', state => {
-       // deal em 
+        // deal em 
     });
-    
+
     let drew = false;
-    
+
     socket.on('connect_error', () => {
         if (!drew) {
             console.log('this is a temp solution for offline debugging of the ui')
@@ -286,14 +290,14 @@ $(document).ready(() => {
             drawall();
         }
     });
-    
+
 
     $(window).on('resize', () => {
         updateCanvasDimensions();
-        
+
         player.seat = testdata.seat;
         state.seating = testdata.seatingstate;
-        
+
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
