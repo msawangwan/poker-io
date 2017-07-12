@@ -157,6 +157,14 @@ $(document).ready(() => {
             
             ctx.fillStyle = color;
             ctx.fill();
+            
+            const labelsize = ctx.measureText(label);
+            
+            ctx.beginPath();
+            ctx.font = '12px serif';
+            ctx.fillStyle = 'white';
+            // ctx.fillText(label, coord.x, coord.y);
+            ctx.fillText(label, coord.x - labelsize.width/2, coord.y);
         }
 
         const text = ctx.measureText('pot size: 0');
