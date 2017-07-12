@@ -146,6 +146,34 @@ $(document).ready(() => {
         ctx.fill();
     };
 
+    const drawSeating = (seatCoordinates, seatStates) => {
+        if (!seatStates) {
+            return false;
+        }
+
+        for (const [position, coord] of seatCoordinates.entries()) {
+            let seatColor = 'lightblue';
+
+            if (position > 0) { // note: valid player seat positions are exclusive to numbers 1-9
+                const seat = seatStates[position - 1];
+
+                if (seat[1].vacant) {
+                    drawEmptySeat(coord.x, coord.y, fixedTableDimensions.seatSize);
+                } else {
+                    const p = seat[1].player;
+
+                    if (p.id === socket.id) {
+                        seatColor = 'orange';
+                    }
+
+                    drawPlayerSeat(coord.x, coord.y, p, fixedTableDimensions.seatSize, seatColor);
+                }
+            }
+        }
+
+        return true;
+    };
+
     const drawSeat = (x, y, seatSize, seatColor) => {
         ctx.beginPath();
         ctx.moveTo(x, y);
@@ -233,7 +261,13 @@ $(document).ready(() => {
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
         drawTable(tableDimensions);
-        drawSeats(seatCoords, playerSeat, seatingState);
+        // drawSeats(seatCoords, playerSeat, seatingState);
+        const seatDrawResult = drawSeating(seatCoords, seatingState);
+
+        if (!seatDrawResult) {
+            alert('error drawing seats');
+        }
+
         drawPotSize(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
     };
 
@@ -253,9 +287,17 @@ $(document).ready(() => {
         }
     };
 
+    const tableState = {
+        playerseat: undefined,
+        allseats: undefined
+    };
+
     socket.emit('joined-table', { name: 'hi-mi-me-o', balance: 10000 });
 
     socket.on('update-table-seating', seating => {
+        tableState.playerseat = seating.state;
+        tableState.allseats = seating.seating;
+
         drawAll(seating.seat, seating.seating);
     });
 
@@ -298,7 +340,8 @@ $(document).ready(() => {
 
 
     $(window).on('resize', () => {
-        drawAll(gamestate.player.seating, gamestate.table.seating);
+        drawAll(tableState.playerseat, tableState.allseats);
+        // drawAll(gamestate.player.seating, gamestate.table.seating);
     });
 
     // const img_cardback = new Image();
