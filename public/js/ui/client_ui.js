@@ -75,22 +75,22 @@ $(document).ready(() => {
         const originx = currentCanvasCenter.x();
         const originy = currentCanvasCenter.y();
 
-        const focuileft = originx - focuilength;
-        const focuiright = originx + focuilength;
+        // const focuileft = originx - focuilength;
+        // const focuiright = originx + focuilength;
 
-        ctx.beginPath();
+        // ctx.beginPath();
 
-        ctx.arc(focuileft, originy, radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        ctx.arc(focuiright, originy, radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+        // ctx.arc(focuileft, originy, radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        // ctx.arc(focuiright, originy, radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
 
-        ctx.moveTo(focuiright, originy + radius);
-        ctx.lineTo(focuileft, originy + radius);
+        // ctx.moveTo(focuiright, originy + radius);
+        // ctx.lineTo(focuileft, originy + radius);
 
-        ctx.stroke();
+        // ctx.stroke();
 
-        ctx.fillStyle = 'green';
-        ctx.fill();
-        ctx.fillStyle = 'white';
+        // ctx.fillStyle = 'green';
+        // ctx.fill();
+        // ctx.fillStyle = 'white';
 
         return {
             origin: {
@@ -98,7 +98,11 @@ $(document).ready(() => {
                 y: originy
             },
             radius: radius,
-            focui: focuilength
+            focui: {
+                length: focuilength,
+                left: originx - focuilength,
+                right: originx + focuilength
+            }
         }
     };
 
@@ -185,6 +189,24 @@ $(document).ready(() => {
         return seating;
     };
 
+    const drawTable = (tableDimensions) => {
+        ctx.beginPath();
+
+        ctx.arc(tableDimensions.focui.left, tableDimensions.origin.y, tableDimensions.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        ctx.arc(tableDimensions.focui.right, tableDimensions.origin.y, tableDimensions.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+
+        const yoffset = tableDimensions.origin.y + tableDimensions.radius;
+
+        ctx.moveTo(tableDimensions.focui.right, yoffset);
+        ctx.lineTo(tableDimensions.focui.left, yoffset);
+
+        ctx.stroke();
+
+        ctx.fillStyle = 'green';
+        ctx.fill();
+        ctx.fillStyle = 'white';
+    }
+
     const player = {
         seat: -1
     };
@@ -204,14 +226,18 @@ $(document).ready(() => {
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui);
+        drawTable(tableDimensions);
+        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
+
     });
 
     $(window).on('resize', () => {
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui);
+        drawTable(tableDimensions);
+        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
+
     });
 
     // const img_cardback = new Image();
