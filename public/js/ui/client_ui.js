@@ -200,51 +200,7 @@ $(document).ready(() => {
         ctx.fillText(labeltxt, x - ctx.measureText(labeltxt).width / 2, y);
     };
 
-    const drawSeats = (seatingCoordinates, playerSeat, otherSeats) => {
-        const size = 35;
-        const seatingState = otherSeats;
-
-        for (const [position, coord] of seatingCoordinates.entries()) {
-            if (position < 1) {
-                continue;
-            }
-
-            ctx.beginPath();
-            ctx.moveTo(coord.x, coord.y);
-            ctx.arc(coord.x, coord.y, size, Math.PI * 2, false);
-            ctx.stroke();
-
-            let label = 'empty';
-            let color = 'lightblue'
-
-            const seat = seatingState[position - 1]; // [a, b]
-            console.log(seat);
-
-            if (!seat[1].vacant) {
-                label = seat[1].player.name;
-            }
-
-            if (label === 'empty') {
-                color = 'black';
-            }
-
-            if (playerSeat === position) {
-                color = 'red';
-            }
-
-            ctx.fillStyle = color;
-            ctx.fill();
-
-            const labelsize = ctx.measureText(label);
-
-            ctx.beginPath();
-            ctx.font = '12px serif';
-            ctx.fillStyle = 'white';
-            ctx.fillText(label, coord.x - labelsize.width / 2, coord.y);
-        }
-    };
-
-    const drawPotSize = (tableCenterx, tableCentery, potsize) => {
+    const drawPotLabel = (tableCenterx, tableCentery, potsize) => {
         const text = `pot size: ${potsize || 0}`;
         const textwidth = ctx.measureText(text).width;
 
@@ -261,30 +217,19 @@ $(document).ready(() => {
         const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
         drawTable(tableDimensions);
-        // drawSeats(seatCoords, playerSeat, seatingState);
+
         const seatDrawResult = drawSeating(seatCoords, seatingState);
 
         if (!seatDrawResult) {
             alert('error drawing seats');
         }
 
-        drawPotSize(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
+        drawPotLabel(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
     };
 
-    const gamestate = {
-        table: {
-            seating: undefined
-        },
-        player: {
-            seating: undefined
-        },
-        conn: {
-            connected: false
-        },
-        update: {
-            tick: undefined,
-            phase: ''
-        }
+    const playerState = {
+        name: `player ${Math.floor(Math.random() * 100)}`,
+        balance: 10000
     };
 
     const tableState = {
@@ -292,7 +237,7 @@ $(document).ready(() => {
         allseats: undefined
     };
 
-    socket.emit('joined-table', { name: 'hi-mi-me-o', balance: 10000 });
+    socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('update-table-seating', seating => {
         tableState.playerseat = seating.state;
@@ -301,39 +246,6 @@ $(document).ready(() => {
         drawAll(seating.seat, seating.seating);
     });
 
-    // socket.on('ack-client-connect-success', state => {
-    //     gamestate.player.seating = state.assignedseat;
-
-    //     if (!gamestate.conn.connected) {
-    //         gamestate.conn.connected = true;
-    //         gamestate.update.tick = setInterval(() => {
-    //             socket.emit('update-gamestate-request', {
-    //                 playerAtSeat: gamestate.player.seating,
-    //             });
-    //         }, 1200);
-    //     }
-
-    //     socket.emit('player-joined-table');
-
-    //     // socket.emit('client-request-seating-update', { playerseatindex: gamestate.player.seating });
-    // });
-
-    // socket.on('ack-client-connect-fail', state => {
-    //     alert(state.reason);
-    // });
-
-    // socket.on('update-gamestate-response', state => {
-
-
-    //     drawAll();
-    // });
-
-    // socket.on('server-response-seating-update', state => {
-    //     gamestate.table.seating = state.seatingstate;
-
-    //     drawAll(gamestate.player.seating, gamestate.table.seating);
-    // });
-
     socket.on('connect_error', () => {
         // do something
     });
@@ -341,7 +253,6 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         drawAll(tableState.playerseat, tableState.allseats);
-        // drawAll(gamestate.player.seating, gamestate.table.seating);
     });
 
     // const img_cardback = new Image();
