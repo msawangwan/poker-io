@@ -226,6 +226,10 @@ $(document).ready(() => {
         const $centerLabel = $('#table-center-label');
 
         if ($centerLabel) {
+            const old = document.getElementById('table-center-label');
+            if (old) {
+                old.getContext('2d').clearRect(0, 0, $centerLabel.width, $centerLabel.height);
+            }
             $centerLabel.remove();
         }
 
@@ -270,13 +274,6 @@ $(document).ready(() => {
         tableState.coordinates.center.y = tablecenter.y;
         tableState.coordinates.seats = seatCoords;
 
-        if (isResizeDraw) {
-            drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
-        } else {
-            drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerLabel);
-        }
-
-
         return true;
     };
 
@@ -284,12 +281,12 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
-        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, 'Waiting for players ...', false));
+        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats));
     });
 
     socket.on('table-seating-state', data => {
         tableState.allseats = data.seating;
-        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, 'Waiting for players ...', false));
+        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats));
     });
 
     socket.on('current-game-state', data => {
@@ -301,11 +298,13 @@ $(document).ready(() => {
             case -1:
                 if (playerState.current !== 'waiting') {
                     playerState.current = 'waiting';
-                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
+                    // drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
+                    Promise.resolve().then(() => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...'));
                 }
                 return;
             case 0:
                 socket.emit('game-start');
+                drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `game starting ...`);
                 return;
             case 1:
                 socket.emit('ready-for-deal');
@@ -323,7 +322,8 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         console.log('window resized');
-        drawAll(tableState.playerseat, tableState.allseats, '', true);
+        drawAll(tableState.playerseat, tableState.allseats);
+        drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
     });
 
     // const img_cardback = new Image();
