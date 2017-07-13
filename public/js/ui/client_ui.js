@@ -283,7 +283,6 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
-        // Promise.resolve().then();
         enqueueProcess(() => drawAll(tableState.playerseat, tableState.allseats))
     });
 
@@ -293,7 +292,10 @@ $(document).ready(() => {
             drawAll(tableState.playerseat, tableState.allseats);
             drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
         });
-        // Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats));
+    });
+
+    socket.on('dealer-dealt-hole-cards', cards => {
+
     });
 
     socket.on('current-game-state', data => {
@@ -304,25 +306,33 @@ $(document).ready(() => {
         switch (currentStateIndex) {
             case -1:
                 if (playerState.current !== -1) {
-                    enqueueProcess(() => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...'));
-                    // Promise.resolve().then(() => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...'));
+                    enqueueProcess(
+                        () => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...')
+                    );
                     playerState.current = -1;
                 }
                 return;
             case 0:
                 if (playerState.current !== 0) {
-                    socket.emit('game-start');
+                    socket.emit('player-ready-for-game');
                     drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `game starting ...`);
                     playerState.current = 0;
                 }
                 return;
             case 1:
                 if (playerState.current !== 1) {
-                    socket.emit('ready-for-deal');
+                    socket.emit('game-ready-for-start');
                     drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
                     playerState.current = 1;
                 }
                 return;
+            case 2:
+                if (playerState.current !== 2) {
+                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
+                    socket.emit('ready-for-shuffle');
+                    playerState.current = 2;
+                }
+                break;
             default:
                 return;
         }
