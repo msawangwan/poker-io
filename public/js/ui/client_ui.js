@@ -251,7 +251,7 @@ $(document).ready(() => {
         drawTableCenterLabel(x, y, `pot size: ${potsize || 0}`);
     };
 
-    const drawAll = (playerSeat, seatingState, isResizeDraw) => {
+    const drawAll = (playerSeat, seatingState, centerLabel, isResizeDraw) => {
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
@@ -275,12 +275,12 @@ $(document).ready(() => {
         tableState.coordinates.seats = seatCoords;
 
         if (isResizeDraw) {
-            console.log('redraw event: ' + centerlabelText);
             drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
+        } else {
+            // drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
+            drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerLabel);
         }
 
-        // drawPotLabel(tablecenter.x, tablecenter.y, 0);
-        drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
 
         return true;
     };
@@ -289,12 +289,12 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
-        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, false));
+        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, 'Waiting for players ...', false));
     });
 
     socket.on('table-seating-state', data => {
         tableState.allseats = data.seating;
-        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, false));
+        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, 'Waiting for players ...', false));
     });
 
     socket.on('current-game-state', data => {
@@ -327,7 +327,7 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         console.log('window resized');
-        drawAll(tableState.playerseat, tableState.allseats, true);
+        drawAll(tableState.playerseat, tableState.allseats, '', true);
     });
 
     // const img_cardback = new Image();
