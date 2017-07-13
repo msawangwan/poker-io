@@ -228,7 +228,7 @@ $(document).ready(() => {
         if ($centerLabel) {
             const old = document.getElementById('table-center-label');
             if (old) {
-                old.getContext('2d').clearRect(0, 0, $centerLabel.width, $centerLabel.height);
+                old.getContext('2d').clearRect(0, 0, 300, 300);
             }
             $centerLabel.remove();
         }
@@ -294,8 +294,10 @@ $(document).ready(() => {
         });
     });
 
-    socket.on('dealer-dealt-hole-cards', cards => {
-
+    socket.on('hand-dealt', data => {
+        console.log('dealer dealt: ');
+        console.log(data.playerhand[0]);
+        console.log(data.playerhand[1]);
     });
 
     socket.on('current-game-state', data => {
@@ -333,6 +335,16 @@ $(document).ready(() => {
                     playerState.current = 2;
                 }
                 break;
+            case 3:
+                if (playerState.current !== 3) {
+                    socket.emit('waiting-for-hole-cards');
+                    playerState.current = 3;
+                }
+            case 4:
+                if (playerState.current !== 4) {
+                    console.log('got hole cards');
+                    playerState.current = 4;
+                }
             default:
                 return;
         }
