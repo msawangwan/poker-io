@@ -16,18 +16,17 @@ $(document).ready(() => {
         balance: 10000,
         current: 'new'
     };
-    
+
     const tableState = {
         playerseat: undefined,
         allseats: undefined,
         coordinates: {
             dimensions: undefined,
-            center: undefined,
+            center: { x: undefined, y: undefined },
             seats: undefined
         }
-        // drawn: false
     };
-    
+
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
@@ -39,6 +38,10 @@ $(document).ready(() => {
     const currentCanvasCenter = {
         x: () => canvasAxis.width * 0.5,
         y: () => canvasAxis.height * 0.5
+    };
+
+    const fixedTableDimensions = {
+        seatSize: 35
     };
 
     const updateCanvasDimensions = () => {
@@ -55,10 +58,6 @@ $(document).ready(() => {
         canvas.height = canvasAxis.height;
 
         return true;
-    };
-
-    const fixedTableDimensions = {
-        seatSize: 35
     };
 
     const calcTableDimensions = (radius, focuilength) => {
@@ -220,28 +219,39 @@ $(document).ready(() => {
         ctx.fillStyle = 'white';
         ctx.fillText(labeltxt, x - ctx.measureText(labeltxt).width / 2, y);
     };
-    
+
+    let centerlabelText = '...';
+
     const drawTableCenterLabel = (x, y, labeltxt) => {
-        const textwidth = ctx.measureText(labeltxt).width;
-        
-        ctx.beginPath();
-        ctx.font = '24px serif';
-        ctx.fillStyle = 'white';
-        ctx.fillText(text, tableCenterx - textwidth, tableCentery);
+        const $centerLabel = $('#table-center-label');
+
+        if ($centerLabel) {
+            $centerLabel.remove();
+        }
+
+        const labelCanvas = document.createElement('canvas');
+        const labelctx = labelCanvas.getContext('2d');
+
+        labelCanvas.setAttribute('id', 'table-center-label')
+        labelCanvas.width = 300;
+        labelCanvas.height = 300;
+
+        const textDimensions = ctx.measureText(labeltxt);
+
+        labelctx.font = '24px serif';
+        labelctx.fillStyle = 'white';
+        labelctx.fillText(labeltxt, labelCanvas.width / 2 - textDimensions.width, labelCanvas.height / 2);
+
+        ctx.drawImage(labelCanvas, x - labelCanvas.width / 2, y - labelCanvas.height / 2);
+
+        centerlabelText = labeltxt;
     };
 
     const drawPotLabel = (x, y, potsize) => {
-        // const text = `pot size: ${potsize || 0}`;
-        // const textwidth = ctx.measureText(text).width;
-
-        // ctx.beginPath();
-        // ctx.font = '24px serif';
-        // ctx.fillStyle = 'white';
-        // ctx.fillText(text, x - textwidth, y);
-        drawTableCenterLabel(x, y,`pot size: ${potsize || 0}`);
+        drawTableCenterLabel(x, y, `pot size: ${potsize || 0}`);
     };
 
-    const drawAll = (playerSeat, seatingState) => {
+    const drawAll = (playerSeat, seatingState, isResizeDraw) => {
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
@@ -254,17 +264,23 @@ $(document).ready(() => {
         if (!seatDrawResult) {
             return false;
         }
-        
+
         const tablecenter = {
-            x:seatCoords.get(-1).x, y: seatCoords.get(-1).y
+            x: seatCoords.get(-1).x, y: seatCoords.get(-1).y
         };
 
-        // drawPotLabel(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
-        drawPotLabel(tablecenter.x, tablecenter.y, 0);
-
         tableState.coordinates.dimensions = tableDimensions;
-        tableState.coordinates.center = tablecenter;
+        tableState.coordinates.center.x = tablecenter.x;
+        tableState.coordinates.center.y = tablecenter.y;
         tableState.coordinates.seats = seatCoords;
+
+        if (isResizeDraw) {
+            console.log('redraw event: ' + centerlabelText);
+            drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
+        }
+
+        // drawPotLabel(tablecenter.x, tablecenter.y, 0);
+        drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
 
         return true;
     };
@@ -273,14 +289,12 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
-        process.nextTick(()=> drawAll(tableState.playerseat, tableState.allseats));
-        // drawAll(tableState.playerseat, tableState.allseats);
+        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, false));
     });
 
     socket.on('table-seating-state', data => {
         tableState.allseats = data.seating;
-        process.nextTick(()=> drawAll(tableState.playerseat, tableState.allseats));
-        // drawAll(tableState.playerseat, tableState.allseats);
+        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats, false));
     });
 
     socket.on('current-game-state', data => {
@@ -292,8 +306,7 @@ $(document).ready(() => {
             case -1:
                 if (playerState.current !== 'waiting') {
                     playerState.current = 'waiting';
-                    drawPotLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
-                    // socket.emit('waiting-for-players');
+                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
                 }
                 return;
             case 0:
@@ -314,7 +327,7 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         console.log('window resized');
-        drawAll(tableState.playerseat, tableState.allseats);
+        drawAll(tableState.playerseat, tableState.allseats, true);
     });
 
     // const img_cardback = new Image();
