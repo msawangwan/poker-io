@@ -328,8 +328,9 @@ $(document).ready(() => {
         const cardA = data.playerhand[0];
         const cardB = data.playerhand[1];
         console.log('dealer dealt: '); // { suite, value }
-        console.log(cardA);
-        console.log(cardB);
+        console.log(data.playerhand);
+        console.log(data.playerhand[2].af.value + ' of ' + data.playerhand[2].af.suite);
+        console.log(data.playerhand[2].bf.value + ' of ' + data.playerhand[2].bf.suite);
         loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, tableState.coordinates.center.x, tableState.coordinates.center.y);
         loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, tableState.coordinates.center.x + cardpixelwidth, tableState.coordinates.center.y);
     });
