@@ -211,9 +211,6 @@ $(document).ready(() => {
     }
 
     const drawAll = (playerSeat, seatingState) => {
-        if (!playerSeat || !seatingState) {
-            return false;
-        }
         updateCanvasDimensions();
 
         const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
@@ -255,13 +252,21 @@ $(document).ready(() => {
         drawAll(tableState.playerseat, tableState.allseats);
     });
 
-    socket.on('game-state', data => {
+    socket.on('current-game-state', data => {
         const currentStateIndex = data.state[0];
-        console.log(data.state);
-        if (currentStateIndex === -1) {
-            socket.emit('waiting-for-players');
-        } else if (currentStateIndex === 0) {
-            socket.emit('deal');
+
+        console.log('state: ' + data.state[1]);
+        console.log('state index: ' + data.state[0]);
+
+        switch (currentStateIndex) {
+            case -1:
+                socket.emit('waiting-for-players');
+                break;
+            case 0:
+                socket.emit('deal');
+                break;
+            default:
+                break;
         }
     });
 
@@ -271,6 +276,7 @@ $(document).ready(() => {
 
 
     $(window).on('resize', () => {
+        console.log('window resized');
         drawAll(tableState.playerseat, tableState.allseats);
     });
 
