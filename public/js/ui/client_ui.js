@@ -30,6 +30,8 @@ $(document).ready(() => {
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
+    let centerlabelText = '...';
+
     const canvasAxis = {
         width: 0,
         height: 0
@@ -220,8 +222,6 @@ $(document).ready(() => {
         ctx.fillText(labeltxt, x - ctx.measureText(labeltxt).width / 2, y);
     };
 
-    let centerlabelText = '...';
-
     const drawTableCenterLabel = (x, y, labeltxt) => {
         const $centerLabel = $('#table-center-label');
 
@@ -245,10 +245,6 @@ $(document).ready(() => {
         ctx.drawImage(labelCanvas, x - labelCanvas.width / 2, y - labelCanvas.height / 2);
 
         centerlabelText = labeltxt;
-    };
-
-    const drawPotLabel = (x, y, potsize) => {
-        drawTableCenterLabel(x, y, `pot size: ${potsize || 0}`);
     };
 
     const drawAll = (playerSeat, seatingState, centerLabel, isResizeDraw) => {
@@ -277,7 +273,6 @@ $(document).ready(() => {
         if (isResizeDraw) {
             drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
         } else {
-            // drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
             drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerLabel);
         }
 
@@ -314,6 +309,7 @@ $(document).ready(() => {
                 return;
             case 1:
                 socket.emit('ready-for-deal');
+                drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
                 return;
             default:
                 return;
