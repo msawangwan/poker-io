@@ -295,7 +295,7 @@ $(document).ready(() => {
     });
 
     socket.on('hand-dealt', data => {
-        console.log('dealer dealt: ');
+        console.log('dealer dealt: '); // { suite, value }
         console.log(data.playerhand[0]);
         console.log(data.playerhand[1]);
     });
