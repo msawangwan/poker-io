@@ -3,13 +3,12 @@ const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
-const validStates = [
-    'new', 'waiting', 'playing'
-];
-
+const assetCache = new Map();
 
 $(document).ready(() => {
-    const socket = io.connect(window.location.origin);
+    const socket = io.connect(window.location.origin, {
+        'reconnection': false
+    });
 
     const playerState = {
         name: `player ${Math.floor(Math.random() * 100)}`,
@@ -277,6 +276,37 @@ $(document).ready(() => {
         return true;
     };
 
+    const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
+    const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+    const cardpixelwidth = 72.15;
+    const cardpixelheight = 83.25;
+
+    const loadSpriteFromSpriteSheet = (src, col, row, destx, desty) => {
+        const cachedimg = new Image();
+
+        cachedimg.onload = () => {
+            const loadcard = (col, row) => {
+                console.log(`loading card sprite ${col} ${row}`)
+                ctx.drawImage(
+                    cachedimg,
+                    row * cardpixelwidth, // frame index * frame width
+                    col * cardpixelheight, // frame row?
+                    cardpixelwidth, // frame width
+                    cardpixelheight, // frame height
+                    destx, // dest x
+                    desty, // dest y
+                    // col * row, // dest x
+                    // col, // dest y
+                    cardpixelwidth, // frame width on draw (same as input usually)
+                    cardpixelheight // frame height on draw (same as input usually)
+                );
+            };
+            loadcard(col, row);
+        };
+
+        cachedimg.src = src
+    };
+
     const enqueueProcess = task => Promise.resolve().then(task());
 
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
@@ -295,9 +325,13 @@ $(document).ready(() => {
     });
 
     socket.on('hand-dealt', data => {
+        const cardA = data.playerhand[0];
+        const cardB = data.playerhand[1];
         console.log('dealer dealt: '); // { suite, value }
-        console.log(data.playerhand[0]);
-        console.log(data.playerhand[1]);
+        console.log(cardA);
+        console.log(cardB);
+        loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, tableState.coordinates.center.x, tableState.coordinates.center.y);
+        loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, tableState.coordinates.center.x, tableState.coordinates.center.y);
     });
 
     socket.on('current-game-state', data => {
@@ -351,7 +385,7 @@ $(document).ready(() => {
     });
 
     socket.on('connect_error', () => {
-        // do something
+        // disconnected
     });
 
 
