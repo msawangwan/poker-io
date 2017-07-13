@@ -14,7 +14,7 @@ $(document).ready(() => {
     const playerState = {
         name: `player ${Math.floor(Math.random() * 100)}`,
         balance: 10000,
-        current: 'new'
+        current: -1000
     };
 
     const tableState = {
@@ -277,16 +277,23 @@ $(document).ready(() => {
         return true;
     };
 
+    const enqueueProcess = task => Promise.resolve().then(task());
+
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
-        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats));
+        // Promise.resolve().then();
+        enqueueProcess(() => drawAll(tableState.playerseat, tableState.allseats))
     });
 
     socket.on('table-seating-state', data => {
         tableState.allseats = data.seating;
-        Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats));
+        enqueueProcess(() => {
+            drawAll(tableState.playerseat, tableState.allseats);
+            drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
+        });
+        // Promise.resolve().then(() => drawAll(tableState.playerseat, tableState.allseats));
     });
 
     socket.on('current-game-state', data => {
@@ -296,19 +303,25 @@ $(document).ready(() => {
 
         switch (currentStateIndex) {
             case -1:
-                if (playerState.current !== 'waiting') {
-                    playerState.current = 'waiting';
-                    // drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
-                    Promise.resolve().then(() => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...'));
+                if (playerState.current !== -1) {
+                    enqueueProcess(() => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...'));
+                    // Promise.resolve().then(() => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...'));
+                    playerState.current = -1;
                 }
                 return;
             case 0:
-                socket.emit('game-start');
-                drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `game starting ...`);
+                if (playerState.current !== 0) {
+                    socket.emit('game-start');
+                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `game starting ...`);
+                    playerState.current = 0;
+                }
                 return;
             case 1:
-                socket.emit('ready-for-deal');
-                drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
+                if (playerState.current !== 1) {
+                    socket.emit('ready-for-deal');
+                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
+                    playerState.current = 1;
+                }
                 return;
             default:
                 return;
