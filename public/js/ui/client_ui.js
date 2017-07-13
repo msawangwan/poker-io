@@ -7,6 +7,22 @@ const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
 
+    const playerState = {
+        name: `player ${Math.floor(Math.random() * 100)}`,
+        balance: 10000
+    };
+    
+    const tableState = {
+        playerseat: undefined,
+        allseats: undefined,
+        coordinates: {
+            dimensions: undefined,
+            center: undefined,
+            seats: undefined
+        }
+        // drawn: false
+    };
+    
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
@@ -199,16 +215,26 @@ $(document).ready(() => {
         ctx.fillStyle = 'white';
         ctx.fillText(labeltxt, x - ctx.measureText(labeltxt).width / 2, y);
     };
-
-    const drawPotLabel = (tableCenterx, tableCentery, potsize) => {
-        const text = `pot size: ${potsize || 0}`;
-        const textwidth = ctx.measureText(text).width;
-
+    
+    const drawTableCenterLabel = (x, y, labeltxt) => {
+        const textwidth = ctx.measureText(labeltxt).width;
+        
         ctx.beginPath();
         ctx.font = '24px serif';
         ctx.fillStyle = 'white';
         ctx.fillText(text, tableCenterx - textwidth, tableCentery);
-    }
+    };
+
+    const drawPotLabel = (x, y, potsize) => {
+        // const text = `pot size: ${potsize || 0}`;
+        // const textwidth = ctx.measureText(text).width;
+
+        // ctx.beginPath();
+        // ctx.font = '24px serif';
+        // ctx.fillStyle = 'white';
+        // ctx.fillText(text, x - textwidth, y);
+        drawTableCenterLabel(x, y,`pot size: ${potsize || 0}`);
+    };
 
     const drawAll = (playerSeat, seatingState) => {
         updateCanvasDimensions();
@@ -223,33 +249,33 @@ $(document).ready(() => {
         if (!seatDrawResult) {
             return false;
         }
+        
+        const tablecenter = {
+            x:seatCoords.get(-1).x, y: seatCoords.get(-1).y
+        };
 
-        drawPotLabel(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
+        // drawPotLabel(seatCoords.get(-1).x, seatCoords.get(-1).y, 0);
+        drawPotLabel(tablecenter.x, tablecenter.y, 0);
+
+        tableState.coordinates.dimensions = tableDimensions;
+        tableState.coordinates.center = tablecenter;
+        tableState.coordinates.seats = seatCoords;
 
         return true;
-    };
-
-    const playerState = {
-        name: `player ${Math.floor(Math.random() * 100)}`,
-        balance: 10000
-    };
-
-    const tableState = {
-        playerseat: undefined,
-        allseats: undefined,
-        drawn: false
     };
 
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('player-assigned-seat', data => {
         tableState.playerseat = data.seat;
-        drawAll(tableState.playerseat, tableState.allseats);
+        process.nextTick(()=> drawAll(tableState.playerseat, tableState.allseats));
+        // drawAll(tableState.playerseat, tableState.allseats);
     });
 
     socket.on('table-seating-state', data => {
         tableState.allseats = data.seating;
-        drawAll(tableState.playerseat, tableState.allseats);
+        process.nextTick(()=> drawAll(tableState.playerseat, tableState.allseats));
+        // drawAll(tableState.playerseat, tableState.allseats);
     });
 
     socket.on('current-game-state', data => {
@@ -259,7 +285,8 @@ $(document).ready(() => {
 
         switch (currentStateIndex) {
             case -1:
-                socket.emit('waiting-for-players');
+                // socket.emit('waiting-for-players');
+                drawPotLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
                 break;
             case 0:
                 socket.emit('game-start');
