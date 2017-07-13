@@ -331,7 +331,7 @@ $(document).ready(() => {
         console.log(cardA);
         console.log(cardB);
         loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, tableState.coordinates.center.x, tableState.coordinates.center.y);
-        loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, tableState.coordinates.center.x, tableState.coordinates.center.y);
+        loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, tableState.coordinates.center.x + cardpixelwidth, tableState.coordinates.center.y);
     });
 
     socket.on('current-game-state', data => {
