@@ -3,13 +3,18 @@ const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
+const validStates = [
+    'new', 'waiting', 'playing'
+];
+
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin);
 
     const playerState = {
         name: `player ${Math.floor(Math.random() * 100)}`,
-        balance: 10000
+        balance: 10000,
+        current: 'new'
     };
     
     const tableState = {
@@ -285,14 +290,20 @@ $(document).ready(() => {
 
         switch (currentStateIndex) {
             case -1:
-                // socket.emit('waiting-for-players');
-                drawPotLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
-                break;
+                if (playerState.current !== 'waiting') {
+                    playerState.current = 'waiting';
+                    drawPotLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...');
+                    // socket.emit('waiting-for-players');
+                }
+                return;
             case 0:
                 socket.emit('game-start');
-                break;
+                return;
+            case 1:
+                socket.emit('ready-for-deal');
+                return;
             default:
-                break;
+                return;
         }
     });
 
