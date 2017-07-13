@@ -253,17 +253,16 @@ $(document).ready(() => {
     });
 
     socket.on('current-game-state', data => {
-        const currentStateIndex = data.state[0];
+        const currentStateIndex = data.state;
 
-        console.log('state: ' + data.state[1]);
-        console.log('state index: ' + data.state[0]);
+        console.log('state: ' + currentStateIndex);
 
         switch (currentStateIndex) {
             case -1:
                 socket.emit('waiting-for-players');
                 break;
             case 0:
-                socket.emit('deal');
+                socket.emit('game-start');
                 break;
             default:
                 break;
