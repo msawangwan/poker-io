@@ -3,6 +3,35 @@ const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
+const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
+const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+const cardpixelwidth = 72.15;
+const cardpixelheight = 83.25;
+
+const loadSpriteFromSpriteSheet = (ctx, src, col, row, destx, desty) => {
+    const cachedimg = new Image(); // TODO: cache these
+
+    cachedimg.onload = () => {
+        const loadcard = (ctx, col, row) => {
+            console.log(`loading card sprite ${col} ${row}`)
+            ctx.drawImage(
+                cachedimg,
+                row * cardpixelwidth, // frame index * frame width
+                col * cardpixelheight, // frame row?
+                cardpixelwidth, // frame width
+                cardpixelheight, // frame height
+                destx, // dest x
+                desty, // dest y
+                cardpixelwidth, // frame width on draw (same as input usually)
+                cardpixelheight // frame height on draw (same as input usually)
+            );
+        };
+        loadcard(ctx, col, row);
+    };
+
+    cachedimg.src = src
+};
+
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -15,6 +44,10 @@ $(document).ready(() => {
             index: undefined,
             x: 0,
             y: 0
+        },
+        holeCards: {
+            a: undefined,
+            b: undefined
         },
         phaseIndex: undefined
     };
@@ -65,6 +98,28 @@ $(document).ready(() => {
         canvas.height = canvasAxis.height;
 
         return true;
+    };
+
+    const updateTableDimensions = (playerseat) => {
+        const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
+        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
+
+        canvasState.table.dimensions = tableDimensions;
+        canvasState.table.center.x = seatCoords.get(-1).x;
+        canvasState.table.center.y = seatCoords.get(-1).y;
+        canvasState.table.seatCoordinates = seatCoords;
+
+        tableState.pos.x = canvasState.table.center.x;
+        tableState.pos.y = canvasState.table.center.y;
+
+        const playerSeatCoords = getTablePosByIndex(playerseat);
+
+        if (playerSeatCoords) {
+            playerState.assignedSeat.x = playerSeatCoords.x;
+            playerState.assignedSeat.y = playerSeatCoords.y;
+        } else {
+            console.log('err: no seat coords found');
+        }
     };
 
     const calcTableDimensions = (radius, focuilength) => {
@@ -156,16 +211,29 @@ $(document).ready(() => {
         return seating;
     };
 
-    const drawTable = table => {
+    const getTablePosByIndex = (index) => {
+        const coords = canvasState.table.seatCoordinates;
+        if (coords) { // TODO: handle undefined
+            const pos = coords.get(index + 1);
+            if (pos) {
+                return {
+                    x: pos.x,
+                    y: pos.y
+                }
+            }
+        }
+    };
+
+    const drawTable = (dimensions) => {
         ctx.beginPath();
 
-        ctx.arc(table.focui.left, table.origin.y, table.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        ctx.arc(table.focui.right, table.origin.y, table.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+        ctx.arc(dimensions.focui.left, dimensions.origin.y, dimensions.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        ctx.arc(dimensions.focui.right, dimensions.origin.y, dimensions.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
 
-        const yoffset = table.origin.y + table.radius;
+        const yoffset = dimensions.origin.y + dimensions.radius;
 
-        ctx.moveTo(table.focui.right, yoffset);
-        ctx.lineTo(table.focui.left, yoffset);
+        ctx.moveTo(dimensions.focui.right, yoffset);
+        ctx.lineTo(dimensions.focui.left, yoffset);
 
         ctx.stroke();
 
@@ -220,6 +288,23 @@ $(document).ready(() => {
         drawSeatLabel(x, y, player.name);
     };
 
+    const drawCards = () => {
+        if (!playerState.holeCards.a || !playerState.holeCards.b) {
+            return false;
+        }
+
+        const cardA = playerState.holeCards.a;
+        const cardB = playerState.holeCards.b;
+
+        console.log(cardA);
+        console.log(cardB);
+
+        loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
+        loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
+
+        return true;
+    };
+
     const drawSeatLabel = (x, y, labeltxt) => {
         ctx.beginPath();
         ctx.font = '12px serif';
@@ -256,85 +341,48 @@ $(document).ready(() => {
         centerlabelText = labeltxt;
     };
 
-    const drawAll = (playerSeat, seatingState, centerLabel, isResizeDraw) => {
-        updateCanvasDimensions();
+    const renderQueue = [];
+    const renderLabelQueue = [];
 
-        const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
-
-        drawTable(tableDimensions);
-
-        const seatDrawResult = drawSeating(seatCoords, seatingState);
-
-        if (!seatDrawResult) {
-            return false;
-        }
-
-        canvasState.table.dimensions = tableDimensions;
-        canvasState.table.center.x = seatCoords.get(-1).x;
-        canvasState.table.center.y = seatCoords.get(-1).y;
-        canvasState.table.seatCoordinates = seatCoords;
-
-        tableState.pos.x = canvasState.table.center.x;
-        tableState.pos.y = canvasState.table.center.y;
-
-        const playerSeatCoords = getTablePosByIndex(playerSeat);
-
-        if (playerSeatCoords) {
-            playerState.assignedSeat.x = playerSeatCoords.x;
-            playerState.assignedSeat.y = playerSeatCoords.y;
-        } else {
-            console.log('err: no seat coords found');
-        }
-
-        return true;
-    };
-
-    const render = (table, seating, cards, labels) => {
-
-    };
-
-    const getTablePosByIndex = (index) => {
-        const coords = canvasState.table.seatCoordinates;
-        if (coords) { // TODO: handle undefined
-            const pos = coords.get(index + 1);
-            if (pos) {
-                return {
-                    x: pos.x,
-                    y: pos.y
-                }
+    const render = (table, seating, labels, cards) => {
+        if (table) {
+            if (canvasState.table.dimensions) {
+                drawTable(canvasState.table.dimensions);
             }
         }
+
+        if (seating) {
+            if (canvasState.table.seatCoordinates && tableState.seats) {
+                drawSeating(canvasState.table.seatCoordinates, tableState.seats);
+            }
+        }
+
+        if (labels) {
+            if (tableState.pos) {
+                drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
+            }
+        }
+
+        if (cards) {
+            drawCards();
+        }
     };
 
-    const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
-    const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
-    const cardpixelwidth = 72.15;
-    const cardpixelheight = 83.25;
-
-    const loadSpriteFromSpriteSheet = (src, col, row, destx, desty) => {
-        const cachedimg = new Image(); // TODO: cache these
-
-        cachedimg.onload = () => {
-            const loadcard = (col, row) => {
-                console.log(`loading card sprite ${col} ${row}`)
-                ctx.drawImage(
-                    cachedimg,
-                    row * cardpixelwidth, // frame index * frame width
-                    col * cardpixelheight, // frame row?
-                    cardpixelwidth, // frame width
-                    cardpixelheight, // frame height
-                    destx, // dest x
-                    desty, // dest y
-                    cardpixelwidth, // frame width on draw (same as input usually)
-                    cardpixelheight // frame height on draw (same as input usually)
-                );
-            };
-            loadcard(col, row);
-        };
-
-        cachedimg.src = src
-    };
+    const renderLoop = setInterval(() => {
+        console.log(`update rate: ${1000 / 120}`);
+        if (renderQueue.length > 0) {
+            while (renderQueue.length > 0) {
+                const cur = renderQueue.shift();
+                cur();
+            }
+        }
+        if (renderLabelQueue.length > 0) {
+            while (renderLabelQueue.length > 0) {
+                const cur = renderLabelQueue.shift();
+                cur();
+            }
+        }
+    }, 1000 / 120);
 
     const enqueueProcess = task => Promise.resolve().then(task());
 
@@ -342,32 +390,26 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         playerState.assignedSeat.index = data.seat;
-        enqueueProcess(() => {
-            drawAll(playerState.assignedSeat.index, tableState.seats);
-        });
+        centerlabelText = 'player seated ...';
     });
 
     socket.on('table-seating-state', data => {
         tableState.seats = data.seating;
-        enqueueProcess(() => {
-            drawAll(playerState.assignedSeat.index, tableState.seats);
-            drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
+        centerlabelText = 'waiting for players ...';
+        renderQueue.push(() => {
+            updateCanvasDimensions();
+            updateTableDimensions(playerState.assignedSeat.index);
+            render(true, true, true, false);
         });
     });
 
     socket.on('hand-dealt', data => {
-        const cardA = data.playerhand[0];
-        const cardB = data.playerhand[1];
+        playerState.holeCards.a = data.playerhand[0];
+        playerState.holeCards.b = data.playerhand[1];
 
-        console.log('**'); // { suite, value }
-        console.log('dealer dealt'); // { suite, value }
-        console.log(data.playerhand[2].af.value + ' of ' + data.playerhand[2].af.suite);
-        console.log(data.playerhand[2].bf.value + ' of ' + data.playerhand[2].bf.suite);
-        console.log(data.playerhand);
-        console.log('**'); // { suite, value }
-
-        loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
-        loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
+        renderQueue.push(() => {
+            render(false, false, false, true);
+        });
     });
 
     socket.on('current-game-state', data => {
@@ -378,29 +420,32 @@ $(document).ready(() => {
         switch (currentStateIndex) {
             case -1:
                 if (playerState.phaseIndex !== -1) {
-                    enqueueProcess(() => {
-                        drawTableCenterLabel(tableState.pos.x, tableState.pos.y, 'Waiting for players ...')
-                    });
+                    centerlabelText = 'waiting for players ...';
                     playerState.phaseIndex = -1;
                 }
-                return;
+                break;
             case 0:
                 if (playerState.phaseIndex !== 0) {
                     socket.emit('player-ready-for-game');
-                    drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `game starting ...`);
+                    renderLabelQueue.push(() => {
+                        centerlabelText = 'game starting ...';
+                        render(false, false, true, false);
+                    });
                     playerState.phaseIndex = 0;
                 }
-                return;
+                break;
             case 1:
                 if (playerState.phaseIndex !== 1) {
                     socket.emit('game-ready-for-start');
-                    drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `pot size: ${0}`);
+                    renderLabelQueue.push(() => {
+                        centerlabelText = `pot size: ${0}`;
+                        render(false, false, true, false);
+                    });
                     playerState.phaseIndex = 1;
                 }
-                return;
+                break;
             case 2:
                 if (playerState.phaseIndex !== 2) {
-                    drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `pot size: ${0}`);
                     socket.emit('ready-for-shuffle');
                     playerState.phaseIndex = 2;
                 }
@@ -410,26 +455,33 @@ $(document).ready(() => {
                     socket.emit('waiting-for-hole-cards');
                     playerState.phaseIndex = 3;
                 }
+                break;
             case 4:
                 if (playerState.phaseIndex !== 4) {
                     console.log('got hole cards');
                     playerState.phaseIndex = 4;
                 }
+                break;
             default:
-                return;
+                break;
         }
     });
 
     socket.on('connect_error', () => {
-        // disconnected
+        clearInterval(renderLoop);
     });
-
 
     $(window).on('resize', () => {
         console.log('window resized');
-        // TODO: wrap in enqueue process???
-        drawAll(playerState.assignedSeat.index, tableState.seats);
-        drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
+
+        updateCanvasDimensions();
+        updateTableDimensions(playerState.assignedSeat.index);
+
+        enqueueProcess(() => {
+            renderQueue.push(() => {
+                render(true, true, true, true);
+            });
+        });
     });
 });
     // const img_cardback = new Image();
