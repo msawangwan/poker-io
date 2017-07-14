@@ -12,11 +12,11 @@ $(document).ready(() => {
         name: `player ${Math.floor(Math.random() * 100)}`,
         balance: 10000,
         assignedSeat: {
-            index: -10,
+            index: undefined,
             x: 0,
             y: 0
         },
-        phaseIndex: -1000
+        phaseIndex: undefined
     };
 
     const tableState = {
@@ -25,8 +25,6 @@ $(document).ready(() => {
     };
 
     const canvasState = {
-        // playerseat: undefined,
-        // allseats: undefined,
         table: {
             dimensions: undefined,
             center: { x: undefined, y: undefined },
@@ -272,16 +270,13 @@ $(document).ready(() => {
             return false;
         }
 
-        // const tablecenter = {
-        //     x: seatCoords.get(-1).x, y: seatCoords.get(-1).y
-        // };
-
         canvasState.table.dimensions = tableDimensions;
         canvasState.table.center.x = seatCoords.get(-1).x;
         canvasState.table.center.y = seatCoords.get(-1).y;
-        // canvasState.table.center.x = tablecenter.x;
-        // canvasState.table.center.y = tablecenter.y;
         canvasState.table.seats = seatCoords;
+
+        tableState.pos.x = canvasState.table.center.x;
+        tableState.pos.y = canvasState.table.center.y;
 
         return true;
     };
@@ -324,8 +319,6 @@ $(document).ready(() => {
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('player-assigned-seat', data => {
-        // canvasState.playerseat = data.seat;
-        // enqueueProcess(() => drawAll(canvasState.playerseat, canvasState.allseats))
         playerState.assignedSeat.index = data.seat;
         enqueueProcess(() => {
             drawAll(playerState.assignedSeat.index, tableState.seats);
@@ -333,11 +326,8 @@ $(document).ready(() => {
     });
 
     socket.on('table-seating-state', data => {
-        // canvasState.allseats = data.seating;
         tableState.seats = data.seating;
         enqueueProcess(() => {
-            // drawAll(canvasState.playerseat, canvasState.allseats);
-            // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, centerlabelText);
             drawAll(playerState.assignedSeat.index, tableState.seats);
             drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
         });
@@ -354,8 +344,6 @@ $(document).ready(() => {
         console.log(data.playerhand);
         console.log('**'); // { suite, value }
 
-        // loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, canvasState.table.center.x, canvasState.table.center.y);
-        // loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, canvasState.table.center.x + cardpixelwidth, canvasState.table.center.y);
         loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
         loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
     });
@@ -369,7 +357,6 @@ $(document).ready(() => {
             case -1:
                 if (playerState.phaseIndex !== -1) {
                     enqueueProcess(() => {
-                        // () => drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, 'Waiting for players ...')
                         drawTableCenterLabel(tableState.pos.x, tableState.pos.y, 'Waiting for players ...')
                     });
                     playerState.phaseIndex = -1;
@@ -378,7 +365,6 @@ $(document).ready(() => {
             case 0:
                 if (playerState.phaseIndex !== 0) {
                     socket.emit('player-ready-for-game');
-                    // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, `game starting ...`);
                     drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `game starting ...`);
                     playerState.phaseIndex = 0;
                 }
@@ -387,14 +373,12 @@ $(document).ready(() => {
                 if (playerState.phaseIndex !== 1) {
                     socket.emit('game-ready-for-start');
                     drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `pot size: ${0}`);
-                    // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, `pot size: ${0}`);
                     playerState.phaseIndex = 1;
                 }
                 return;
             case 2:
                 if (playerState.phaseIndex !== 2) {
                     drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `pot size: ${0}`);
-                    // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, `pot size: ${0}`);
                     socket.emit('ready-for-shuffle');
                     playerState.phaseIndex = 2;
                 }
@@ -422,8 +406,6 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         console.log('window resized');
         // TODO: wrap in enqueue process???
-        // drawAll(canvasState.playerseat, canvasState.allseats);
-        // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, centerlabelText);
         drawAll(playerState.assignedSeat.index, tableState.seats);
         drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
     });
