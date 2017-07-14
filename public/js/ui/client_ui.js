@@ -3,8 +3,6 @@ const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
-const assetCache = new Map();
-
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -13,13 +11,23 @@ $(document).ready(() => {
     const playerState = {
         name: `player ${Math.floor(Math.random() * 100)}`,
         balance: 10000,
-        current: -1000
+        assignedSeat: {
+            index: -10,
+            x: 0,
+            y: 0
+        },
+        phaseIndex: -1000
     };
 
     const tableState = {
-        playerseat: undefined,
-        allseats: undefined,
-        coordinates: {
+        pos: { x: 0, y: 0 },
+        seats: undefined
+    };
+
+    const canvasState = {
+        // playerseat: undefined,
+        // allseats: undefined,
+        table: {
             dimensions: undefined,
             center: { x: undefined, y: undefined },
             seats: undefined
@@ -264,16 +272,22 @@ $(document).ready(() => {
             return false;
         }
 
-        const tablecenter = {
-            x: seatCoords.get(-1).x, y: seatCoords.get(-1).y
-        };
+        // const tablecenter = {
+        //     x: seatCoords.get(-1).x, y: seatCoords.get(-1).y
+        // };
 
-        tableState.coordinates.dimensions = tableDimensions;
-        tableState.coordinates.center.x = tablecenter.x;
-        tableState.coordinates.center.y = tablecenter.y;
-        tableState.coordinates.seats = seatCoords;
+        canvasState.table.dimensions = tableDimensions;
+        canvasState.table.center.x = seatCoords.get(-1).x;
+        canvasState.table.center.y = seatCoords.get(-1).y;
+        // canvasState.table.center.x = tablecenter.x;
+        // canvasState.table.center.y = tablecenter.y;
+        canvasState.table.seats = seatCoords;
 
         return true;
+    };
+
+    const render = (table, seating, cards, labels) => {
+
     };
 
     const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
@@ -282,7 +296,7 @@ $(document).ready(() => {
     const cardpixelheight = 83.25;
 
     const loadSpriteFromSpriteSheet = (src, col, row, destx, desty) => {
-        const cachedimg = new Image();
+        const cachedimg = new Image(); // TODO: cache these
 
         cachedimg.onload = () => {
             const loadcard = (col, row) => {
@@ -295,8 +309,6 @@ $(document).ready(() => {
                     cardpixelheight, // frame height
                     destx, // dest x
                     desty, // dest y
-                    // col * row, // dest x
-                    // col, // dest y
                     cardpixelwidth, // frame width on draw (same as input usually)
                     cardpixelheight // frame height on draw (same as input usually)
                 );
@@ -312,27 +324,40 @@ $(document).ready(() => {
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('player-assigned-seat', data => {
-        tableState.playerseat = data.seat;
-        enqueueProcess(() => drawAll(tableState.playerseat, tableState.allseats))
+        // canvasState.playerseat = data.seat;
+        // enqueueProcess(() => drawAll(canvasState.playerseat, canvasState.allseats))
+        playerState.assignedSeat.index = data.seat;
+        enqueueProcess(() => {
+            drawAll(playerState.assignedSeat.index, tableState.seats);
+        });
     });
 
     socket.on('table-seating-state', data => {
-        tableState.allseats = data.seating;
+        // canvasState.allseats = data.seating;
+        tableState.seats = data.seating;
         enqueueProcess(() => {
-            drawAll(tableState.playerseat, tableState.allseats);
-            drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
+            // drawAll(canvasState.playerseat, canvasState.allseats);
+            // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, centerlabelText);
+            drawAll(playerState.assignedSeat.index, tableState.seats);
+            drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
         });
     });
 
     socket.on('hand-dealt', data => {
         const cardA = data.playerhand[0];
         const cardB = data.playerhand[1];
-        console.log('dealer dealt: '); // { suite, value }
-        console.log(data.playerhand);
+
+        console.log('**'); // { suite, value }
+        console.log('dealer dealt'); // { suite, value }
         console.log(data.playerhand[2].af.value + ' of ' + data.playerhand[2].af.suite);
         console.log(data.playerhand[2].bf.value + ' of ' + data.playerhand[2].bf.suite);
-        loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, tableState.coordinates.center.x, tableState.coordinates.center.y);
-        loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, tableState.coordinates.center.x + cardpixelwidth, tableState.coordinates.center.y);
+        console.log(data.playerhand);
+        console.log('**'); // { suite, value }
+
+        // loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, canvasState.table.center.x, canvasState.table.center.y);
+        // loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, canvasState.table.center.x + cardpixelwidth, canvasState.table.center.y);
+        loadSpriteFromSpriteSheet(cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
+        loadSpriteFromSpriteSheet(cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
     });
 
     socket.on('current-game-state', data => {
@@ -342,43 +367,47 @@ $(document).ready(() => {
 
         switch (currentStateIndex) {
             case -1:
-                if (playerState.current !== -1) {
-                    enqueueProcess(
-                        () => drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, 'Waiting for players ...')
-                    );
-                    playerState.current = -1;
+                if (playerState.phaseIndex !== -1) {
+                    enqueueProcess(() => {
+                        // () => drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, 'Waiting for players ...')
+                        drawTableCenterLabel(tableState.pos.x, tableState.pos.y, 'Waiting for players ...')
+                    });
+                    playerState.phaseIndex = -1;
                 }
                 return;
             case 0:
-                if (playerState.current !== 0) {
+                if (playerState.phaseIndex !== 0) {
                     socket.emit('player-ready-for-game');
-                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `game starting ...`);
-                    playerState.current = 0;
+                    // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, `game starting ...`);
+                    drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `game starting ...`);
+                    playerState.phaseIndex = 0;
                 }
                 return;
             case 1:
-                if (playerState.current !== 1) {
+                if (playerState.phaseIndex !== 1) {
                     socket.emit('game-ready-for-start');
-                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
-                    playerState.current = 1;
+                    drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `pot size: ${0}`);
+                    // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, `pot size: ${0}`);
+                    playerState.phaseIndex = 1;
                 }
                 return;
             case 2:
-                if (playerState.current !== 2) {
-                    drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, `pot size: ${0}`);
+                if (playerState.phaseIndex !== 2) {
+                    drawTableCenterLabel(tableState.pos.x, tableState.pos.y, `pot size: ${0}`);
+                    // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, `pot size: ${0}`);
                     socket.emit('ready-for-shuffle');
-                    playerState.current = 2;
+                    playerState.phaseIndex = 2;
                 }
                 break;
             case 3:
-                if (playerState.current !== 3) {
+                if (playerState.phaseIndex !== 3) {
                     socket.emit('waiting-for-hole-cards');
-                    playerState.current = 3;
+                    playerState.phaseIndex = 3;
                 }
             case 4:
-                if (playerState.current !== 4) {
+                if (playerState.phaseIndex !== 4) {
                     console.log('got hole cards');
-                    playerState.current = 4;
+                    playerState.phaseIndex = 4;
                 }
             default:
                 return;
@@ -392,10 +421,13 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         console.log('window resized');
-        drawAll(tableState.playerseat, tableState.allseats);
-        drawTableCenterLabel(tableState.coordinates.center.x, tableState.coordinates.center.y, centerlabelText);
+        // TODO: wrap in enqueue process???
+        // drawAll(canvasState.playerseat, canvasState.allseats);
+        // drawTableCenterLabel(canvasState.table.center.x, canvasState.table.center.y, centerlabelText);
+        drawAll(playerState.assignedSeat.index, tableState.seats);
+        drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
     });
-
+});
     // const img_cardback = new Image();
     // const drawTable = seatedAt => {
     //     const tableradius = table.dimensions.radius;
@@ -423,18 +455,6 @@ $(document).ready(() => {
     //         ctx.fillText(theta, x, y);
     //     }
     // };
-
-    // socket.on('update-ui-display-table', state => {
-    //     updateCanvasDimensions();
-    //     drawTable();
-    //     for (const s of state.tableState) {
-    //         if (s === 'empty seat') {
-    //             // seat is empty
-    //         } else {
-
-    //         }
-    //     }
-    // });
 
     // const img_cardsheet = new Image();
 
@@ -473,42 +493,8 @@ $(document).ready(() => {
     // };
 
     // img_cardsheet.src = cardspritesheet;
-});
 
 // const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
 // const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 // const cardpixelwidth = 72.15;
 // const cardpixelheight = 83.25;
-
-// function ImageCache() {
-//     this.store = new Map();
-// }
-
-// ImageCache.prototype.load = function (assetpath) {
-//     if (this.store.has(assetpath)) {
-//         return this.store.get(assetpath);
-//     }
-
-//     const img = new Image();
-
-//     img.onload = () => { }
-//     img.src = assetpath;
-
-//     this.store.set(assetpath, img);
-// };
-
-// // sheet = parent spritesheet
-// // framedata = frame width, frame height, frame index start, frame index end
-// function Sprite(sheet, framedata, onload) {
-//     this.src = sheet;
-
-//     const { w, h, s, e } = framedate;
-
-//     this.frame = {
-//         width: w, height: h, start: s, end: e
-//     }
-// }
-
-// Sprite.prototype.load = function () {
-
-// };
