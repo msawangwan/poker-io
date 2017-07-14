@@ -62,13 +62,16 @@ $(document).ready(() => {
             dimensions: undefined,
             center: { x: undefined, y: undefined },
             seatCoordinates: undefined
+        },
+        labels: {
+            tableCenter: ' ... '
         }
     };
 
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
-    let centerlabelText = '...';
+    // let centerlabelText = '...';
 
     const canvasAxis = {
         width: 0,
@@ -340,11 +343,26 @@ $(document).ready(() => {
 
         ctx.drawImage(labelCanvas, x - labelCanvas.width / 2, y - labelCanvas.height / 2);
 
-        centerlabelText = labeltxt;
+        // centerlabelText = labeltxt;
     };
 
     const renderQueue = [];
     const renderLabelQueue = [];
+
+    const labelq = [];
+
+    const setCurrentTableCenterLabel = (latestText) => {
+        console.log('setting current label as: ' + latestText);
+        while (labelq.length > 0) {
+            const discarded = labelq.shift();
+            console.log('discarded labels: ' + discarded);
+        }
+
+        canvasState.labels.tableCenter = latestText;
+        console.log('current label: ' + canvasState.labels.tableCenter);
+
+        labelq.push(latestText);
+    };
 
     const render = (table, seating, labels, cards) => {
         if (table) {
@@ -361,7 +379,7 @@ $(document).ready(() => {
 
         if (labels) {
             if (tableState.pos) {
-                drawTableCenterLabel(tableState.pos.x, tableState.pos.y, centerlabelText);
+                drawTableCenterLabel(tableState.pos.x, tableState.pos.y, canvasState.labels.tableCenter);
             }
         }
 
@@ -379,17 +397,10 @@ $(document).ready(() => {
                 cur();
             }
         }
-        if (renderLabelQueue.length > 0) {
-            let latest = undefined;
-            while (renderLabelQueue.length > 0) {
-                // const cur = renderLabelQueue.shift();
-                // cur();
-                latest = renderLabelQueue.shift();
-            }
 
-            if (latest) {
-                latest();
-            }
+        if (labelq.length > 0) {
+            canvasState.labels.tableCenter = labelq.pop();
+            render(false, false, true, false);
         }
     }, tickrate);
 
@@ -397,12 +408,12 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         playerState.assignedSeat.index = data.seat;
-        centerlabelText = 'player seated ...';
+        setCurrentTableCenterLabel('player seated ...');
     });
 
     socket.on('table-seating-state', data => {
         tableState.seats = data.seating;
-        centerlabelText = 'waiting for players ...';
+        setCurrentTableCenterLabel('waiting for players ...');
         renderQueue.push(() => {
             updateCanvasDimensions();
             updateTableDimensions(playerState.assignedSeat.index);
@@ -427,27 +438,21 @@ $(document).ready(() => {
         switch (currentStateIndex) {
             case -1:
                 if (playerState.phaseIndex !== -1) {
-                    centerlabelText = 'waiting for players ...';
+                    setCurrentTableCenterLabel('waiting for players ...');
                     playerState.phaseIndex = -1;
                 }
                 break;
             case 0:
                 if (playerState.phaseIndex !== 0) {
                     socket.emit('player-ready-for-game');
-                    renderLabelQueue.push(() => {
-                        centerlabelText = 'game starting ...';
-                        render(false, false, true, false);
-                    });
+                    setCurrentTableCenterLabel('game starting ...');
                     playerState.phaseIndex = 0;
                 }
                 break;
             case 1:
                 if (playerState.phaseIndex !== 1) {
                     socket.emit('game-ready-for-start');
-                    renderLabelQueue.push(() => {
-                        centerlabelText = `pot size: ${0}`;
-                        render(false, false, true, false);
-                    });
+                    setCurrentTableCenterLabel(`pot size: ${0}`);
                     playerState.phaseIndex = 1;
                 }
                 break;
