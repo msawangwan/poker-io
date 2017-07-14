@@ -28,7 +28,7 @@ $(document).ready(() => {
         table: {
             dimensions: undefined,
             center: { x: undefined, y: undefined },
-            seats: undefined
+            seatCoordinates: undefined
         }
     };
 
@@ -273,16 +273,38 @@ $(document).ready(() => {
         canvasState.table.dimensions = tableDimensions;
         canvasState.table.center.x = seatCoords.get(-1).x;
         canvasState.table.center.y = seatCoords.get(-1).y;
-        canvasState.table.seats = seatCoords;
+        canvasState.table.seatCoordinates = seatCoords;
 
         tableState.pos.x = canvasState.table.center.x;
         tableState.pos.y = canvasState.table.center.y;
+
+        const playerSeatCoords = getTablePosByIndex(playerSeat);
+
+        if (playerSeatCoords) {
+            playerState.assignedSeat.x = playerSeatCoords.x;
+            playerState.assignedSeat.y = playerSeatCoords.y;
+        } else {
+            console.log('err: no seat coords found');
+        }
 
         return true;
     };
 
     const render = (table, seating, cards, labels) => {
 
+    };
+
+    const getTablePosByIndex = (index) => {
+        const coords = canvasState.table.seatCoordinates;
+        if (coords) { // TODO: handle undefined
+            const pos = coords.get(index + 1);
+            if (pos) {
+                return {
+                    x: pos.x,
+                    y: pos.y
+                }
+            }
+        }
     };
 
     const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
