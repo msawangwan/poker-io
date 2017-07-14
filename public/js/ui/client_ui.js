@@ -71,8 +71,6 @@ $(document).ready(() => {
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
-    // let centerlabelText = '...';
-
     const canvasAxis = {
         width: 0,
         height: 0
@@ -320,8 +318,6 @@ $(document).ready(() => {
 
         if ($centerLabel) {
             const old = document.getElementById('table-center-label');
-            console.log(x);
-            console.log(y);
             if (old) {
                 old.getContext('2d').clearRect(0, 0, old.width, old.height);
             }
@@ -342,8 +338,6 @@ $(document).ready(() => {
         labelctx.fillText(labeltxt, labelCanvas.width / 2 - textDimensions.width, labelCanvas.height / 2);
 
         ctx.drawImage(labelCanvas, x - labelCanvas.width / 2, y - labelCanvas.height / 2);
-
-        // centerlabelText = labeltxt;
     };
 
     const renderQueue = [];
