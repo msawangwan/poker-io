@@ -317,8 +317,10 @@ $(document).ready(() => {
 
         if ($centerLabel) {
             const old = document.getElementById('table-center-label');
+            console.log(x);
+            console.log(y);
             if (old) {
-                old.getContext('2d').clearRect(0, 0, 300, 300);
+                old.getContext('2d').clearRect(0, 0, old.width, old.height);
             }
             $centerLabel.remove();
         }
@@ -368,8 +370,9 @@ $(document).ready(() => {
         }
     };
 
+    const tickrate = 1000 / 2;
+
     const renderLoop = setInterval(() => {
-        console.log(`update rate: ${1000 / 120}`);
         if (renderQueue.length > 0) {
             while (renderQueue.length > 0) {
                 const cur = renderQueue.shift();
@@ -377,14 +380,18 @@ $(document).ready(() => {
             }
         }
         if (renderLabelQueue.length > 0) {
+            let latest = undefined;
             while (renderLabelQueue.length > 0) {
-                const cur = renderLabelQueue.shift();
-                cur();
+                // const cur = renderLabelQueue.shift();
+                // cur();
+                latest = renderLabelQueue.shift();
+            }
+
+            if (latest) {
+                latest();
             }
         }
-    }, 1000 / 120);
-
-    const enqueueProcess = task => Promise.resolve().then(task());
+    }, tickrate);
 
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
@@ -477,80 +484,10 @@ $(document).ready(() => {
         updateCanvasDimensions();
         updateTableDimensions(playerState.assignedSeat.index);
 
-        enqueueProcess(() => {
+        Promise.resolve().then(() => {
             renderQueue.push(() => {
                 render(true, true, true, true);
             });
         });
     });
 });
-    // const img_cardback = new Image();
-    // const drawTable = seatedAt => {
-    //     const tableradius = table.dimensions.radius;
-
-    //     const originx = currentCanvasCenter.x();
-    //     const originy = currentCanvasCenter.y();
-
-    //     const scale = table.dimensions.scale;
-
-    //     const imgw = img_cardback.width * scale;
-    //     const imgh = img_cardback.height * scale;
-
-    //     const offsetx = imgw / 2;
-    //     const offsety = imgh / 2;
-
-    //     const step = table.dimensions.spacing;
-
-    //     for (let theta = 0; theta < 360; theta += step) {
-    //         const rads = toRadians(theta);
-
-    //         const x = (originx + tableradius * 0.25 * Math.cos(rads)) - offsetx;
-    //         const y = (originy + tableradius * Math.sin(rads)) - offsety;
-
-    //         ctx.font = '24px serif';
-    //         ctx.fillText(theta, x, y);
-    //     }
-    // };
-
-    // const img_cardsheet = new Image();
-
-    // const getCardAtIndex = (s, v) => {
-    //     console.log(s + ' ' + v);
-    //     ctx.drawImage(
-    //         img_cardsheet,
-    //         v * cardpixelwidth, // frame index * frame width
-    //         s * cardpixelheight, // frame row?
-    //         cardpixelwidth, // frame width
-    //         cardpixelheight, // frame height
-    //         s * v, // dest x
-    //         s, // dest y
-    //         cardpixelwidth, // frame width on draw (same as input usually)
-    //         cardpixelheight // frame height on draw (same as input usually)
-    //     );
-    // };
-
-    // let suite = 0;
-    // let v = 0;
-
-    // img_cardsheet.onload = () => {
-    //     setInterval(() => {
-    //         if (suite >= 4) {
-    //             suite = 0;
-    //         }
-
-    //         if (v >= 13) {
-    //             v = 0;
-    //         }
-
-    //         getCardAtIndex(suite, v);
-    //         suite += 1;
-    //         v += 1;
-    //     }, 750);
-    // };
-
-    // img_cardsheet.src = cardspritesheet;
-
-// const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
-// const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
-// const cardpixelwidth = 72.15;
-// const cardpixelheight = 83.25;
