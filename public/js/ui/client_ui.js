@@ -439,55 +439,6 @@ $(document).ready(() => {
         });
     });
 
-    // socket.on('current-game-state', data => {
-    //     const currentStateIndex = data.state;
-
-    //     console.log('state: ' + currentStateIndex);
-
-    //     switch (currentStateIndex) {
-    //         case -1:
-    //             if (playerState.phaseIndex !== -1) {
-    //                 setCurrentTableCenterLabel('waiting for players ...');
-    //                 playerState.phaseIndex = -1;
-    //             }
-    //             break;
-    //         case 0:
-    //             if (playerState.phaseIndex !== 0) {
-    //                 socket.emit('player-ready-for-game');
-    //                 setCurrentTableCenterLabel('game starting ...');
-    //                 playerState.phaseIndex = 0;
-    //             }
-    //             break;
-    //         case 1:
-    //             if (playerState.phaseIndex !== 1) {
-    //                 socket.emit('game-ready-for-start');
-    //                 setCurrentTableCenterLabel(`pot size: ${0}`);
-    //                 playerState.phaseIndex = 1;
-    //             }
-    //             break;
-    //         case 2:
-    //             if (playerState.phaseIndex !== 2) {
-    //                 socket.emit('ready-for-shuffle');
-    //                 playerState.phaseIndex = 2;
-    //             }
-    //             break;
-    //         case 3:
-    //             if (playerState.phaseIndex !== 3) {
-    //                 socket.emit('waiting-for-hole-cards');
-    //                 playerState.phaseIndex = 3;
-    //             }
-    //             break;
-    //         case 4:
-    //             if (playerState.phaseIndex !== 4) {
-    //                 console.log('got hole cards');
-    //                 playerState.phaseIndex = 4;
-    //             }
-    //             break;
-    //         default:
-    //             break;
-    //     }
-    // });
-
     socket.on('connect_error', () => {
         clearInterval(renderLoop);
     });
