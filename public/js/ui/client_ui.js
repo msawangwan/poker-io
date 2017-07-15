@@ -415,63 +415,78 @@ $(document).ready(() => {
         });
     });
 
+    socket.on('game-start', data => {
+        socket.emit('player-readyup');
+    });
+
+    socket.on('player-readyup-accepted', data => {
+        socket.emit('player-ready-for-shuffle', { dealId: data.dealId });
+    });
+
+    socket.on('deck-shuffled', data => {
+        socket.emit('player-waiting-for-deal');
+    });
+
     socket.on('hand-dealt', data => {
         playerState.holeCards.a = data.playerhand[0];
         playerState.holeCards.b = data.playerhand[1];
+
+        console.log('got cards');
+        console.log(playerState.holeCards);
 
         renderQueue.push(() => {
             render(false, false, false, true);
         });
     });
 
-    socket.on('current-game-state', data => {
-        const currentStateIndex = data.state;
+    // socket.on('current-game-state', data => {
+    //     const currentStateIndex = data.state;
 
-        console.log('state: ' + currentStateIndex);
+    //     console.log('state: ' + currentStateIndex);
 
-        switch (currentStateIndex) {
-            case -1:
-                if (playerState.phaseIndex !== -1) {
-                    setCurrentTableCenterLabel('waiting for players ...');
-                    playerState.phaseIndex = -1;
-                }
-                break;
-            case 0:
-                if (playerState.phaseIndex !== 0) {
-                    socket.emit('player-ready-for-game');
-                    setCurrentTableCenterLabel('game starting ...');
-                    playerState.phaseIndex = 0;
-                }
-                break;
-            case 1:
-                if (playerState.phaseIndex !== 1) {
-                    socket.emit('game-ready-for-start');
-                    setCurrentTableCenterLabel(`pot size: ${0}`);
-                    playerState.phaseIndex = 1;
-                }
-                break;
-            case 2:
-                if (playerState.phaseIndex !== 2) {
-                    socket.emit('ready-for-shuffle');
-                    playerState.phaseIndex = 2;
-                }
-                break;
-            case 3:
-                if (playerState.phaseIndex !== 3) {
-                    socket.emit('waiting-for-hole-cards');
-                    playerState.phaseIndex = 3;
-                }
-                break;
-            case 4:
-                if (playerState.phaseIndex !== 4) {
-                    console.log('got hole cards');
-                    playerState.phaseIndex = 4;
-                }
-                break;
-            default:
-                break;
-        }
-    });
+    //     switch (currentStateIndex) {
+    //         case -1:
+    //             if (playerState.phaseIndex !== -1) {
+    //                 setCurrentTableCenterLabel('waiting for players ...');
+    //                 playerState.phaseIndex = -1;
+    //             }
+    //             break;
+    //         case 0:
+    //             if (playerState.phaseIndex !== 0) {
+    //                 socket.emit('player-ready-for-game');
+    //                 setCurrentTableCenterLabel('game starting ...');
+    //                 playerState.phaseIndex = 0;
+    //             }
+    //             break;
+    //         case 1:
+    //             if (playerState.phaseIndex !== 1) {
+    //                 socket.emit('game-ready-for-start');
+    //                 setCurrentTableCenterLabel(`pot size: ${0}`);
+    //                 playerState.phaseIndex = 1;
+    //             }
+    //             break;
+    //         case 2:
+    //             if (playerState.phaseIndex !== 2) {
+    //                 socket.emit('ready-for-shuffle');
+    //                 playerState.phaseIndex = 2;
+    //             }
+    //             break;
+    //         case 3:
+    //             if (playerState.phaseIndex !== 3) {
+    //                 socket.emit('waiting-for-hole-cards');
+    //                 playerState.phaseIndex = 3;
+    //             }
+    //             break;
+    //         case 4:
+    //             if (playerState.phaseIndex !== 4) {
+    //                 console.log('got hole cards');
+    //                 playerState.phaseIndex = 4;
+    //             }
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // });
 
     socket.on('connect_error', () => {
         clearInterval(renderLoop);
