@@ -10,22 +10,49 @@ const cardpixelheight = 83.25;
 
 function SpriteCache() {
     this.makeKey = (s, v) => `${s}::${v}`;
-    this.store = new Map();
+
+    this.spriteDataStore = new Map();
+    this.spriteImageStore = new Map();
 };
 
 SpriteCache.prototype.load = function (src, key, frame) {
-    if (this.store.has(key)) {
-        console.log('sprite cache loading from cache');
-        return this.store.get(key);
+    if (this.spriteDataStore.has(key)) {
+        return this.spriteDataStore.get(key);
     }
 
-    console.log('sprite cache creating and caching new sprite');
     const cached = new Sprite(src, frame.row, frame.col, frame.width, frame.height);
 
-    this.store.set(key, cached);
+    this.spriteDataStore.set(key, cached);
 
     return cached;
 };
+
+SpriteCache.prototype.draw = function (sprite, ctx, dx, dy, sx, sy) {
+    let img = this.spriteImageStore.get(sprite.cacheKey);
+
+    if (!img) {
+        img = new Image();
+        this.spriteImageStore.set(sprite.cacheKey, img);
+    }
+
+    sprite.draw(ctx, img, dx, dy, sx, sy);
+
+    // img.onload = () => {
+    //     ctx.drawImage(
+    //         img,
+    //         sprite.row.offset,
+    //         sprite.col.offset,
+    //         sprite.width,
+    //         sprite.height,
+    //         dx,
+    //         dy,
+    //         sprite.width * sx,
+    //         sprite.height * sy
+    //     );
+    // };
+
+    // img.src = sprite.src;
+}
 
 function Sprite(src, row, col, w, h) {
     this.src = src;
@@ -40,13 +67,12 @@ function Sprite(src, row, col, w, h) {
     this.col = {
         offset: col * h, index: col
     };
+
+    this.cacheKey = `${this.row.index}::${this.col.index}`;
 };
 
-Sprite.prototype.draw = function (ctx, dx, dy, sx, sy) {
-    const img = new Image(); // TODO: cache
-
+Sprite.prototype.draw = function (ctx, img, dx, dy, sx, sy) {
     img.onload = () => {
-        console.log('drawing sprite ...');
         ctx.drawImage(
             img,
             this.row.offset,
@@ -63,29 +89,6 @@ Sprite.prototype.draw = function (ctx, dx, dy, sx, sy) {
     img.src = this.src;
 };
 
-const loadSpriteFromSpriteSheet = (ctx, src, col, row, destx, desty) => {
-    const cachedimg = new Image(); // TODO: cache these
-
-    cachedimg.onload = () => {
-        const loadcard = (ctx, col, row) => {
-            console.log(`loading card sprite ${col} ${row}`)
-            ctx.drawImage(
-                cachedimg,
-                row * cardpixelwidth, // frame index * frame width
-                col * cardpixelheight, // frame row?
-                cardpixelwidth, // frame width
-                cardpixelheight, // frame height
-                destx, // dest x
-                desty, // dest y
-                cardpixelwidth, // frame width on draw (same as input usually)
-                cardpixelheight // frame height on draw (same as input usually)
-            );
-        };
-        loadcard(ctx, col, row);
-    };
-
-    cachedimg.src = src
-};
 
 const spriteCache = new SpriteCache();
 
@@ -377,12 +380,8 @@ $(document).ready(() => {
             height: cardpixelheight
         });
 
-        cardSprite1.draw(ctx, playerState.assignedSeat.x, playerState.assignedSeat.y, 1, 1);
-        cardSprite2.draw(ctx, playerState.assignedSeat.x + cardSprite2.width, playerState.assignedSeat.y, 1, 1);
-
-
-        // loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
-        // loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
+        spriteCache.draw(cardSprite1, ctx, playerState.assignedSeat.x, playerState.assignedSeat.y, 1, 1);
+        spriteCache.draw(cardSprite2, ctx, playerState.assignedSeat.x + cardSprite2.width, playerState.assignedSeat.y, 1, 1);
 
         return true;
     };
