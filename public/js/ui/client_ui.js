@@ -8,6 +8,61 @@ const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 const cardpixelwidth = 72.15;
 const cardpixelheight = 83.25;
 
+function SpriteCache() {
+    this.makeKey = (s, v) => `${s}::${v}`;
+    this.store = new Map();
+};
+
+SpriteCache.prototype.load = function (src, key, frame) {
+    if (this.store.has(key)) {
+        console.log('sprite cache loading from cache');
+        return this.store.get(key);
+    }
+
+    console.log('sprite cache creating and caching new sprite');
+    const cached = new Sprite(src, frame.row, frame.col, frame.width, frame.height);
+
+    this.store.set(key, cached);
+
+    return cached;
+};
+
+function Sprite(src, row, col, w, h) {
+    this.src = src;
+
+    this.width = w;
+    this.height = h;
+
+    this.row = {
+        offset: row * w, index: row
+    };
+
+    this.col = {
+        offset: col * h, index: col
+    };
+};
+
+Sprite.prototype.draw = function (ctx, dx, dy, sx, sy) {
+    const img = new Image(); // TODO: cache
+
+    img.onload = () => {
+        console.log('drawing sprite ...');
+        ctx.drawImage(
+            img,
+            this.row.offset,
+            this.col.offset,
+            this.width,
+            this.height,
+            dx,
+            dy,
+            this.width * sx,
+            this.height * sy
+        );
+    };
+
+    img.src = this.src;
+};
+
 const loadSpriteFromSpriteSheet = (ctx, src, col, row, destx, desty) => {
     const cachedimg = new Image(); // TODO: cache these
 
@@ -32,6 +87,8 @@ const loadSpriteFromSpriteSheet = (ctx, src, col, row, destx, desty) => {
     cachedimg.src = src
 };
 
+const spriteCache = new SpriteCache();
+
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -47,7 +104,8 @@ $(document).ready(() => {
         },
         holeCards: {
             a: undefined,
-            b: undefined
+            b: undefined,
+            strings: undefined
         },
         phaseIndex: undefined
     };
@@ -297,11 +355,34 @@ $(document).ready(() => {
         const cardA = playerState.holeCards.a;
         const cardB = playerState.holeCards.b;
 
-        console.log(cardA);
-        console.log(cardB);
+        const cardAsuite = playerState.holeCards.strings.af.suite;
+        const cardAvalue = playerState.holeCards.strings.af.value;
+        const cardBsuite = playerState.holeCards.strings.bf.suite;
+        const cardBvalue = playerState.holeCards.strings.bf.value;
 
-        loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
-        loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
+        const c1Key = spriteCache.makeKey(cardAsuite, cardAvalue);
+        const c2Key = spriteCache.makeKey(cardBsuite, cardBvalue);
+
+        const cardSprite1 = spriteCache.load(cardspritesheet, c1Key, {
+            row: cardA.value,
+            col: cardA.suite,
+            width: cardpixelwidth,
+            height: cardpixelheight
+        });
+
+        const cardSprite2 = spriteCache.load(cardspritesheet, c2Key, {
+            row: cardB.value,
+            col: cardB.suite,
+            width: cardpixelwidth,
+            height: cardpixelheight
+        });
+
+        cardSprite1.draw(ctx, playerState.assignedSeat.x, playerState.assignedSeat.y, 1, 1);
+        cardSprite2.draw(ctx, playerState.assignedSeat.x + cardSprite2.width, playerState.assignedSeat.y, 1, 1);
+
+
+        // loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardA.suite, cardA.value, playerState.assignedSeat.x, playerState.assignedSeat.y);
+        // loadSpriteFromSpriteSheet(ctx, cardspritesheet, cardB.suite, cardB.value, playerState.assignedSeat.x + cardpixelwidth, playerState.assignedSeat.y);
 
         return true;
     };
@@ -430,9 +511,10 @@ $(document).ready(() => {
     socket.on('hand-dealt', data => {
         playerState.holeCards.a = data.playerhand[0];
         playerState.holeCards.b = data.playerhand[1];
+        playerState.holeCards.strings = data.playerhand[2];
 
         console.log('got cards');
-        console.log(playerState.holeCards);
+        console.log(data.playerhand);
 
         renderQueue.push(() => {
             render(false, false, false, true);
