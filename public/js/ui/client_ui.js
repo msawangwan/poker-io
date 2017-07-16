@@ -7,6 +7,8 @@ const cardbackpair = './asset/cards-hand-card-back.png';
 const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 const cardpixelwidth = 72.15;
 const cardpixelheight = 83.25;
+const cardbackpixelwidth = 269;
+const cardbackpixelheight = 188;
 
 function SpriteCache() {
     this.makeKey = (s, v) => `${s}::${v}`;
@@ -72,7 +74,6 @@ Sprite.prototype.draw = function (ctx, img, dx, dy, sx, sy) {
 
     img.src = this.src;
 };
-
 
 const spriteCache = new SpriteCache();
 
@@ -375,7 +376,6 @@ $(document).ready(() => {
 
     const drawAllOpponentActiveHand = (seatCoordinates, seatStates) => {
         if (!seatStates) {
-            console.log('errrror');
             return false;
         }
 
@@ -384,18 +384,19 @@ $(document).ready(() => {
                 const seat = seatStates[position - 1];
 
                 if (!seat[1].vacant) {
-                    console.log('found an oppoennt active hand');
                     const p = seat[1].player;
 
                     if (p.id === socket.id) {
                         continue;
                     }
 
-                    const handBackside = spriteCache.load(cardbackpair, 'card::backpair', {
+                    const key = spriteCache.makeKey(`cardback::${position}`)
+
+                    const handBackside = spriteCache.load(cardbackpair, key, {
                         row: 0,
                         col: 0,
-                        width: 269,
-                        height: 188
+                        width: cardbackpixelwidth,
+                        height: cardbackpixelheight
                     });
 
                     spriteCache.draw(handBackside, ctx, coord.x, coord.y, 0.25, 0.25);
@@ -404,7 +405,7 @@ $(document).ready(() => {
         }
 
         return true;
-    }
+    };
 
     const drawSeatLabel = (x, y, labeltxt) => {
         ctx.beginPath();
@@ -440,11 +441,6 @@ $(document).ready(() => {
         ctx.drawImage(labelCanvas, x - labelCanvas.width / 2, y - labelCanvas.height / 2);
     };
 
-    const renderQueue = [];
-    const renderLabelQueue = [];
-
-    const labelq = [];
-
     const setCurrentTableCenterLabel = (latestText) => {
         console.log('setting current label as: ' + latestText);
         while (labelq.length > 0) {
@@ -457,6 +453,11 @@ $(document).ready(() => {
 
         labelq.push(latestText);
     };
+
+    const renderQueue = [];
+    const renderLabelQueue = [];
+
+    const labelq = [];
 
     const render = (table, seating, labels, cards) => {
         if (table) {
@@ -499,6 +500,25 @@ $(document).ready(() => {
         }
     }, tickrate);
 
+
+    const $formplacebet = $('#input-place-bet');
+
+    $formplacebet.on('submit', () => {
+        const text = $formplacebet.find('input[type=testt]:focus').val();
+        const range = $formplacebet.find('input[type=ranget]:focus').val();
+        const submit = $formplacebet.find('input[type=submitt]:focus').val();
+
+        const t = $('input[name=bet-as-text]').val()
+        const r = $('input[name=bet-as-range]').val()
+        const b = $('input[name=send-bet]').val()
+
+        console.log('text: ' + text + ' ' + t);
+        console.log('range: ' + text + ' ' + r);
+        console.log('submit: ' + text + ' ' + b);
+
+        event.preventDefault();
+    });
+
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });
 
     socket.on('player-assigned-seat', data => {
@@ -512,7 +532,7 @@ $(document).ready(() => {
         renderQueue.push(() => {
             updateCanvasDimensions();
             updateTableDimensions(playerState.assignedSeat.index);
-            render(true, true, true, false);
+            render(true, true, true, true);
         });
     });
 
@@ -532,9 +552,6 @@ $(document).ready(() => {
         playerState.holeCards.a = data.playerhand[0];
         playerState.holeCards.b = data.playerhand[1];
         playerState.holeCards.strings = data.playerhand[2];
-
-        console.log('got cards');
-        console.log(data.playerhand);
 
         renderQueue.push(() => {
             render(false, false, false, true);
