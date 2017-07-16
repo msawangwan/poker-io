@@ -3,7 +3,7 @@ const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
-const cardbackpair = './asset/cards-hand-back-of-cards.jpg';
+const cardbackpair = './asset/cards-hand-card-back.png';
 const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 const cardpixelwidth = 72.15;
 const cardpixelheight = 83.25;
@@ -36,23 +36,7 @@ SpriteCache.prototype.draw = function (sprite, ctx, dx, dy, sx, sy) {
     }
 
     sprite.draw(ctx, img, dx, dy, sx, sy);
-
-    // img.onload = () => {
-    //     ctx.drawImage(
-    //         img,
-    //         sprite.row.offset,
-    //         sprite.col.offset,
-    //         sprite.width,
-    //         sprite.height,
-    //         dx,
-    //         dy,
-    //         sprite.width * sx,
-    //         sprite.height * sy
-    //     );
-    // };
-
-    // img.src = sprite.src;
-}
+};
 
 function Sprite(src, row, col, w, h) {
     this.src = src;
@@ -350,7 +334,7 @@ $(document).ready(() => {
         drawSeatLabel(x, y, player.name);
     };
 
-    const drawCards = () => {
+    const drawPlayerHand = () => {
         if (!playerState.holeCards.a || !playerState.holeCards.b) {
             return false;
         }
@@ -366,6 +350,8 @@ $(document).ready(() => {
         const c1Key = spriteCache.makeKey(cardAsuite, cardAvalue);
         const c2Key = spriteCache.makeKey(cardBsuite, cardBvalue);
 
+        const scalefactor = 0.75;
+
         const cardSprite1 = spriteCache.load(cardspritesheet, c1Key, {
             row: cardA.value,
             col: cardA.suite,
@@ -380,11 +366,45 @@ $(document).ready(() => {
             height: cardpixelheight
         });
 
-        spriteCache.draw(cardSprite1, ctx, playerState.assignedSeat.x, playerState.assignedSeat.y, 1, 1);
-        spriteCache.draw(cardSprite2, ctx, playerState.assignedSeat.x + cardSprite2.width, playerState.assignedSeat.y, 1, 1);
+
+        spriteCache.draw(cardSprite1, ctx, playerState.assignedSeat.x, playerState.assignedSeat.y, scalefactor, scalefactor);
+        spriteCache.draw(cardSprite2, ctx, (playerState.assignedSeat.x + (cardSprite2.width * scalefactor)), playerState.assignedSeat.y, scalefactor, scalefactor);
 
         return true;
     };
+
+    const drawAllOpponentActiveHand = (seatCoordinates, seatStates) => {
+        if (!seatStates) {
+            console.log('errrror');
+            return false;
+        }
+
+        for (const [position, coord] of seatCoordinates.entries()) {
+            if (position > 0) { // note: valid player seat positions are exclusive to numbers 1-9
+                const seat = seatStates[position - 1];
+
+                if (!seat[1].vacant) {
+                    console.log('found an oppoennt active hand');
+                    const p = seat[1].player;
+
+                    if (p.id === socket.id) {
+                        continue;
+                    }
+
+                    const handBackside = spriteCache.load(cardbackpair, 'card::backpair', {
+                        row: 0,
+                        col: 0,
+                        width: 269,
+                        height: 188
+                    });
+
+                    spriteCache.draw(handBackside, ctx, coord.x, coord.y, 0.25, 0.25);
+                }
+            }
+        }
+
+        return true;
+    }
 
     const drawSeatLabel = (x, y, labeltxt) => {
         ctx.beginPath();
@@ -458,7 +478,8 @@ $(document).ready(() => {
         }
 
         if (cards) {
-            drawCards();
+            drawPlayerHand();
+            drawAllOpponentActiveHand(canvasState.table.seatCoordinates, tableState.seats);
         }
     };
 
