@@ -28,10 +28,8 @@ $(document).ready(() => {
 
     const resizeCanvas = (c) => { // TODO: figure this out properly
         const rect = c.parentNode.getBoundingClientRect();
-        // c.width = rect.width;
-        // c.height = rect.height;
-        c.width = window.innerWidth;
-        c.height = window.innerHeight;
+        c.width = rect.width;
+        c.height = rect.height;
     };
 
     resizeCanvas(staticCanvas);
