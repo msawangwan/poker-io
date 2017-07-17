@@ -1,4 +1,4 @@
-const toRadians = theta => theta * (Math.PI / 180);
+const toradian = theta => theta * (Math.PI / 180);
 const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
@@ -9,71 +9,6 @@ const cardpixelwidth = 72.15;
 const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
-
-function SpriteCache() {
-    this.makeKey = (s, v) => `${s}::${v}`;
-
-    this.spriteDataStore = new Map();
-    this.spriteImageStore = new Map();
-};
-
-SpriteCache.prototype.load = function (src, key, frame) {
-    if (this.spriteDataStore.has(key)) {
-        return this.spriteDataStore.get(key);
-    }
-
-    const cached = new Sprite(src, frame.row, frame.col, frame.width, frame.height);
-
-    this.spriteDataStore.set(key, cached);
-
-    return cached;
-};
-
-SpriteCache.prototype.draw = function (sprite, ctx, dx, dy, sx, sy) {
-    let img = this.spriteImageStore.get(sprite.cacheKey);
-
-    if (!img) {
-        img = new Image();
-        this.spriteImageStore.set(sprite.cacheKey, img);
-    }
-
-    sprite.draw(ctx, img, dx, dy, sx, sy);
-};
-
-function Sprite(src, row, col, w, h) {
-    this.src = src;
-
-    this.width = w;
-    this.height = h;
-
-    this.row = {
-        offset: row * w, index: row
-    };
-
-    this.col = {
-        offset: col * h, index: col
-    };
-
-    this.cacheKey = `${this.row.index}::${this.col.index}`;
-};
-
-Sprite.prototype.draw = function (ctx, img, dx, dy, sx, sy) {
-    img.onload = () => {
-        ctx.drawImage(
-            img,
-            this.row.offset,
-            this.col.offset,
-            this.width,
-            this.height,
-            dx,
-            dy,
-            this.width * sx,
-            this.height * sy
-        );
-    };
-
-    img.src = this.src;
-};
 
 const spriteCache = new SpriteCache();
 
@@ -127,13 +62,10 @@ $(document).ready(() => {
         y: () => maincanvas.height * 0.5
     };
 
-    const fixedTableDimensions = {
-        seatSize: 35
+    const seating = {
+        coordinates: undefined,
+        playercoordinates: undefined
     };
-
-    // const seating = {
-
-    // }
 
     const updateCanvasDimensions = () => {
         const rect = canvas.parentNode.getBoundingClientRect();
@@ -158,16 +90,19 @@ $(document).ready(() => {
         canvasState.table.dimensions = tableDimensions;
         canvasState.table.center.x = seatCoords.get(-1).x;
         canvasState.table.center.y = seatCoords.get(-1).y;
-        canvasState.table.seatCoordinates = seatCoords;
+        canvasState.table.seatCoordinates = seatCoords; // TODO: DEPRECATED
+
+        seating.coordinates = seatCoords;
 
         tableState.pos.x = canvasState.table.center.x;
         tableState.pos.y = canvasState.table.center.y;
 
-        const playerSeatCoords = getTablePosByIndex(playerseat);
+        const playerSeatCoords = getTablePosByIndex(playerseat, seating.coordinates);
 
         if (playerSeatCoords) {
-            playerState.assignedSeat.x = playerSeatCoords.x;
-            playerState.assignedSeat.y = playerSeatCoords.y;
+            playerState.assignedSeat.x = playerSeatCoords.x; // TODO: DEPRECATED
+            playerState.assignedSeat.y = playerSeatCoords.y; // TODO: DEPRECATED
+            seating.playercoordinates = playerSeatCoords;
         } else {
             console.log('err: no seat coords found');
         }
@@ -201,7 +136,7 @@ $(document).ready(() => {
         const thetaUpper = 25;
         const thetaLower = 325;
 
-        const seating = new Map([
+        const pointsOnTableCircumference = new Map([
             [-1, {
                 label: 'pot-table-center',
                 x: ox,
@@ -219,13 +154,13 @@ $(document).ready(() => {
             }],
             [2, {
                 label: 'right-theta-upper',
-                x: offsetOriginRight + radius * Math.cos(toRadians(thetaUpper)),
-                y: oy - radius * Math.sin(toRadians(thetaUpper))
+                x: offsetOriginRight + radius * Math.cos(toradian(thetaUpper)),
+                y: oy - radius * Math.sin(toradian(thetaUpper))
             }],
             [3, {
                 label: 'right-theta-lower',
-                x: offsetOriginRight + radius * Math.cos(toRadians(thetaLower)),
-                y: oy - radius * Math.sin(toRadians(thetaLower))
+                x: offsetOriginRight + radius * Math.cos(toradian(thetaLower)),
+                y: oy - radius * Math.sin(toradian(thetaLower))
             }],
             [4, {
                 label: 'right-lower',
@@ -244,13 +179,13 @@ $(document).ready(() => {
             }],
             [7, {
                 label: 'left-theta-lower',
-                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaLower)),
-                y: oy - radius * Math.sin(toRadians(thetaLower))
+                x: offsetOriginLeft - radius * Math.cos(toradian(thetaLower)),
+                y: oy - radius * Math.sin(toradian(thetaLower))
             }],
             [8, {
                 label: 'left-theta-upper',
-                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaUpper)),
-                y: oy - radius * Math.sin(toRadians(thetaUpper))
+                x: offsetOriginLeft - radius * Math.cos(toradian(thetaUpper)),
+                y: oy - radius * Math.sin(toradian(thetaUpper))
             }],
             [9, {
                 label: 'left-upper',
@@ -259,11 +194,10 @@ $(document).ready(() => {
             }],
         ]);
 
-        return seating;
+        return pointsOnTableCircumference;
     };
 
-    const getTablePosByIndex = (index) => {
-        const coords = canvasState.table.seatCoordinates;
+    const getTablePosByIndex = (index, coords) => {
         if (coords) { // TODO: handle undefined
             const pos = coords.get(index + 1);
             if (pos) {
@@ -292,7 +226,7 @@ $(document).ready(() => {
         ctx.fill();
     };
 
-    const drawSeating = (seatCoordinates, seatStates) => {
+    const drawSeating = (seatCoordinates, seatStates, seatSize) => {
         if (!seatStates) {
             return false;
         }
@@ -304,7 +238,7 @@ $(document).ready(() => {
                 const seat = seatStates[position - 1];
 
                 if (seat[1].vacant) {
-                    drawEmptySeat(coord.x, coord.y, fixedTableDimensions.seatSize);
+                    drawEmptySeat(coord.x, coord.y, seatSize);
                 } else {
                     const p = seat[1].player;
 
@@ -312,7 +246,7 @@ $(document).ready(() => {
                         seatColor = 'orange';
                     }
 
-                    drawPlayerSeat(coord.x, coord.y, p, fixedTableDimensions.seatSize, seatColor);
+                    drawPlayerSeat(coord.x, coord.y, p, seatSize, seatColor);
                 }
             }
         }
@@ -463,16 +397,16 @@ $(document).ready(() => {
 
     const labelq = [];
 
-    const render = (table, seating, labels, cards) => {
+    const render = (table, seat, labels, cards) => {
         if (table) {
             if (canvasState.table.dimensions) {
                 drawTable(canvasState.table.dimensions);
             }
         }
 
-        if (seating) {
+        if (seat) {
             if (canvasState.table.seatCoordinates && tableState.seats) {
-                drawSeating(canvasState.table.seatCoordinates, tableState.seats);
+                drawSeating(canvasState.table.seatCoordinates, tableState.seats, 35);
             }
         }
 
