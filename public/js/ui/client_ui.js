@@ -26,13 +26,20 @@ $(document).ready(() => {
 
     const tableScale = 0.65;
 
-    const resizeCanvas = (c) => { // TODO: figure this out properly
+    const resizeCanvasMEH = (c) => { // TODO: figure this out properly
         const rect = c.parentNode.getBoundingClientRect();
         c.width = rect.width;
         c.height = rect.height;
     };
 
-    resizeCanvas(staticCanvas);
+    const resizeCanvas = (canvas, parentCanvasId) => {
+        const c = $(`#${parentCanvasId}`);
+        canvas.width = c.width();
+        canvas.height = c.height();
+        console.log('ss');
+    };
+
+    resizeCanvas(staticCanvas, 'container-canvas');
 
     const tableObject = new Table(staticCtx);
     const seatObjects = [
@@ -535,12 +542,7 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         console.log('window resized');
 
-        // const rect = canvas.parentNode.getBoundingClientRect();
-
-        // canvas.width = rect.width;
-        // canvas.height = rect.height;
-
-        resizeCanvas(staticCanvas);
+        resizeCanvas(staticCanvas, 'container-canvas');
         tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
 
 
