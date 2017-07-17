@@ -10,9 +10,16 @@ const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
 
-const spriteCache = new SpriteCache();
-
 $(document).ready(() => {
+    const spriteCache = new SpriteCache();
+
+    const canvas = document.getElementById('main-canvas');
+    const ctx = canvas.getContext('2d');
+
+    const tableObject = new Table('container-canvas', ctx);
+
+    tableObject.render(canvas.width, canvas.height);
+
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
@@ -49,8 +56,8 @@ $(document).ready(() => {
         }
     };
 
-    const canvas = document.getElementById('table-canvas');
-    const ctx = canvas.getContext('2d');
+    // const canvas = document.getElementById('table-canvas');
+    // const ctx = canvas.getContext('2d');
 
     const maincanvas = {
         width: 0,
@@ -68,44 +75,44 @@ $(document).ready(() => {
     };
 
     const updateCanvasDimensions = () => {
-        const rect = canvas.parentNode.getBoundingClientRect();
+        // const rect = canvas.parentNode.getBoundingClientRect();
 
-        if (maincanvas.width === canvas.width && maincanvas.height === canvas.height) {
-            return false;
-        }
+        // if (maincanvas.width === canvas.width && maincanvas.height === canvas.height) {
+        //     return false;
+        // }
 
-        maincanvas.width = rect.width;
-        maincanvas.height = rect.height;
+        // maincanvas.width = rect.width;
+        // maincanvas.height = rect.height;
 
-        canvas.width = maincanvas.width;
-        canvas.height = maincanvas.height;
+        // canvas.width = maincanvas.width;
+        // canvas.height = maincanvas.height;
 
-        return true;
+        // return true;
     };
 
     const updateTableDimensions = (playerseat) => {
-        const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
-        const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
+        // const tableDimensions = calcTableDimensions(canvas.height / 4, canvas.width / 8);
+        // const seatCoords = calcSeatCoordinates(tableDimensions.origin, tableDimensions.radius, tableDimensions.focui.length);
 
-        canvasState.table.dimensions = tableDimensions;
-        canvasState.table.center.x = seatCoords.get(-1).x;
-        canvasState.table.center.y = seatCoords.get(-1).y;
-        canvasState.table.seatCoordinates = seatCoords; // TODO: DEPRECATED
+        // canvasState.table.dimensions = tableDimensions;
+        // canvasState.table.center.x = seatCoords.get(-1).x;
+        // canvasState.table.center.y = seatCoords.get(-1).y;
+        // canvasState.table.seatCoordinates = seatCoords; // TODO: DEPRECATED
 
-        seating.coordinates = seatCoords;
+        // seating.coordinates = seatCoords;
 
-        tableState.pos.x = canvasState.table.center.x;
-        tableState.pos.y = canvasState.table.center.y;
+        // tableState.pos.x = canvasState.table.center.x;
+        // tableState.pos.y = canvasState.table.center.y;
 
-        const playerSeatCoords = getTablePosByIndex(playerseat, seating.coordinates);
+        // const playerSeatCoords = getTablePosByIndex(playerseat, seating.coordinates);
 
-        if (playerSeatCoords) {
-            playerState.assignedSeat.x = playerSeatCoords.x; // TODO: DEPRECATED
-            playerState.assignedSeat.y = playerSeatCoords.y; // TODO: DEPRECATED
-            seating.playercoordinates = playerSeatCoords;
-        } else {
-            console.log('err: no seat coords found');
-        }
+        // if (playerSeatCoords) {
+        //     playerState.assignedSeat.x = playerSeatCoords.x; // TODO: DEPRECATED
+        //     playerState.assignedSeat.y = playerSeatCoords.y; // TODO: DEPRECATED
+        //     seating.playercoordinates = playerSeatCoords;
+        // } else {
+        //     console.log('err: no seat coords found');
+        // }
     };
 
     const calcTableDimensions = (radius, focuilength) => {
@@ -398,28 +405,28 @@ $(document).ready(() => {
     const labelq = [];
 
     const render = (table, seat, labels, cards) => {
-        if (table) {
-            if (canvasState.table.dimensions) {
-                drawTable(canvasState.table.dimensions);
-            }
-        }
+        // if (table) {
+        //     if (canvasState.table.dimensions) {
+        //         drawTable(canvasState.table.dimensions);
+        //     }
+        // }
 
-        if (seat) {
-            if (canvasState.table.seatCoordinates && tableState.seats) {
-                drawSeating(canvasState.table.seatCoordinates, tableState.seats, 35);
-            }
-        }
+        // if (seat) {
+        //     if (canvasState.table.seatCoordinates && tableState.seats) {
+        //         drawSeating(canvasState.table.seatCoordinates, tableState.seats, 35);
+        //     }
+        // }
 
-        if (labels) {
-            if (tableState.pos) {
-                drawTableCenterLabel(tableState.pos.x, tableState.pos.y, canvasState.labels.tableCenter);
-            }
-        }
+        // if (labels) {
+        //     if (tableState.pos) {
+        //         drawTableCenterLabel(tableState.pos.x, tableState.pos.y, canvasState.labels.tableCenter);
+        //     }
+        // }
 
-        if (cards) {
-            drawPlayerHand();
-            drawAllOpponentActiveHand(canvasState.table.seatCoordinates, tableState.seats);
-        }
+        // if (cards) {
+        //     drawPlayerHand();
+        //     drawAllOpponentActiveHand(canvasState.table.seatCoordinates, tableState.seats);
+        // }
     };
 
     const tickrate = 1000 / 2;
@@ -455,6 +462,7 @@ $(document).ready(() => {
     socket.on('player-assigned-seat', data => {
         playerState.assignedSeat.index = data.seat;
         setCurrentTableCenterLabel('player seated ...');
+        tableObject.seatPlayer();
     });
 
     socket.on('table-seating-state', data => {
@@ -496,13 +504,19 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         console.log('window resized');
 
-        updateCanvasDimensions();
-        updateTableDimensions(playerState.assignedSeat.index);
+        const rect = canvas.parentNode.getBoundingClientRect();
 
-        Promise.resolve().then(() => {
-            renderQueue.push(() => {
-                render(true, true, true, true);
-            });
-        });
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+
+        tableObject.render(canvas.width, canvas.height);
+        // updateCanvasDimensions();
+        // updateTableDimensions(playerState.assignedSeat.index);
+
+        // Promise.resolve().then(() => {
+        //     renderQueue.push(() => {
+        //         render(true, true, true, true);
+        //     });
+        // });
     });
 });
