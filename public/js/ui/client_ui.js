@@ -117,32 +117,36 @@ $(document).ready(() => {
     const canvas = document.getElementById('table-canvas');
     const ctx = canvas.getContext('2d');
 
-    const canvasAxis = {
+    const maincanvas = {
         width: 0,
         height: 0
     };
 
     const currentCanvasCenter = {
-        x: () => canvasAxis.width * 0.5,
-        y: () => canvasAxis.height * 0.5
+        x: () => maincanvas.width * 0.5,
+        y: () => maincanvas.height * 0.5
     };
 
     const fixedTableDimensions = {
         seatSize: 35
     };
 
+    // const seating = {
+
+    // }
+
     const updateCanvasDimensions = () => {
         const rect = canvas.parentNode.getBoundingClientRect();
 
-        if (canvasAxis.width === canvas.width && canvasAxis.height === canvas.height) {
+        if (maincanvas.width === canvas.width && maincanvas.height === canvas.height) {
             return false;
         }
 
-        canvasAxis.width = rect.width;
-        canvasAxis.height = rect.height;
+        maincanvas.width = rect.width;
+        maincanvas.height = rect.height;
 
-        canvas.width = canvasAxis.width;
-        canvas.height = canvasAxis.height;
+        canvas.width = maincanvas.width;
+        canvas.height = maincanvas.height;
 
         return true;
     };
@@ -501,22 +505,15 @@ $(document).ready(() => {
     }, tickrate);
 
 
-    const $formplacebet = $('#input-place-bet');
+    const $containerbetting = $('#container-betting');
+    const $containerturnactions = $('#container-turn-actions');
+    const $bettextfield = $('#bet-amount-text-field');
+    const $betrangeslider = $('#bet-range-slider');
+    const $betsubmitbutton = $('#bet-submit-bet-btn');
 
-    $formplacebet.on('submit', () => {
-        const text = $formplacebet.find('input[type=testt]:focus').val();
-        const range = $formplacebet.find('input[type=ranget]:focus').val();
-        const submit = $formplacebet.find('input[type=submitt]:focus').val();
-
-        const t = $('input[name=bet-as-text]').val()
-        const r = $('input[name=bet-as-range]').val()
-        const b = $('input[name=send-bet]').val()
-
-        console.log('text: ' + text + ' ' + t);
-        console.log('range: ' + text + ' ' + r);
-        console.log('submit: ' + text + ' ' + b);
-
-        event.preventDefault();
+    $betrangeslider.on('change', () => {
+        const slidervalue = $betrangeslider.val();
+        $bettextfield.val(slidervalue);
     });
 
     socket.emit('joined-table', { name: playerState.name, balance: playerState.balance });

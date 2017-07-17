@@ -63,6 +63,7 @@
 body {
     padding: 50px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    color: white;
 }
 
 .color-bg-primary { background: var(--color-scheme-bg); }
@@ -118,11 +119,11 @@ body {
       "leftpanel rightpanel rightpanel rightpanel rightpanel";
 }
 
-input-subdivision {
-    display: flex;
+.input-subdivision {
+    /* display: flex;
     
     flex-wrap: wrap;
-    flex-direction: row;
+    flex-direction: row; */
 }
 
 .input-subdivision:nth-child(1) {
@@ -131,4 +132,44 @@ input-subdivision {
 
 .input-subdivision:nth-child(2) {
     grid-area: rightpanel;
+
+    display: flex;
+
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    align-content: stretch;
+    justify-content: space-around;
+}
+
+.container-bet-action {
+    flex: 0 1 auto;
+}
+
+.container-bet-action:nth-child(1) {
+    align-self: center;
+}
+
+.container-bet-action:nth-child(1) > input {
+    width: 75px;
+}
+
+.container-bet-action:nth-child(2) {
+    align-self: center;
+}
+
+#container-betting {
+    border: 2px solid white;
+}
+
+#container-turn-actions {
+    border: 1px solid white;
+}
+
+#container-bet-slider-form{
+    border: 1px solid white;
+}
+
+#bet-amount-text-field {
+    width: 75px;
 }

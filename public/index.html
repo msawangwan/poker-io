@@ -21,12 +21,20 @@
                         <input type="submit" name="send-chat-message" value="send" />
                     </form>
                 </div>
-                <div class="input-subdivision" id="input-place-bet">
-                    <form>
-                        <input type="text" name="bet-as-text" />
-                        <input type="range" name="bet-as-range" />
-                        <input type="submit" name="send-bet" value="bet" />
-                    </form>
+                <div class="input-subdivision" id="container-betting">
+                    <div class="container-bet-action" id="container-turn-actions">
+                        <input type="button" name="send-fold" id="btn-send-fold" value="fold" />
+                        <input type="button" name="send-call" id="btn-send-call" value="call" />
+                        <input type="button" name="send-raise" id="btn-send-raise" value="raise" />
+                    </div>
+                    <div class="container-bet-action" id="container-bet-slider-form">
+                        <form id="form-betting-slider">
+                            <input type="text" name="bet-as-text" id="bet-amount-text-field" />
+                            <input type="button" value="-" />
+                            <input type="range" name="bet-as-range" id="bet-range-slider" />
+                            <input type="button" value="+" />
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
