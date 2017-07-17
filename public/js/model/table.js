@@ -1,3 +1,8 @@
+const toradian = theta => theta * (Math.PI / 180);
+
+const thetaUpper = toradian(25);
+const thetaLower = toradian(325);
+
 const maxSeats = 9; // TODO: load from config
 
 function Table(parentCtx) {
@@ -12,123 +17,117 @@ function Table(parentCtx) {
         length: 0,
         radius: 0
     };
-    
+
     this.seats = new Map();
 }
 
-Table.prototype.render = function (width, height, scale) {
+Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale) {
     ctx = this.canvas.getContext('2d');
-    
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.canvas.width = Math.floor(width * scale);
-    this.canvas.height = Math.floor(height * scale);
+    this.canvas.width = Math.floor(parentCanvasWidth * scale);
+    this.canvas.height = Math.floor(parentCanvasHeight * scale);
 
-    const originx = this.canvas.width / 2;
-    const originy = this.canvas.height / 2;
-    const length = this.canvas.width / 8;
+    const globalx = parentCanvasWidth * 0.5;
+    const globaly = parentCanvasHeight * 0.5;
+    const localx = this.canvas.width * 0.5;
+    const localy = this.canvas.height * 0.5;
+
     const radius = this.canvas.height / 4;
+    const length = Math.floor(this.canvas.width * 0.15);
 
     ctx.beginPath();
 
-    ctx.arc(originx - length, originy, radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-    ctx.arc(originx + length, originy, radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-
-    ctx.stroke();
+    ctx.arc(localx - length, localy, radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+    ctx.arc(localx + length, localy, radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
 
     ctx.fillStyle = 'green';
     ctx.fill();
 
-    const offsetoriginx = width / 2 - originx;
-    const offsetoriginy = height / 2 - originy;
+    this.parentCtx.drawImage(this.canvas, (parentCanvasWidth * 0.5) - this.canvas.width / 2, (parentCanvasHeight * 0.5) - localy);
 
-    this.parentCtx.drawImage(this.canvas, offsetoriginx, offsetoriginy);
-
-    this.dimensions.originx = originx;
-    this.dimensions.originy = originy;
-    this.dimensions.length = length;
+    this.dimensions.originx = localx;
+    this.dimensions.originy = localy;
     this.dimensions.radius = radius;
+    this.dimensions.offset = length;
 };
 
-Table.prototype.calcPositionOnTable = function(o, radius, f) {
-    const { x: ox, y: oy } = o;
+Table.prototype.pointOnTable = function (position) {
+    const ox = this.dimensions.originx;
+    const oy = this.dimensions.originy;
+    const r = this.dimensions.radius;
+    const off = this.dimensions.offset;
 
-    const offsetOriginLeft = ox - f;
-    const offsetOriginRight = ox + f;
+    const offsetLeft = ox - off;
+    const offsetRight = ox + off;
 
-    const offset = f / 2;
-    const thetaUpper = 25;
-    const thetaLower = 325;
+    const seatRadius = 0;
 
-    const pointsOnTableCircumference = new Map([
-        [-1, {
-            label: 'pot-table-center',
-            x: ox,
-            y: oy
-        }],
-        [0, {
-            label: 'house-center-upper',
-            x: ox,
-            y: oy - radius
-        }],
-        [1, {
-            label: 'right-upper',
-            x: offsetOriginRight,
-            y: oy - radius
-        }],
-        [2, {
-            label: 'right-theta-upper',
-            x: offsetOriginRight + radius * Math.cos(toradian(thetaUpper)),
-            y: oy - radius * Math.sin(toradian(thetaUpper))
-        }],
-        [3, {
-            label: 'right-theta-lower',
-            x: offsetOriginRight + radius * Math.cos(toradian(thetaLower)),
-            y: oy - radius * Math.sin(toradian(thetaLower))
-        }],
-        [4, {
-            label: 'right-lower',
-            x: offsetOriginRight,
-            y: oy + radius
-        }],
-        [5, {
-            label: 'center-lower',
-            x: ox,
-            y: oy + radius
-        }],
-        [6, {
-            label: 'left-lower',
-            x: offsetOriginLeft,
-            y: oy + radius
-        }],
-        [7, {
-            label: 'left-theta-lower',
-            x: offsetOriginLeft - radius * Math.cos(toradian(thetaLower)),
-            y: oy - radius * Math.sin(toradian(thetaLower))
-        }],
-        [8, {
-            label: 'left-theta-upper',
-            x: offsetOriginLeft - radius * Math.cos(toradian(thetaUpper)),
-            y: oy - radius * Math.sin(toradian(thetaUpper))
-        }],
-        [9, {
-            label: 'left-upper',
-            x: offsetOriginLeft,
-            y: oy - radius
-        }],
-    ]);
+    let x = -1;
+    let y = -1;
 
-    return pointsOnTableCircumference;
+    switch (position) {
+        case -1: // center
+            x = ox;
+            y = oy;
+            break;
+        case -2: // center upper
+            x = ox;
+            y = oy - r;
+            break;
+        case 0: // right upper
+            x = offsetRight;
+            y = oy - r;
+            break;
+        case 1: // right theta upper
+            x = offsetRight + r * Math.cos(thetaUpper) - (seatRadius / 2);
+            y = oy - r * Math.sin(thetaUpper);
+            break;
+        case 2: // right theta lower
+            x = offsetRight + r * Math.cos(thetaLower) - (seatRadius / 2);
+            y = oy - r * Math.sin(thetaLower);
+            break;
+        case 3: // right lower
+            x = offsetRight;
+            y = oy + r + (seatRadius / 2);
+            break;
+        case 4: // center lower
+            x = ox;
+            y = oy + r + (seatRadius / 2);
+            break;
+        case 5: // left lower
+            x = offsetLeft;
+            y = oy + r + (seatRadius / 2);
+            break;
+        case 6: // left theta lower
+            x = offsetLeft - r * Math.cos(thetaLower);
+            y = oy - r * Math.sin(thetaLower);
+            break;
+        case 7: // left theta upper
+            x = offsetLeft - r * Math.cos(thetaUpper);
+            y = oy - r * Math.sin(thetaUpper);
+            break;
+        case 8: // left upper
+            x = offsetLeft;
+            y = oy - r;
+            break;
+        default:
+            break;
+    }
+
+    return {
+        x: x, y: y
+    };
 };
 
-Table.prototype.createSeat = function(position) {
+Table.prototype.createSeat = function (position) {
     if (this.seats.size > maxSeats) {
         return false;
     }
-    
+
     this.seats.set(position, {
-       vacant: true,
-       player: undefined
+        vacant: true,
+        player: undefined
     });
 };
 

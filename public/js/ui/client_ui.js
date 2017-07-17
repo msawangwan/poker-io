@@ -1,4 +1,4 @@
-const toradian = theta => theta * (Math.PI / 180);
+const toRadians = theta => theta * (Math.PI / 180);
 const div = content => $('<div></div>').text(content);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
@@ -15,28 +15,46 @@ $(document).ready(() => {
 
     const canvas = document.getElementById('static-canvas'); // DEPRECATED
     const ctx = canvas.getContext('2d');
-    
+
     const staticCanvas = document.getElementById('static-canvas');
     const dynamicCanvas = document.getElementById('dynamic-canvas');
     const uiCanvas = document.getElementById('ui-canvas');
-    
+
     const staticCtx = staticCanvas.getContext('2d');
     const dynamicCtx = dynamicCanvas.getContext('2d');
     const uiCtx = uiCanvas.getContext('2d');
-    
+
     const tableScale = 0.65;
 
-    const resizeCanvas = (c) => {
+    const resizeCanvas = (c) => { // TODO: figure this out properly
         const rect = c.parentNode.getBoundingClientRect();
-        c.width = rect.width;
-        c.height = rect.height;
+        // c.width = rect.width;
+        // c.height = rect.height;
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
     };
 
     resizeCanvas(staticCanvas);
 
     const tableObject = new Table(staticCtx);
+    const seatObjects = [
+        new Seat(staticCtx, 0, 32, 'black'),
+        new Seat(staticCtx, 1, 32, 'black'),
+        new Seat(staticCtx, 2, 32, 'black'),
+        new Seat(staticCtx, 3, 32, 'black'),
+        new Seat(staticCtx, 4, 32, 'black'),
+        new Seat(staticCtx, 5, 32, 'black'),
+        new Seat(staticCtx, 6, 32, 'black'),
+        new Seat(staticCtx, 7, 32, 'black'),
+        new Seat(staticCtx, 8, 32, 'black'),
+    ];
 
     tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
+
+    for (const s of seatObjects) {
+        const c = tableObject.pointOnTable(s.position);
+        s.render(c.x, c.y);
+    }
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -73,9 +91,6 @@ $(document).ready(() => {
             tableCenter: ' ... '
         }
     };
-
-    // const canvas = document.getElementById('table-canvas');
-    // const ctx = canvas.getContext('2d');
 
     const maincanvas = {
         width: 0,
@@ -157,7 +172,7 @@ $(document).ready(() => {
         const offsetOriginLeft = ox - f;
         const offsetOriginRight = ox + f;
 
-        const offset = f / 2;
+        // const offset = f / 2;
         const thetaUpper = 25;
         const thetaLower = 325;
 
@@ -179,13 +194,13 @@ $(document).ready(() => {
             }],
             [2, {
                 label: 'right-theta-upper',
-                x: offsetOriginRight + radius * Math.cos(toradian(thetaUpper)),
-                y: oy - radius * Math.sin(toradian(thetaUpper))
+                x: offsetOriginRight + radius * Math.cos(toRadians(thetaUpper)),
+                y: oy - radius * Math.sin(toRadians(thetaUpper))
             }],
             [3, {
                 label: 'right-theta-lower',
-                x: offsetOriginRight + radius * Math.cos(toradian(thetaLower)),
-                y: oy - radius * Math.sin(toradian(thetaLower))
+                x: offsetOriginRight + radius * Math.cos(toRadians(thetaLower)),
+                y: oy - radius * Math.sin(toRadians(thetaLower))
             }],
             [4, {
                 label: 'right-lower',
@@ -204,13 +219,13 @@ $(document).ready(() => {
             }],
             [7, {
                 label: 'left-theta-lower',
-                x: offsetOriginLeft - radius * Math.cos(toradian(thetaLower)),
-                y: oy - radius * Math.sin(toradian(thetaLower))
+                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaLower)),
+                y: oy - radius * Math.sin(toRadians(thetaLower))
             }],
             [8, {
                 label: 'left-theta-upper',
-                x: offsetOriginLeft - radius * Math.cos(toradian(thetaUpper)),
-                y: oy - radius * Math.sin(toradian(thetaUpper))
+                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaUpper)),
+                y: oy - radius * Math.sin(toRadians(thetaUpper))
             }],
             [9, {
                 label: 'left-upper',
@@ -526,9 +541,15 @@ $(document).ready(() => {
 
         // canvas.width = rect.width;
         // canvas.height = rect.height;
-    
+
         resizeCanvas(staticCanvas);
         tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
+
+
+        for (const s of seatObjects) {
+            const c = tableObject.pointOnTable(s.position);
+            s.render(c.x, c.y);
+        }
         // updateCanvasDimensions();
         // updateTableDimensions(playerState.assignedSeat.index);
 
