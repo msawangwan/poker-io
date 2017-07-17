@@ -13,19 +13,30 @@ const cardbackpixelheight = 188;
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
-    const canvas = document.getElementById('main-canvas');
-    const tableScale = 0.90;
-
-    const rect = canvas.parentNode.getBoundingClientRect(); // TODO: PUT THIS IN A FUNCTION
-
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-
+    const canvas = document.getElementById('static-canvas'); // DEPRECATED
     const ctx = canvas.getContext('2d');
+    
+    const staticCanvas = document.getElementById('static-canvas');
+    const dynamicCanvas = document.getElementById('dynamic-canvas');
+    const uiCanvas = document.getElementById('ui-canvas');
+    
+    const staticCtx = staticCanvas.getContext('2d');
+    const dynamicCtx = dynamicCanvas.getContext('2d');
+    const uiCtx = uiCanvas.getContext('2d');
+    
+    const tableScale = 0.65;
 
-    const tableObject = new Table('container-canvas', ctx);
+    const resizeCanvas = (c) => {
+        const rect = c.parentNode.getBoundingClientRect();
+        c.width = rect.width;
+        c.height = rect.height;
+    };
 
-    tableObject.render(canvas.width, canvas.height, tableScale);
+    resizeCanvas(staticCanvas);
+
+    const tableObject = new Table(staticCtx);
+
+    tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -511,12 +522,13 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         console.log('window resized');
 
-        const rect = canvas.parentNode.getBoundingClientRect();
+        // const rect = canvas.parentNode.getBoundingClientRect();
 
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-
-        tableObject.render(canvas.width, canvas.height, tableScale);
+        // canvas.width = rect.width;
+        // canvas.height = rect.height;
+    
+        resizeCanvas(staticCanvas);
+        tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
         // updateCanvasDimensions();
         // updateTableDimensions(playerState.assignedSeat.index);
 
