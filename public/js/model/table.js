@@ -11,25 +11,23 @@ function Table(parentCtx) {
 
     this.parentCtx = parentCtx;
 
-    this.dimensions = {
+    this.transform = {
         originx: 0,
         originy: 0,
-        length: 0,
-        radius: 0
+        radius: 0,
+        offset: 0
     };
 
     this.seats = new Map();
 }
 
 Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale) {
-    ctx = this.canvas.getContext('2d');
+    const ctx = this.canvas.getContext('2d');
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.canvas.width = Math.floor(parentCanvasWidth * scale);
     this.canvas.height = Math.floor(parentCanvasHeight * scale);
 
-    const globalx = parentCanvasWidth * 0.5;
-    const globaly = parentCanvasHeight * 0.5;
     const localx = this.canvas.width * 0.5;
     const localy = this.canvas.height * 0.5;
 
@@ -44,19 +42,23 @@ Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale)
     ctx.fillStyle = 'green';
     ctx.fill();
 
-    this.parentCtx.drawImage(this.canvas, (parentCanvasWidth * 0.5) - this.canvas.width / 2, (parentCanvasHeight * 0.5) - localy);
+    const globalx = parentCanvasWidth;
+    const globaly = parentCanvasHeight;
 
-    this.dimensions.originx = localx;
-    this.dimensions.originy = localy;
-    this.dimensions.radius = radius;
-    this.dimensions.offset = length;
+    this.parentCtx.drawImage(this.canvas, globalx, globaly);
+    // this.parentCtx.drawImage(this.canvas, (parentCanvasWidth * 0.5) - this.canvas.width / 2, (parentCanvasHeight * 0.5) - localy);
+
+    this.transform.originx = localx;
+    this.transform.originy = localy;
+    this.transform.radius = radius;
+    this.transform.offset = length;
 };
 
 Table.prototype.pointOnTable = function (position) {
-    const ox = this.dimensions.originx;
-    const oy = this.dimensions.originy;
-    const r = this.dimensions.radius;
-    const off = this.dimensions.offset;
+    const ox = this.transform.originx;
+    const oy = this.transform.originy;
+    const r = this.transform.radius;
+    const off = this.transform.offset;
 
     const offsetLeft = ox - off;
     const offsetRight = ox + off;
