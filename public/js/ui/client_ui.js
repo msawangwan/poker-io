@@ -14,11 +14,18 @@ $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
     const canvas = document.getElementById('main-canvas');
+    const tableScale = 0.90;
+
+    const rect = canvas.parentNode.getBoundingClientRect(); // TODO: PUT THIS IN A FUNCTION
+
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
     const ctx = canvas.getContext('2d');
 
     const tableObject = new Table('container-canvas', ctx);
 
-    tableObject.render(canvas.width, canvas.height);
+    tableObject.render(canvas.width, canvas.height, tableScale);
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -509,7 +516,7 @@ $(document).ready(() => {
         canvas.width = rect.width;
         canvas.height = rect.height;
 
-        tableObject.render(canvas.width, canvas.height);
+        tableObject.render(canvas.width, canvas.height, tableScale);
         // updateCanvasDimensions();
         // updateTableDimensions(playerState.assignedSeat.index);
 
