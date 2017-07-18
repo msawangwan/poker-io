@@ -24,6 +24,8 @@ function Seat(position, radius, color) {
                 y: 0
             }
         },
+        w: 0,
+        h: 0,
         radius: radius
     };
 
@@ -33,7 +35,38 @@ function Seat(position, radius, color) {
     };
 }
 
-Seat.prototype.render = function (toParentCanvas, atX, atY, tableRadius, tableOffset) {
+Seat.prototype.calcTransform = function (globalx, globaly, tableradius, tableoffset) {
+    const t = this.transform;
+
+    t.w = t.radius * 2;
+    t.h = t.w;
+
+    t.origin.local.x = Math.floor(t.w * 0.5);
+    t.origin.local.y = Math.floor(t.h * 0.5);
+
+    t.origin.global.x = globalx + tableoffset + tableoffset * 2; // TODO: remove one of these lolz
+    t.origin.global.y = globaly + tableradius + t.radius * 2;
+
+    this.transform = t;
+};
+
+Seat.prototype.render = function (toParentCanvas) {
+    const t = this.transform;
+
+    this.canvas.width = t.w;
+    this.canvas.height = t.h;
+
+    const localctx = this.canvas.getContext('2d');
+
+    localctx.clearRect(0, 0, t.w, t.h);
+    localctx.arc(t.origin.local.x, t.origin.local.y, t.radius, Math.PI * 2, false);
+    localctx.fillStyle = this.seatColor;
+    localctx.fill();
+
+    toParentCanvas.getContext('2d').drawImage(this.canvas, t.origin.global.x, t.origin.global.y);
+};
+
+Seat.prototype.render_DEPRECATED = function (toParentCanvas, atX, atY, tableRadius, tableOffset) {
     const localctx = this.canvas.getContext('2d');
     localctx.clearRect(0, 0, this.canvas.width, this.canvas.height);;
 

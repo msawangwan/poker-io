@@ -36,7 +36,7 @@ function Table(parentCtx) {
     };
 }
 
-Table.prototype.calcDimensions = function (parentCanvasWidth, parentCanvasHeight, scale) {
+Table.prototype.calcTransform = function (parentCanvasWidth, parentCanvasHeight, scale) {
     const t = this.transform;
 
     t.w = Math.floor(parentCanvasWidth * scale);
@@ -70,43 +70,6 @@ Table.prototype.render = function (toParentCanvas) {
     localctx.fill();
 
     toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
-};
-
-Table.prototype.renderORIGINAL = function (toParentCanvas, parentCanvasWidth, parentCanvasHeight, scale) {
-    const localctx = this.canvas.getContext('2d');
-
-    localctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    this.canvas.width = Math.floor(parentCanvasWidth * scale);
-    this.canvas.height = Math.floor(parentCanvasHeight * scale);
-
-    const localx = Math.floor(this.canvas.width * 0.5);
-    const localy = Math.floor(this.canvas.height * 0.5);
-
-    const radius = Math.floor(this.canvas.height / 4);
-    const length = Math.floor(this.canvas.width * 0.15);
-
-    localctx.beginPath();
-
-    localctx.arc(localx - length, localy, radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-    localctx.arc(localx + length, localy, radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-
-    localctx.fillStyle = 'green';
-    localctx.fill();
-
-    const globalx = parentCanvasWidth / 2 - localx;
-    const globaly = parentCanvasHeight / 2 - localy;
-
-    toParentCanvas.getContext('2d').drawImage(this.canvas, globalx, globaly);
-
-    this.transform.local.center.x = localx;
-    this.transform.local.center.y = localy;
-
-    this.transform.radius = radius;
-    this.transform.offset = length;
-
-    this.transform.global.centeredAt.x = globalx;
-    this.transform.global.centeredAt.y = globaly;
 };
 
 Table.prototype.pointOnTable = function (position) {

@@ -64,14 +64,16 @@ $(document).ready(() => {
     };
 
     const renderTable = (cnv, t, scale) => {
-        t.calcDimensions(cnv.width, cnv.height, scale);
+        t.calcTransform(cnv.width, cnv.height, scale);
         t.render(cnv);
     };
 
     const renderSeats = (cnv, t) => {
         for (const [pos, s] of t.seats) {
             const point = t.pointOnTable(pos);
-            s.render(cnv, point.x, point.y, t.transform.radius, t.transform.offset);
+            s.calcTransform(point.x, point.y, t.transform.radius, t.transform.offset);
+            s.render(cnv);
+            // s.render_DEPRECATED(cnv, point.x, point.y, t.transform.radius, t.transform.offset);
         }
     };
 
@@ -82,9 +84,6 @@ $(document).ready(() => {
     resizeCanvas(staticCanvas, 'container-canvas');
 
     const tableObject = new Table(staticCtx);
-
-    tableObject.calcDimensions(staticCanvas.width, staticCanvas.height, tableScale);
-    tableObject.render(staticCanvas);
 
     renderTable(staticCanvas, tableObject, tableScale);
 
@@ -284,10 +283,10 @@ $(document).ready(() => {
 
         resizeCanvas(staticCanvas, 'container-canvas');
 
-        // renderTable(staticCanvas, tableObject, tableScale);
 
-        tableObject.calcDimensions(staticCanvas.width, staticCanvas.height, tableScale);
-        tableObject.render(staticCanvas);
+        // tableObject.calcDimensions(staticCanvas.width, staticCanvas.height, tableScale);
+        // tableObject.render(staticCanvas);
+        renderTable(staticCanvas, tableObject, tableScale);
         renderSeats(staticCanvas, tableObject);
     });
 });
