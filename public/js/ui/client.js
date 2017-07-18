@@ -32,16 +32,17 @@ const initTableSeating = (t) => {
     return newSeats;
 };
 
+const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
+
+    for (const c of canvasEleGroup) {
+        resizeCanvas(c, parentCanvasId);
+    }
+}
+
 const resizeCanvas = (canvas, parentCanvasId) => {
     const c = jqObjFromStr(parentCanvasId);
     canvas.width = c.width();
     canvas.height = c.height();
-};
-
-const resizeAllCanvas = (parentCanvasId) => {
-    for (const c in canvasGroup) {
-        resizeCanvas(c, parentCanvasId); // TODO: fix this creating a new jqobject each iter
-    }
 };
 
 const updateTransforms = (parentw, parenth, table, scaler) => {
@@ -84,19 +85,20 @@ const renderLabels = (renderer) => {
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
-    const canvasIds = [
-        'static-canvas', 'dynamic-canvas', 'text-canvas'
+    const containerCanvasId = 'container-canvas';
+    const canvasLayerIds = [
+        'static-canvas', 'dynamic-canvas', 'label-canvas'
     ];
 
-    const staticCanvas = document.getElementById(canvasIds[0]);
-    const dynamicCanvas = document.getElementById(canvasIds[1]);
-    const txtCanvas = document.getElementById(canvasIds[2]);
+    const staticCanvas = document.getElementById(canvasLayerIds[0]);
+    const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
+    const labelCanvas = document.getElementById(canvasLayerIds[2]);
 
-    const canvasGroup = [staticCanvas, dynamicCanvas, txtCanvas];
+    const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
 
     const staticCtx = staticCanvas.getContext('2d');
     const dynamicCtx = dynamicCanvas.getContext('2d');
-    const txtCtx = txtCanvas.getContext('2d');
+    const labelCtx = labelCanvas.getContext('2d');
 
     const tableScale = 0.65;
 
@@ -105,6 +107,9 @@ $(document).ready(() => {
     });
 
     resizeCanvas(staticCanvas, 'container-canvas');
+    resizeCanvas(dynamicCanvas, 'container-canvas');
+    resizeCanvas(labelCanvas, 'container-canvas');
+    // resizeCanvases(containerCanvasId, canvasGroup);
 
     const tableObject = new Table(0);
     const seatObjects = initTableSeating(tableObject);
@@ -120,15 +125,15 @@ $(document).ready(() => {
 
     const lid = labelRenderer.addNew('waiting for players ...', 'serif', 24, 'white');
     labelRenderer.renderTo(
-        staticCanvas,
+        labelCanvas,
         tableObject.transform.global.centeredAt.x,
         tableObject.transform.global.centeredAt.y,
         lid
     );
 
     setTimeout(() => {
-        labelRenderer.removeExisting(lid);
-        console.log('removed');
+        const result = labelRenderer.removeExisting(labelCanvas, lid);
+        console.log('removed: ' + result);
     }, 2000);
 
     const assignedPlayerName = assignName();
@@ -322,6 +327,10 @@ $(document).ready(() => {
         console.log('window resized');
 
         resizeCanvas(staticCanvas, 'container-canvas');
+        resizeCanvas(dynamicCanvas, 'container-canvas');
+        resizeCanvas(labelCanvas, 'container-canvas');
+        // resizeCanvases(containerCanvasId, canvasGroup);
+
 
         render(staticCanvas, tableObject, tableScale);
     });

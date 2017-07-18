@@ -13,7 +13,7 @@
         <div class="main-content-subsection" id="container-canvas">
             <canvas class="canvas-layer" id="static-canvas"></canvas>
             <canvas class="canvas-layer" id="dynamic-canvas"></canvas>
-            <canvas class="canvas-layer" id="text-canvas"></canvas>
+            <canvas class="canvas-layer" id="label-canvas"></canvas>
         </div>
         <div class="main-content-subsection" id="container-input">
             <div id="table-input">
@@ -44,8 +44,10 @@
             <div id="table-output"></div>
         </div>
     </div>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <div class="hidden-content">
+        <div id="temp-container"></div>
+    </div>
+    <script src=" https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js "></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js' type='text/javascript'></script>
     <script src='./js/model/sprite.js' type='text/javascript'></script>
     <script src='./js/model/spritecache.js' type='text/javascript'></script>
