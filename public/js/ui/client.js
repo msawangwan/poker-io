@@ -12,12 +12,57 @@ const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
 
-const canvasIds = [
-    'static-canvas', 'dynamic-canvas', 'text-canvas'
-];
+const resizeCanvas = (canvas, parentCanvasId) => {
+    const c = jqObjFromStr(parentCanvasId);
+    canvas.width = c.width();
+    canvas.height = c.height();
+};
+
+const resizeAllCanvas = (parentCanvasId) => {
+    for (const c in canvasGroup) {
+        resizeCanvas(c, parentCanvasId); // TODO: fix this creating a new jqobject each iter
+    }
+};
+
+const updateTransforms = (parentw, parenth, table, scaler) => {
+    if (!table.transformState.changed) {
+        table.calcTransform(parentw, parenth, scaler);
+
+        for (const [i, s] of table.seats) {
+            if (!s.transformState.changed) {
+                const p = table.pointOnTable(i);
+                s.calcTransform(p.x, p.y, table.transform.radius, table.transform.offset);
+                s.transformState.changed = true;
+            }
+        }
+
+        table.transformState.changed = true;
+    }
+};
+
+const renderTransforms = (parentcanv, table) => {
+    if (table.transformState.changed) {
+        table.render(parentcanv);
+
+        for (const [i, s] of table.seats) {
+            if (s.transformState.changed) {
+                s.render(parentcanv);
+                s.transformState.changed = false;
+                s.transformState.rendered = true;
+            }
+        }
+
+        table.transformState.changed = false;
+        table.transformState.rendered = true;
+    }
+};
 
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
+
+    const canvasIds = [
+        'static-canvas', 'dynamic-canvas', 'text-canvas'
+    ];
 
     const staticCanvas = document.getElementById(canvasIds[0]);
     const dynamicCanvas = document.getElementById(canvasIds[1]);
@@ -30,18 +75,6 @@ $(document).ready(() => {
     const txtCtx = txtCanvas.getContext('2d');
 
     const tableScale = 0.65;
-
-    const resizeCanvas = (canvas, parentCanvasId) => {
-        const c = jqObjFromStr(parentCanvasId);
-        canvas.width = c.width();
-        canvas.height = c.height();
-    };
-
-    const resizeAllCanvas = (parentCanvasId) => {
-        for (const c in canvasGroup) {
-            resizeCanvas(c, parentCanvasId); // TODO: fix this creating a new jqobject each iter
-        }
-    };
 
     const initTableSeating = (t) => {
         const newSeats = [
@@ -63,38 +96,6 @@ $(document).ready(() => {
         return newSeats;
     };
 
-    const updateTransforms = (parentcanvas, table, scaler, renderTable, renderSeats) => {
-        if (renderTable) {
-            table.calcTransform(parentcanvas.width, parentcanvas.height, scaler);
-            table.transformState.changed = true;
-        }
-
-        if (renderSeats) {
-            for (const [i, s] of table.seats) {
-                const p = table.pointOnTable(i);
-                s.calcTransform(p.x, p.y, table.transform.radius, table.transform.offset);
-                s.transformState.changed = true;
-            }
-        }
-    };
-
-    const renderTransforms = (parentcanvas, table) => {
-        if (table.transformState.changed) {
-            table.render(parentcanvas);
-
-            for (const [i, s] of table.seats) {
-                if (s.transformState.changed) {
-                    s.render(parentcanvas);
-                    s.transformState.changed = false;
-                    s.transformState.rendered = true;
-                }
-            }
-
-            table.transformState.changed = false;
-            table.transformState.rendered = true;
-        }
-    };
-
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
@@ -104,8 +105,12 @@ $(document).ready(() => {
     const tableObject = new Table(0);
     const seatObjects = initTableSeating(tableObject);
 
-    updateTransforms(staticCanvas, tableObject, tableScale, true, true);
-    renderTransforms(staticCanvas, tableObject);
+    const render = (c, t, ts) => {
+        updateTransforms(c.width, c.height, t, ts);
+        renderTransforms(c, t);
+    };
+
+    render(staticCanvas, tableObject, tableScale);
 
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;
@@ -299,7 +304,6 @@ $(document).ready(() => {
 
         resizeCanvas(staticCanvas, 'container-canvas');
 
-        updateTransforms(staticCanvas, tableObject, tableScale, true, true);
-        renderTransforms(staticCanvas, tableObject);
+        render(staticCanvas, tableObject, tableScale);
     });
 });

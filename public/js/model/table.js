@@ -11,6 +11,9 @@ function Table(id) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', 'canvas-table');
 
+    // this.canvas.setAttribute('grid-area', 'canvas');
+    // document.getElementById('container-canvas').appendChild(this.canvas);
+
     this.seats = new Map();
 
     this.transform = {
@@ -33,7 +36,7 @@ function Table(id) {
     };
 
     this.transformState = {
-        changed: true,
+        changed: false,
         rendered: false
     };
 }

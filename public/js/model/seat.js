@@ -10,6 +10,9 @@ function Seat(position, radius, color) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', this.id);
 
+    // this.canvas.setAttribute('grid-area', 'canvas');
+    // document.getElementById('container-canvas').appendChild(this.canvas);
+
     this.canvas.width = radius * 2;
     this.canvas.height = radius * 2;
 
@@ -30,7 +33,7 @@ function Seat(position, radius, color) {
     };
 
     this.transformState = {
-        changed: true,
+        changed: false,
         rendered: false
     };
 }
