@@ -13,8 +13,8 @@ const cardbackpixelheight = 188;
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
-    const canvas = document.getElementById('static-canvas'); // DEPRECATED
-    const ctx = canvas.getContext('2d');
+    // const canvas = document.getElementById('static-canvas'); // DEPRECATED
+    // const ctx = canvas.getContext('2d');
 
     const staticCanvas = document.getElementById('static-canvas');
     const dynamicCanvas = document.getElementById('dynamic-canvas');
@@ -31,25 +31,28 @@ $(document).ready(() => {
         canvas.width = c.width();
         canvas.height = c.height();
     };
+    
+    const initTableSeating = (table) => {
+        const newSeats = [
+            new Seat(staticCtx, 0, 32, 'black'),
+            new Seat(staticCtx, 1, 32, 'black'),
+            new Seat(staticCtx, 2, 32, 'black'),
+            new Seat(staticCtx, 3, 32, 'black'),
+            new Seat(staticCtx, 4, 32, 'black'),
+            new Seat(staticCtx, 5, 32, 'black'),
+            new Seat(staticCtx, 6, 32, 'black'),
+            new Seat(staticCtx, 7, 32, 'black'),
+            new Seat(staticCtx, 8, 32, 'black'),
+        ];
+        
+        for (const s of newSeats) {
+            table.createSeat(s.position);
+        }
+        
+        return newSeats;
+    };
 
-    resizeCanvas(staticCanvas, 'container-canvas');
-
-    const tableObject = new Table(staticCtx);
-    const seatObjects = [
-        new Seat(staticCtx, -2, 32, 'yellow'),
-        new Seat(staticCtx, -1, 32, 'red'),
-        new Seat(staticCtx, 0, 32, 'black'),
-        new Seat(staticCtx, 1, 32, 'black'),
-        new Seat(staticCtx, 2, 32, 'black'),
-        new Seat(staticCtx, 3, 32, 'black'),
-        new Seat(staticCtx, 4, 32, 'black'),
-        new Seat(staticCtx, 5, 32, 'black'),
-        new Seat(staticCtx, 6, 32, 'black'),
-        new Seat(staticCtx, 7, 32, 'black'),
-        new Seat(staticCtx, 8, 32, 'black'),
-    ];
-
-    const drawTableAndStuff = (table, seats, canvas, scale) => {
+    const renderTableAndSeating = (table, seats, canvas, scale) => {
         table.render(canvas, canvas.width, canvas.height, scale);
 
         for (const s of seats) {
@@ -58,42 +61,53 @@ $(document).ready(() => {
         }
     };
 
-    drawTableAndStuff(tableObject, seatObjects, staticCanvas, tableScale);
-
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
 
+    resizeCanvas(staticCanvas, 'container-canvas');
+
+    const tableObject = new Table(staticCtx);
+    const seatObjects = initTableSeating(tableObject);
+    
+    renderTableAndSeating(tableObject, seatObjects, staticCanvas, tableScale);
+    
+    const assignedPlayerName = assignName();
+    const uniquePlayerId = socket.id || -100;
+    const defaultPlayerBalance = 500;
+
+    const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
+    
     const playerState = {
-        name: `player ${Math.floor(Math.random() * 100)}`,
-        balance: 10000,
-        assignedSeat: {
-            index: undefined,
-            x: 0,
-            y: 0
-        },
-        holeCards: {
-            a: undefined,
-            b: undefined,
-            strings: undefined
-        },
-        phaseIndex: undefined
+        // name: `player ${Math.floor(Math.random() * 100)}`,
+        // balance: 10000,
+        // assignedSeat: {
+        //     index: undefined,
+        //     x: 0,
+        //     y: 0
+        // },
+        // holeCards: {
+        //     a: undefined,
+        //     b: undefined,
+        //     strings: undefined
+        // },
+        // phaseIndex: undefined
     };
 
     const tableState = {
-        pos: { x: 0, y: 0 },
-        seats: undefined
+        // pos: { x: 0, y: 0 },
+        // seats: undefined
     };
 
     const canvasState = {
-        table: {
-            dimensions: undefined,
-            center: { x: undefined, y: undefined },
-            seatCoordinates: undefined
-        },
-        labels: {
-            tableCenter: ' ... '
-        }
+        // table: {
+        //     dimensions: undefined,
+        //     center: { x: undefined, y: undefined },
+        //     seatCoordinates: undefined
+        // },
+        // labels: {
+        //     tableCenter: ' ... '
+        // }
     };
 
     const maincanvas = {
@@ -102,13 +116,13 @@ $(document).ready(() => {
     };
 
     const currentCanvasCenter = {
-        x: () => maincanvas.width * 0.5,
-        y: () => maincanvas.height * 0.5
+        // x: () => maincanvas.width * 0.5,
+        // y: () => maincanvas.height * 0.5
     };
 
     const seating = {
-        coordinates: undefined,
-        playercoordinates: undefined
+        // coordinates: undefined,
+        // playercoordinates: undefined
     };
 
     const updateCanvasDimensions = () => {
@@ -153,149 +167,149 @@ $(document).ready(() => {
     };
 
     const calcTableDimensions = (radius, focuilength) => {
-        const originx = currentCanvasCenter.x();
-        const originy = currentCanvasCenter.y();
+        // const originx = currentCanvasCenter.x();
+        // const originy = currentCanvasCenter.y();
 
-        return {
-            origin: {
-                x: originx,
-                y: originy
-            },
-            radius: radius,
-            focui: {
-                length: focuilength,
-                left: originx - focuilength,
-                right: originx + focuilength
-            }
-        }
+        // return {
+        //     origin: {
+        //         x: originx,
+        //         y: originy
+        //     },
+        //     radius: radius,
+        //     focui: {
+        //         length: focuilength,
+        //         left: originx - focuilength,
+        //         right: originx + focuilength
+        //     }
+        // }
     };
 
     const calcSeatCoordinates = (o, radius, f) => {
-        const { x: ox, y: oy } = o;
+        // const { x: ox, y: oy } = o;
 
-        const offsetOriginLeft = ox - f;
-        const offsetOriginRight = ox + f;
+        // const offsetOriginLeft = ox - f;
+        // const offsetOriginRight = ox + f;
 
-        // const offset = f / 2;
-        const thetaUpper = 25;
-        const thetaLower = 325;
+        // // const offset = f / 2;
+        // const thetaUpper = 25;
+        // const thetaLower = 325;
 
-        const pointsOnTableCircumference = new Map([
-            [-1, {
-                label: 'pot-table-center',
-                x: ox,
-                y: oy
-            }],
-            [0, {
-                label: 'house-center-upper',
-                x: ox,
-                y: oy - radius
-            }],
-            [1, {
-                label: 'right-upper',
-                x: offsetOriginRight,
-                y: oy - radius
-            }],
-            [2, {
-                label: 'right-theta-upper',
-                x: offsetOriginRight + radius * Math.cos(toRadians(thetaUpper)),
-                y: oy - radius * Math.sin(toRadians(thetaUpper))
-            }],
-            [3, {
-                label: 'right-theta-lower',
-                x: offsetOriginRight + radius * Math.cos(toRadians(thetaLower)),
-                y: oy - radius * Math.sin(toRadians(thetaLower))
-            }],
-            [4, {
-                label: 'right-lower',
-                x: offsetOriginRight,
-                y: oy + radius
-            }],
-            [5, {
-                label: 'center-lower',
-                x: ox,
-                y: oy + radius
-            }],
-            [6, {
-                label: 'left-lower',
-                x: offsetOriginLeft,
-                y: oy + radius
-            }],
-            [7, {
-                label: 'left-theta-lower',
-                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaLower)),
-                y: oy - radius * Math.sin(toRadians(thetaLower))
-            }],
-            [8, {
-                label: 'left-theta-upper',
-                x: offsetOriginLeft - radius * Math.cos(toRadians(thetaUpper)),
-                y: oy - radius * Math.sin(toRadians(thetaUpper))
-            }],
-            [9, {
-                label: 'left-upper',
-                x: offsetOriginLeft,
-                y: oy - radius
-            }],
-        ]);
+        // const pointsOnTableCircumference = new Map([
+        //     [-1, {
+        //         label: 'pot-table-center',
+        //         x: ox,
+        //         y: oy
+        //     }],
+        //     [0, {
+        //         label: 'house-center-upper',
+        //         x: ox,
+        //         y: oy - radius
+        //     }],
+        //     [1, {
+        //         label: 'right-upper',
+        //         x: offsetOriginRight,
+        //         y: oy - radius
+        //     }],
+        //     [2, {
+        //         label: 'right-theta-upper',
+        //         x: offsetOriginRight + radius * Math.cos(toRadians(thetaUpper)),
+        //         y: oy - radius * Math.sin(toRadians(thetaUpper))
+        //     }],
+        //     [3, {
+        //         label: 'right-theta-lower',
+        //         x: offsetOriginRight + radius * Math.cos(toRadians(thetaLower)),
+        //         y: oy - radius * Math.sin(toRadians(thetaLower))
+        //     }],
+        //     [4, {
+        //         label: 'right-lower',
+        //         x: offsetOriginRight,
+        //         y: oy + radius
+        //     }],
+        //     [5, {
+        //         label: 'center-lower',
+        //         x: ox,
+        //         y: oy + radius
+        //     }],
+        //     [6, {
+        //         label: 'left-lower',
+        //         x: offsetOriginLeft,
+        //         y: oy + radius
+        //     }],
+        //     [7, {
+        //         label: 'left-theta-lower',
+        //         x: offsetOriginLeft - radius * Math.cos(toRadians(thetaLower)),
+        //         y: oy - radius * Math.sin(toRadians(thetaLower))
+        //     }],
+        //     [8, {
+        //         label: 'left-theta-upper',
+        //         x: offsetOriginLeft - radius * Math.cos(toRadians(thetaUpper)),
+        //         y: oy - radius * Math.sin(toRadians(thetaUpper))
+        //     }],
+        //     [9, {
+        //         label: 'left-upper',
+        //         x: offsetOriginLeft,
+        //         y: oy - radius
+        //     }],
+        // ]);
 
-        return pointsOnTableCircumference;
+        // return pointsOnTableCircumference;
     };
 
     const getTablePosByIndex = (index, coords) => {
-        if (coords) { // TODO: handle undefined
-            const pos = coords.get(index + 1);
-            if (pos) {
-                return {
-                    x: pos.x,
-                    y: pos.y
-                }
-            }
-        }
+        // if (coords) { // TODO: handle undefined
+        //     const pos = coords.get(index + 1);
+        //     if (pos) {
+        //         return {
+        //             x: pos.x,
+        //             y: pos.y
+        //         }
+        //     }
+        // }
     };
 
     const drawTable = (dimensions) => {
-        ctx.beginPath();
+        // ctx.beginPath();
 
-        ctx.arc(dimensions.focui.left, dimensions.origin.y, dimensions.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
-        ctx.arc(dimensions.focui.right, dimensions.origin.y, dimensions.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
+        // ctx.arc(dimensions.focui.left, dimensions.origin.y, dimensions.radius, Math.PI * 0.5, Math.PI * 0.50 + Math.PI);
+        // ctx.arc(dimensions.focui.right, dimensions.origin.y, dimensions.radius, Math.PI * 0.50 + Math.PI, Math.PI * 0.5);
 
-        const yoffset = dimensions.origin.y + dimensions.radius;
+        // const yoffset = dimensions.origin.y + dimensions.radius;
 
-        ctx.moveTo(dimensions.focui.right, yoffset);
-        ctx.lineTo(dimensions.focui.left, yoffset);
+        // ctx.moveTo(dimensions.focui.right, yoffset);
+        // ctx.lineTo(dimensions.focui.left, yoffset);
 
-        ctx.stroke();
+        // ctx.stroke();
 
-        ctx.fillStyle = 'green';
-        ctx.fill();
+        // ctx.fillStyle = 'green';
+        // ctx.fill();
     };
 
     const drawSeating = (seatCoordinates, seatStates, seatSize) => {
-        if (!seatStates) {
-            return false;
-        }
+        // if (!seatStates) {
+        //     return false;
+        // }
 
-        for (const [position, coord] of seatCoordinates.entries()) {
-            let seatColor = 'lightblue';
+        // for (const [position, coord] of seatCoordinates.entries()) {
+        //     let seatColor = 'lightblue';
 
-            if (position > 0) { // note: valid player seat positions are exclusive to numbers 1-9
-                const seat = seatStates[position - 1];
+        //     if (position > 0) { // note: valid player seat positions are exclusive to numbers 1-9
+        //         const seat = seatStates[position - 1];
 
-                if (seat[1].vacant) {
-                    drawEmptySeat(coord.x, coord.y, seatSize);
-                } else {
-                    const p = seat[1].player;
+        //         if (seat[1].vacant) {
+        //             drawEmptySeat(coord.x, coord.y, seatSize);
+        //         } else {
+        //             const p = seat[1].player;
 
-                    if (p.id === socket.id) {
-                        seatColor = 'orange';
-                    }
+        //             if (p.id === socket.id) {
+        //                 seatColor = 'orange';
+        //             }
 
-                    drawPlayerSeat(coord.x, coord.y, p, seatSize, seatColor);
-                }
-            }
-        }
+        //             drawPlayerSeat(coord.x, coord.y, p, seatSize, seatColor);
+        //         }
+        //     }
+        // }
 
-        return true;
+        // return true;
     };
 
     const drawSeat = (x, y, seatSize, seatColor) => {
@@ -543,7 +557,7 @@ $(document).ready(() => {
 
         resizeCanvas(staticCanvas, 'container-canvas');
 
-        drawTableAndStuff(tableObject, seatObjects, staticCanvas, tableScale);
+        renderTableAndSeating(tableObject, seatObjects, staticCanvas, tableScale);
 
         // updateCanvasDimensions();
         // updateTableDimensions(playerState.assignedSeat.index);

@@ -133,6 +133,18 @@ Table.prototype.pointOnTable = function (position) {
     };
 };
 
+Table.prototype.getTablePosByIndex = function(index, coords) {
+        if (coords) { // TODO: handle undefined
+            const pos = coords.get(index);
+            if (pos) {
+                return {
+                    x: pos.x,
+                    y: pos.y
+                }
+            }
+        }
+    };
+
 Table.prototype.createSeat = function (position) {
     if (this.seats.size > maxSeats) {
         return false;
