@@ -58,11 +58,6 @@ $(document).ready(() => {
 
     drawTableAndStuff(tableObject, seatObjects, staticCanvas, tableScale);
 
-    // for (const s of seatObjects) {
-    //     const c = tableObject.pointOnTable(s.position);
-    //     s.render(c.x, c.y);
-    // }
-
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });

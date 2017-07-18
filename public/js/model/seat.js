@@ -8,19 +8,17 @@ function Seat(parentCtx, position, radius, color) {
     this.parentCtx = parentCtx;
 
     this.transform = {
-        local: {
-            center: {
+        origin: {
+            local: {
                 x: 0,
                 y: 0
             },
-            radius: radius
-        },
-        global: {
-            centeredAt: {
+            global: {
                 x: 0,
                 y: 0
             }
-        }
+        },
+        radius: radius
     };
 
     this.seatColor = color;
@@ -37,17 +35,17 @@ Seat.prototype.render = function (x, y, tableRadius, tableOffset) {
     const localy = Math.floor(this.canvas.height * 0.5);
 
     ctx.beginPath();
-    ctx.arc(localx, localy, this.transform.local.radius, Math.PI * 2, false);
+    ctx.arc(localx, localy, this.transform.radius, Math.PI * 2, false);
     ctx.fillStyle = this.seatColor;
     ctx.fill();
 
-    const globalx = x + localx + tableOffset * 2;
+    const globalx = x + localx + tableOffset * 2 + this.transform.radius / 2;
     const globaly = y + localy + tableRadius;
 
     this.parentCtx.drawImage(this.canvas, globalx, globaly);
 
-    this.transform.local.center.x = localx;
-    this.transform.local.center.y = localy;
+    this.transform.origin.local.x = localx;
+    this.transform.origin.local.y = localy;
 };
 
 Seat.prototype.sit = function () {

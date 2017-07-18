@@ -39,8 +39,8 @@ Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale)
     this.canvas.width = Math.floor(parentCanvasWidth * scale);
     this.canvas.height = Math.floor(parentCanvasHeight * scale);
 
-    const localx = this.canvas.width * 0.5;
-    const localy = this.canvas.height * 0.5;
+    const localx = Math.floor(this.canvas.width * 0.5);
+    const localy = Math.floor(this.canvas.height * 0.5);
 
     const radius = Math.floor(this.canvas.height / 4);
     const length = Math.floor(this.canvas.width * 0.15);
