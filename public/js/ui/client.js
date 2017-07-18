@@ -113,6 +113,10 @@ $(document).ready(() => {
         renderTransforms(c, t);
     };
 
+    const getCenter = (table) => {
+        return [table.transform.global.centeredAt.x, table.transform.global.centeredAt.y];
+    };
+
     render(staticCanvas, tableObject, tableScale);
 
     const assignedPlayerName = assignName();
@@ -121,12 +125,9 @@ $(document).ready(() => {
 
     const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    const cx = tableObject.transform.global.centeredAt.x;
-    const cy = tableObject.transform.global.centeredAt.y;
+    const [cx, cy] = getCenter(tableObject);
 
-    labelRenderer.addNew('waiting for players ...', cx, cy, hAlign[2], 'serif', 24, 'black');
-    labelRenderer.addNew('heheeplayers ...', cx, cy + 20, hAlign[2], 'serif', 24, 'black');
-
+    labelRenderer.addNew('waiting for players ...', cx, cy, 'serif', 24, 'black');
     labelRenderer.render(labelCtx);
 
     const drawPlayerHand = () => {
@@ -201,57 +202,12 @@ $(document).ready(() => {
         return true;
     };
 
-    const drawSeatLabel = (x, y, labeltxt) => {
-        ctx.beginPath();
-        ctx.font = '12px serif';
-        ctx.fillStyle = 'white';
-        ctx.fillText(labeltxt, x - ctx.measureText(labeltxt).width / 2, y);
-    };
-
-    const drawTableCenterLabel = (x, y, labeltxt) => {
-        const $centerLabel = $('#table-center-label');
-
-        if ($centerLabel) {
-            const old = document.getElementById('table-center-label');
-            if (old) {
-                old.getContext('2d').clearRect(0, 0, old.width, old.height);
-            }
-            $centerLabel.remove();
-        }
-
-        const labelCanvas = document.createElement('canvas');
-        const labelctx = labelCanvas.getContext('2d');
-
-        labelCanvas.setAttribute('id', 'table-center-label')
-        labelCanvas.width = 300;
-        labelCanvas.height = 300;
-
-        const textDimensions = ctx.measureText(labeltxt);
-
-        labelctx.font = '24px serif';
-        labelctx.fillStyle = 'white';
-        labelctx.fillText(labeltxt, labelCanvas.width / 2 - textDimensions.width, labelCanvas.height / 2);
-
-        ctx.drawImage(labelCanvas, x - labelCanvas.width / 2, y - labelCanvas.height / 2);
-    };
-
-    const setCurrentTableCenterLabel = (latestText) => {
-        console.log('setting current label as: ' + latestText);
-        while (labelq.length > 0) {
-            const discarded = labelq.shift();
-            console.log('discarded labels: ' + discarded);
-        }
-
-        canvasState.labels.tableCenter = latestText;
-        console.log('current label: ' + canvasState.labels.tableCenter);
-
-        labelq.push(latestText);
-    };
-
     const tickrate = 1000 / 2;
 
     const renderLoop = setInterval(() => {
-
+        // updateTransforms(c.width, c.height, t, ts);
+        // renderTransforms(c, t);
+        // labelRenderer.render(labelCtx);
     }, tickrate);
 
     const $containerbetting = $('#container-betting');
@@ -269,18 +225,11 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         // playerState.assignedSeat.index = data.seat;
-        // setCurrentTableCenterLabel('player seated ...');
         tableObject.seatPlayer();
     });
 
     socket.on('table-seating-state', data => {
         // tableState.seats = data.seating;
-        // setCurrentTableCenterLabel('waiting for players ...');
-        // renderQueue.push(() => {
-        //     updateCanvasDimensions();
-        //     updateTableDimensions(playerState.assignedSeat.index);
-        //     render(true, true, true, true);
-        // });
     });
 
     socket.on('game-start', data => {
@@ -299,10 +248,6 @@ $(document).ready(() => {
         playerState.holeCards.a = data.playerhand[0];
         playerState.holeCards.b = data.playerhand[1];
         playerState.holeCards.strings = data.playerhand[2];
-
-        renderQueue.push(() => {
-            render(false, false, false, true);
-        });
     });
 
     socket.on('connect_error', () => {
