@@ -9,16 +9,23 @@ function Table(parentCtx) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', 'canvas-table');
 
-    // $('#canvas-table').appendTo($('#static-canvas'));
-    // $('#canvas-table').css('border', 'solid 2px red');
-
     this.parentCtx = parentCtx;
 
     this.transform = {
-        originx: 0,
-        originy: 0,
+        local: {
+            center: {
+                x: 0,
+                y: 0
+            }
+        },
+        global: {
+            centeredAt: {
+                x: 0,
+                y: 0,
+            }
+        },
         radius: 0,
-        offset: 0
+        offset: 0,
     };
 
     this.seats = new Map();
@@ -26,11 +33,11 @@ function Table(parentCtx) {
 
 Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale) {
     const ctx = this.canvas.getContext('2d');
+
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.canvas.width = Math.floor(parentCanvasWidth * scale);
     this.canvas.height = Math.floor(parentCanvasHeight * scale);
-
 
     const localx = this.canvas.width * 0.5;
     const localy = this.canvas.height * 0.5;
@@ -51,15 +58,19 @@ Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale)
 
     this.parentCtx.drawImage(this.canvas, globalx, globaly);
 
-    this.transform.originx = localx;
-    this.transform.originy = localy;
+    this.transform.local.center.x = localx;
+    this.transform.local.center.y = localy;
+
     this.transform.radius = radius;
     this.transform.offset = length;
+
+    this.transform.global.centeredAt.x = globalx;
+    this.transform.global.centeredAt.y = globaly;
 };
 
 Table.prototype.pointOnTable = function (position) {
-    const ox = this.transform.originx;
-    const oy = this.transform.originy;
+    const ox = this.transform.global.centeredAt.x;
+    const oy = this.transform.global.centeredAt.y;
     const r = this.transform.radius;
     const off = this.transform.offset;
 
