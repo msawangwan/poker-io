@@ -26,17 +26,10 @@ $(document).ready(() => {
 
     const tableScale = 0.65;
 
-    const resizeCanvasMEH = (c) => { // TODO: figure this out properly
-        const rect = c.parentNode.getBoundingClientRect();
-        c.width = rect.width;
-        c.height = rect.height;
-    };
-
     const resizeCanvas = (canvas, parentCanvasId) => {
-        const c = $(`#${parentCanvasId}`);
+        const c = $(`#${parentCanvasId}`); // note: c.parentNode.getBoundingClientRect();
         canvas.width = c.width();
         canvas.height = c.height();
-        console.log('ss');
     };
 
     resizeCanvas(staticCanvas, 'container-canvas');
@@ -54,12 +47,21 @@ $(document).ready(() => {
         new Seat(staticCtx, 8, 32, 'black'),
     ];
 
-    tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
+    const drawTableAndStuff = (table, seats, canvas, scale) => {
+        table.render(canvas.width, canvas.height, scale);
 
-    for (const s of seatObjects) {
-        const c = tableObject.pointOnTable(s.position);
-        s.render(c.x, c.y);
-    }
+        for (const s of seats) {
+            const point = table.pointOnTable(s.position);
+            s.render(point.x, point.y);
+        }
+    };
+
+    drawTableAndStuff(tableObject, seatObjects, staticCanvas, tableScale);
+
+    // for (const s of seatObjects) {
+    //     const c = tableObject.pointOnTable(s.position);
+    //     s.render(c.x, c.y);
+    // }
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -543,13 +545,9 @@ $(document).ready(() => {
         console.log('window resized');
 
         resizeCanvas(staticCanvas, 'container-canvas');
-        tableObject.render(staticCanvas.width, staticCanvas.height, tableScale);
 
+        drawTableAndStuff(tableObject, seatObjects, staticCanvas, tableScale);
 
-        for (const s of seatObjects) {
-            const c = tableObject.pointOnTable(s.position);
-            s.render(c.x, c.y);
-        }
         // updateCanvasDimensions();
         // updateTableDimensions(playerState.assignedSeat.index);
 

@@ -9,6 +9,9 @@ function Table(parentCtx) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', 'canvas-table');
 
+    // $('#canvas-table').appendTo($('#static-canvas'));
+    // $('#canvas-table').css('border', 'solid 2px red');
+
     this.parentCtx = parentCtx;
 
     this.transform = {
@@ -28,10 +31,11 @@ Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale)
     this.canvas.width = Math.floor(parentCanvasWidth * scale);
     this.canvas.height = Math.floor(parentCanvasHeight * scale);
 
+
     const localx = this.canvas.width * 0.5;
     const localy = this.canvas.height * 0.5;
 
-    const radius = this.canvas.height / 4;
+    const radius = Math.floor(this.canvas.height / 4);
     const length = Math.floor(this.canvas.width * 0.15);
 
     ctx.beginPath();
@@ -42,11 +46,10 @@ Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale)
     ctx.fillStyle = 'green';
     ctx.fill();
 
-    const globalx = parentCanvasWidth;
-    const globaly = parentCanvasHeight;
+    const globalx = parentCanvasWidth / 2 - localx;
+    const globaly = parentCanvasHeight / 2 - localy;
 
     this.parentCtx.drawImage(this.canvas, globalx, globaly);
-    // this.parentCtx.drawImage(this.canvas, (parentCanvasWidth * 0.5) - this.canvas.width / 2, (parentCanvasHeight * 0.5) - localy);
 
     this.transform.originx = localx;
     this.transform.originy = localy;
@@ -69,11 +72,11 @@ Table.prototype.pointOnTable = function (position) {
     let y = -1;
 
     switch (position) {
-        case -1: // center
+        case -2: // center
             x = ox;
             y = oy;
             break;
-        case -2: // center upper
+        case -1: // center upper
             x = ox;
             y = oy - r;
             break;
