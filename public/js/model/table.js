@@ -144,27 +144,12 @@ Table.prototype.getTablePosByIndex = function(index) {
     }
 };
 
-Table.prototype.addSeat = function (position, seat, x, y) {
+Table.prototype.addSeat = function (seat) {
     if (this.seats.size > maxSeats) {
         return false;
     }
-
-    // this.seats.set(position, {
-    //     vacant: true,
-    //     coordinates: {
-    //         x: x,
-    //         y: y
-    //     },
-    //     player: undefined
-    // });
     
-    this.seats.set(position, {
-        seat: seat,
-        coordinates: {
-            x: x,
-            y: y
-        }
-    });
+    this.seats.set(seat.position, seat);
     
     return true;
 };

@@ -43,11 +43,14 @@ $(document).ready(() => {
         ];
         
         for (const s of newSeats) {
-            const point = t.pointOnTable(s.position);
-            t.addSeat(s.position, s, point.x, point.y);
+            const addedSuccess = t.addSeat(s);
+            
+            if (addedSuccess) {
+                console.log(`debug: added a seat successfully: ${s.position}`);
+            } else {
+                console.log(`err: failed to add a seat ${s.position}`);
+            }
         }
-        
-        console.log(t.seats);
         
         return newSeats;
     };
@@ -59,20 +62,9 @@ $(document).ready(() => {
     const renderSeats = (cnv, t) => {
         for (const [pos, s] of t.seats) {
             const point = t.pointOnTable(pos);
-            s.seat.render(cnv, point.x, point.y, t.transform.radius, t.transform.offset);
+            s.render(cnv, point.x, point.y, t.transform.radius, t.transform.offset);
         }
     };
-
-    // const renderTableAndSeating = (canvas, table, scale) => {
-    //     table.render(canvas, canvas.width, canvas.height, scale);
-
-    //     for (const [p, s] of table.seats) {
-            // const point = s.coordinates;
-            // s.render(canvas, point.x, point.y, table.transform.radius, table.transform.offset);
-    //         const point = table.pointOnTable(s.position);
-    //         s.seat.render(canvas, s.coordinates.x, s.coordinates.y, table.transform.radius, table.transform.offset);
-    //     }
-    // };
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
