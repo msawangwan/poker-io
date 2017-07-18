@@ -12,6 +12,26 @@ const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
 
+const initTableSeating = (t) => {
+    const newSeats = [
+        new Seat(0, 32, 'black'),
+        new Seat(1, 32, 'black'),
+        new Seat(2, 32, 'black'),
+        new Seat(3, 32, 'black'),
+        new Seat(4, 32, 'black'),
+        new Seat(5, 32, 'black'),
+        new Seat(6, 32, 'black'),
+        new Seat(7, 32, 'black'),
+        new Seat(8, 32, 'black'),
+    ];
+
+    for (const s of newSeats) {
+        t.addSeat(s);
+    }
+
+    return newSeats;
+};
+
 const resizeCanvas = (canvas, parentCanvasId) => {
     const c = jqObjFromStr(parentCanvasId);
     canvas.width = c.width();
@@ -57,6 +77,10 @@ const renderTransforms = (parentcanv, table) => {
     }
 };
 
+const renderLabels = (renderer) => {
+
+};
+
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
@@ -76,26 +100,6 @@ $(document).ready(() => {
 
     const tableScale = 0.65;
 
-    const initTableSeating = (t) => {
-        const newSeats = [
-            new Seat(0, 32, 'black'),
-            new Seat(1, 32, 'black'),
-            new Seat(2, 32, 'black'),
-            new Seat(3, 32, 'black'),
-            new Seat(4, 32, 'black'),
-            new Seat(5, 32, 'black'),
-            new Seat(6, 32, 'black'),
-            new Seat(7, 32, 'black'),
-            new Seat(8, 32, 'black'),
-        ];
-
-        for (const s of newSeats) {
-            t.addSeat(s);
-        }
-
-        return newSeats;
-    };
-
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
@@ -110,7 +114,22 @@ $(document).ready(() => {
         renderTransforms(c, t);
     };
 
+    const labelRenderer = new LabelRenderer();
+
     render(staticCanvas, tableObject, tableScale);
+
+    const lid = labelRenderer.addNew('waiting for players ...', 'serif', 24, 'white');
+    labelRenderer.renderTo(
+        staticCanvas,
+        tableObject.transform.global.centeredAt.x,
+        tableObject.transform.global.centeredAt.y,
+        lid
+    );
+
+    setTimeout(() => {
+        labelRenderer.removeExisting(lid);
+        console.log('removed');
+    }, 2000);
 
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;

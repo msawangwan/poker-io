@@ -1,5 +1,3 @@
-// this is a snippet from stack overflow
-// https://stackoverflow.com/questions/3543687/how-do-i-clear-text-from-the-canvas-element
 const defaultFont = '24px serif'; // TODO: load from conf
 const defaultFontColor = 'white'; // TODO: load from conf
 
@@ -7,7 +5,7 @@ function LabelRenderer() {
     this.labels = new Map();
 
     this.currentid = -1;
-    this.labelid = () => currentid += 1;
+    this.labelid = () => this.currentid += 1;
 }
 
 LabelRenderer.prototype.addNew = function (text, font, fontsize, color) {
