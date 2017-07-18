@@ -9,8 +9,6 @@ function Table(parentCtx) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', 'canvas-table');
 
-    this.parentCtx = parentCtx;
-
     this.transform = {
         local: {
             center: {
@@ -32,9 +30,9 @@ function Table(parentCtx) {
 }
 
 Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanvasHeight, scale) {
-    const ctx = this.canvas.getContext('2d');
+    const localctx = this.canvas.getContext('2d');
 
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    localctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.canvas.width = Math.floor(parentCanvasWidth * scale);
     this.canvas.height = Math.floor(parentCanvasHeight * scale);
@@ -45,18 +43,17 @@ Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanv
     const radius = Math.floor(this.canvas.height / 4);
     const length = Math.floor(this.canvas.width * 0.15);
 
-    ctx.beginPath();
+    localctx.beginPath();
 
-    ctx.arc(localx - length, localy, radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-    ctx.arc(localx + length, localy, radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+    localctx.arc(localx - length, localy, radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+    localctx.arc(localx + length, localy, radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
 
-    ctx.fillStyle = 'green';
-    ctx.fill();
+    localctx.fillStyle = 'green';
+    localctx.fill();
 
     const globalx = parentCanvasWidth / 2 - localx;
     const globaly = parentCanvasHeight / 2 - localy;
 
-    // this.parentCtx.drawImage(this.canvas, globalx, globaly);
     toParentCanvas.getContext('2d').drawImage(this.canvas, globalx, globaly);
 
     this.transform.local.center.x = localx;
@@ -69,7 +66,8 @@ Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanv
     this.transform.global.centeredAt.y = globaly;
 };
 
-Table.prototype.pointOnTable = function (position) {
+// TODO: just use (0,0) and then offset later
+Table.prototype.pointOnTable = function (position, posOffset) {
     const ox = this.transform.global.centeredAt.x;
     const oy = this.transform.global.centeredAt.y;
     const r = this.transform.radius;
@@ -77,8 +75,6 @@ Table.prototype.pointOnTable = function (position) {
 
     const offsetLeft = ox - off;
     const offsetRight = ox + off;
-
-    const seatRadius = 0;
 
     let x = -1;
     let y = -1;
@@ -97,24 +93,24 @@ Table.prototype.pointOnTable = function (position) {
             y = oy - r;
             break;
         case 1: // right theta upper
-            x = offsetRight + r * Math.cos(thetaUpper) - (seatRadius / 2);
+            x = offsetRight + r * Math.cos(thetaUpper) - (posOffset / 2);
             y = oy - r * Math.sin(thetaUpper);
             break;
         case 2: // right theta lower
-            x = offsetRight + r * Math.cos(thetaLower) - (seatRadius / 2);
+            x = offsetRight + r * Math.cos(thetaLower) - (posOffset / 2);
             y = oy - r * Math.sin(thetaLower);
             break;
         case 3: // right lower
             x = offsetRight;
-            y = oy + r + (seatRadius / 2);
+            y = oy + r + (posOffset / 2);
             break;
         case 4: // center lower
             x = ox;
-            y = oy + r + (seatRadius / 2);
+            y = oy + r + (posOffset / 2);
             break;
         case 5: // left lower
             x = offsetLeft;
-            y = oy + r + (seatRadius / 2);
+            y = oy + r + (posOffset / 2);
             break;
         case 6: // left theta lower
             x = offsetLeft - r * Math.cos(thetaLower);

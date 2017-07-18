@@ -36,6 +36,8 @@ $(document).ready(() => {
 
     const tableObject = new Table(staticCtx);
     const seatObjects = [
+        new Seat(staticCtx, -2, 32, 'yellow'),
+        new Seat(staticCtx, -1, 32, 'red'),
         new Seat(staticCtx, 0, 32, 'black'),
         new Seat(staticCtx, 1, 32, 'black'),
         new Seat(staticCtx, 2, 32, 'black'),
@@ -51,8 +53,8 @@ $(document).ready(() => {
         table.render(staticCanvas, canvas.width, canvas.height, scale);
 
         for (const s of seats) {
-            const point = table.pointOnTable(s.position);
-            s.render(point.x, point.y, table.transform.radius, table.transform.offset);
+            const point = table.pointOnTable(s.position, s.transform.radius);
+            s.render(staticCanvas, point.x, point.y, table.transform.radius, table.transform.offset);
         }
     };
 
