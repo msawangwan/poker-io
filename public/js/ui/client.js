@@ -64,7 +64,8 @@ $(document).ready(() => {
     };
 
     const renderTable = (cnv, t, scale) => {
-        t.render(cnv, cnv.width, cnv.height, scale);
+        t.calcDimensions(cnv.width, cnv.height, scale);
+        t.render(cnv);
     };
 
     const renderSeats = (cnv, t) => {
@@ -81,6 +82,9 @@ $(document).ready(() => {
     resizeCanvas(staticCanvas, 'container-canvas');
 
     const tableObject = new Table(staticCtx);
+
+    tableObject.calcDimensions(staticCanvas.width, staticCanvas.height, tableScale);
+    tableObject.render(staticCanvas);
 
     renderTable(staticCanvas, tableObject, tableScale);
 
@@ -280,7 +284,10 @@ $(document).ready(() => {
 
         resizeCanvas(staticCanvas, 'container-canvas');
 
-        renderTable(staticCanvas, tableObject, tableScale);
+        // renderTable(staticCanvas, tableObject, tableScale);
+
+        tableObject.calcDimensions(staticCanvas.width, staticCanvas.height, tableScale);
+        tableObject.render(staticCanvas);
         renderSeats(staticCanvas, tableObject);
     });
 });

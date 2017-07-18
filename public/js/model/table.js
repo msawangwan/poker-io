@@ -9,6 +9,8 @@ function Table(parentCtx) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', 'canvas-table');
 
+    this.seats = new Map();
+
     this.transform = {
         local: {
             center: {
@@ -22,14 +24,55 @@ function Table(parentCtx) {
                 y: 0,
             }
         },
+        w: 0,
+        h: 0,
         radius: 0,
         offset: 0,
     };
 
-    this.seats = new Map();
+    this.renderState = {
+        rendered: false,
+        renderOnNextPass: false
+    };
 }
 
-Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanvasHeight, scale) {
+Table.prototype.calcDimensions = function (parentCanvasWidth, parentCanvasHeight, scale) {
+    const t = this.transform;
+
+    t.w = Math.floor(parentCanvasWidth * scale);
+    t.h = Math.floor(parentCanvasHeight * scale);
+
+    t.local.center.x = Math.floor(t.w * 0.5);
+    t.local.center.y = Math.floor(t.h * 0.5);
+
+    t.global.centeredAt.x = parentCanvasWidth / 2 - t.local.center.x;
+    t.global.centeredAt.y = parentCanvasHeight / 2 - t.local.center.y;
+
+    t.radius = Math.floor(t.h / 4);
+    t.offset = Math.floor(t.w * 0.15);
+
+    this.transform = t;
+};
+
+Table.prototype.render = function (toParentCanvas) {
+    const t = this.transform;
+
+    this.canvas.width = t.w;
+    this.canvas.height = t.h;
+
+    const localctx = this.canvas.getContext('2d');
+
+    localctx.clearRect(0, 0, t.w, t.h);
+    localctx.beginPath();
+    localctx.arc(t.local.center.x - t.offset, t.local.center.y, t.radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+    localctx.arc(t.local.center.x + t.offset, t.local.center.y, t.radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+    localctx.fillStyle = 'green';
+    localctx.fill();
+
+    toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
+};
+
+Table.prototype.renderORIGINAL = function (toParentCanvas, parentCanvasWidth, parentCanvasHeight, scale) {
     const localctx = this.canvas.getContext('2d');
 
     localctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -132,7 +175,7 @@ Table.prototype.pointOnTable = function (position) {
     };
 };
 
-Table.prototype.getTablePosByIndex = function(index) {
+Table.prototype.getTablePosByIndex = function (index) {
     if (coords) {
         const pos = coords.get(index);
         if (pos) {
@@ -148,9 +191,9 @@ Table.prototype.addSeat = function (seat) {
     if (this.seats.size > maxSeats) {
         return false;
     }
-    
+
     this.seats.set(seat.position, seat);
-    
+
     return true;
 };
 

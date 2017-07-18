@@ -2,11 +2,9 @@ function Seat(position, radius, color) {
     this.position = position;
     this.id = `canvas-seat-${position}`;
 
-    this.state = {
-        vacant: true,
-        rendered: false
-    };
-    
+    this.seatColor = color;
+
+    this.vacant = true;
     this.occupant = undefined;
 
     this.canvas = document.createElement('canvas');
@@ -29,7 +27,10 @@ function Seat(position, radius, color) {
         radius: radius
     };
 
-    this.seatColor = color;
+    this.renderState = {
+        rendered: false,
+        renderOnNextPass: false
+    };
 }
 
 Seat.prototype.render = function (toParentCanvas, atX, atY, tableRadius, tableOffset) {
