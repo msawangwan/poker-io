@@ -1,6 +1,13 @@
-function Seat(parentCtx, position, radius, color) {
+function Seat(position, radius, color) {
     this.position = position;
     this.id = `canvas-seat-${position}`;
+
+    this.state = {
+        vacant: true,
+        rendered: false
+    };
+    
+    this.occupant = undefined;
 
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', this.id);

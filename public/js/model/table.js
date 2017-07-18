@@ -66,7 +66,6 @@ Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanv
     this.transform.global.centeredAt.y = globaly;
 };
 
-// TODO: just use (0,0) and then offset later?
 Table.prototype.pointOnTable = function (position) {
     const ox = this.transform.global.centeredAt.x;
     const oy = this.transform.global.centeredAt.y;
@@ -133,27 +132,41 @@ Table.prototype.pointOnTable = function (position) {
     };
 };
 
-Table.prototype.getTablePosByIndex = function(index, coords) {
-        if (coords) { // TODO: handle undefined
-            const pos = coords.get(index);
-            if (pos) {
-                return {
-                    x: pos.x,
-                    y: pos.y
-                }
+Table.prototype.getTablePosByIndex = function(index) {
+    if (coords) {
+        const pos = coords.get(index);
+        if (pos) {
+            return {
+                x: pos.x,
+                y: pos.y
             }
         }
-    };
+    }
+};
 
-Table.prototype.createSeat = function (position) {
+Table.prototype.addSeat = function (position, seat, x, y) {
     if (this.seats.size > maxSeats) {
         return false;
     }
 
+    // this.seats.set(position, {
+    //     vacant: true,
+    //     coordinates: {
+    //         x: x,
+    //         y: y
+    //     },
+    //     player: undefined
+    // });
+    
     this.seats.set(position, {
-        vacant: true,
-        player: undefined
+        seat: seat,
+        coordinates: {
+            x: x,
+            y: y
+        }
     });
+    
+    return true;
 };
 
 Table.prototype.seatPlayer = function (position, player) {
