@@ -16,18 +16,25 @@ function LabelRenderer() {
     this.labelNode = document.getElementById('temp-container');
 }
 
-LabelRenderer.prototype.addNew = function (text, halignment, font, fontsize, color) {
+LabelRenderer.prototype.render = function (globalctx) {
+    for (const [id, label] of this.labels) {
+        this.renderTo(globalctx, label.pos.x, label.pos.y, id);
+    }
+};
+
+LabelRenderer.prototype.addNew = function (text, posx, posy, halignment, font, fontsize, color) {
     const id = `text-label-${this.labelid()}`
     const c = document.createElement('canvas');
 
     c.setAttribute('id', id);
+    c.style['background-color'] = 'rgba(255,0,0,0)';
 
     this.labels.set(id, {
         id: id,
         canvas: c,
         pos: {
-            x: 0,
-            y: 0
+            x: posx,
+            y: posy
         },
         text: {
             copy: text,
@@ -43,11 +50,11 @@ LabelRenderer.prototype.addNew = function (text, halignment, font, fontsize, col
     return id;
 };
 
-LabelRenderer.prototype.removeExisting = function (parentcanvas, id) {
+LabelRenderer.prototype.removeExisting = function (globalctx, id) {
     const label = this.labels.get(id);
 
     if (label) {
-        parentcanvas.getContext('2d').clearRect(label.pos.x, label.pos.y, label.canvas.width, label.canvas.height);
+        globalctx.clearRect(label.pos.x, label.pos.y, label.canvas.width, label.canvas.height);
         const node = document.getElementById(label.id);
         if (node) {
             node.parentNode.removeChild(node);
@@ -60,32 +67,31 @@ LabelRenderer.prototype.removeExisting = function (parentcanvas, id) {
     return false;
 };
 
-LabelRenderer.prototype.renderTo = function (parentcanvas, x, y, id) {
+LabelRenderer.prototype.renderTo = function (globalctx, x, y, id) {
     const label = this.labels.get(id);
 
     if (label) {
-        const labelctx = label.canvas.getContext('2d');
-        const globalctx = parentcanvas.getContext('2d');
-
         const size = globalctx.measureText(label.text.copy);
 
-        label.canvas.width = size.width * 10;
-        label.canvas.height = label.text.fontsize;
+        label.canvas.width = Math.floor(size.width * 10);
+        label.canvas.height = Math.floor(label.text.fontsize) * 2;
 
         let rectx = 0;
-        let recty = label.canvas.height / 2;
+        let recty = label.canvas.height - label.canvas.height / 2;
 
         switch (label.text.hAlign) {
             case 'left':
-                rectx = x;
+                rectx = 0;
                 break;
             case 'right':
-                rectx = label.canvas.width;
+                rectx = label.canvas.width / 2 - size.width;
                 break;
             default: // defaults to 'center'
                 rectx = label.canvas.width / 2;
                 break;
         }
+
+        const labelctx = label.canvas.getContext('2d');
 
         labelctx.font = formatfontstr(label.text.font, label.text.fontsize);
         labelctx.fillStyle = label.text.color;
@@ -101,32 +107,3 @@ LabelRenderer.prototype.renderTo = function (parentcanvas, x, y, id) {
 
     return false;
 };
-
-// this.textRendererDraw = function () {
-//     var metrics = this.ctx.measureText(this.lastValue),
-//         rect = {
-//             x: 0,
-//             y: this.y - this.textSize / 2,
-//             width: metrics.width,
-//             height: this.textSize,
-//         };
-
-//     switch (this.hAlign) {
-//         case 'center':
-//             rect.x = this.x - metrics.width / 2;
-//             break;
-//         case 'left':
-//             rect.x = this.x;
-//             break;
-//         case 'right':
-//             rect.x = this.x - metrics.width;
-//             break;
-//     }
-
-//     this.ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
-
-//     this.ctx.font = this.weight + ' ' + this.textSize + ' ' + this.font;
-//     this.ctx.textAlign = this.hAlign;
-//     this.ctx.fillText(this.value, this.x, this.y);
-//     this.lastValue = this.value;
-// };

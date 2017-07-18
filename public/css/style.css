@@ -133,22 +133,22 @@ body {
     width: 100%;
 }
 
-.canvas-layer:nth-child(1) {
+.canvas-layer:nth-child(1) { /* bg */
     background: var(--accent-tone-cool-grey);
 
     z-index: -1;
 }
 
-.canvas-layer:nth-child(2) {
-    background: var(--accent-tone-leather);
-    opacity: 0.25;
+.canvas-layer:nth-child(2) { /* fg */
+    /* background: var(--accent-tone-leather); */
+    /* opacity: 0.25; */
     
     z-index: 0;
 }
 
-.canvas-layer:nth-child(3) {
-    background: var(--accent-tone-ochre);
-    opacity: 0.15;
+.canvas-layer:nth-child(3) { /* labels */
+    /* background: var(--accent-tone-ochre); */
+    opacity: 1;
 
     z-index: 1;
 }

@@ -41,13 +41,7 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
         c.width = w;
         c.height = h;
     }
-}
-
-// const resizeCanvas = (canvas, parentCanvasId) => {
-//     const c = jqObjFromStr(parentCanvasId);
-//     canvas.width = c.width();
-//     canvas.height = c.height();
-// };
+};
 
 const updateTransforms = (parentw, parenth, table, scaler) => {
     if (!table.transformState.changed) {
@@ -84,6 +78,9 @@ const renderTransforms = (parentcanv, table) => {
 
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
+    const labelRenderer = new LabelRenderer();
+
+    const hAlign = ['left', 'right', 'center']; // for text labels
 
     const containerCanvasId = 'container-canvas';
     const canvasLayerIds = [
@@ -116,33 +113,21 @@ $(document).ready(() => {
         renderTransforms(c, t);
     };
 
-    const labelRenderer = new LabelRenderer();
-
     render(staticCanvas, tableObject, tableScale);
-
-    const lid1 = labelRenderer.addNew('waiting for players ...', horizontalAlignment.center, 'serif', 24, 'white');
-    const lid2 = labelRenderer.addNew('HELLO WORLD TO THE LEFT ...', horizontalAlignment.center, 'serif', 24, 'white');
-    const lid3 = labelRenderer.addNew('ALL THE WAY RIGHT...', horizontalAlignment.center, 'serif', 24, 'white');
-
-    const cx = tableObject.transform.global.centeredAt.x;
-    const cy = tableObject.transform.global.centeredAt.y;
-
-    labelRenderer.renderTo(labelCanvas, cx, cy, lid1);
-    labelRenderer.renderTo(labelCanvas, cx, cy - 50, lid2);
-    labelRenderer.renderTo(labelCanvas, cx, cy + 50, lid3);
-
-    setTimeout(() => {
-        let result = labelRenderer.removeExisting(labelCanvas, lid1);
-        result = labelRenderer.removeExisting(labelCanvas, lid2);
-        result = labelRenderer.removeExisting(labelCanvas, lid3);
-        console.log('removed: ' + result);
-    }, 2000);
 
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;
     const defaultPlayerBalance = 500;
 
     const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
+
+    const cx = tableObject.transform.global.centeredAt.x;
+    const cy = tableObject.transform.global.centeredAt.y;
+
+    labelRenderer.addNew('waiting for players ...', cx, cy, hAlign[2], 'serif', 24, 'black');
+    labelRenderer.addNew('heheeplayers ...', cx, cy + 20, hAlign[2], 'serif', 24, 'black');
+
+    labelRenderer.render(labelCtx);
 
     const drawPlayerHand = () => {
         if (!playerState.holeCards.a || !playerState.holeCards.b) {
@@ -268,7 +253,6 @@ $(document).ready(() => {
     const renderLoop = setInterval(() => {
 
     }, tickrate);
-
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
