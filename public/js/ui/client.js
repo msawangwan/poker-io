@@ -1,5 +1,7 @@
 const toRadians = theta => theta * (Math.PI / 180);
+
 const div = content => $('<div></div>').text(content);
+const jqObjFromStr = idstring => $(`#${idstring}`);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
@@ -10,25 +12,37 @@ const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
 
+const canvasIds = [
+    'static-canvas', 'dynamic-canvas', 'text-canvas'
+];
+
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
-    const staticCanvas = document.getElementById('static-canvas');
-    const dynamicCanvas = document.getElementById('dynamic-canvas');
-    const uiCanvas = document.getElementById('ui-canvas');
+    const staticCanvas = document.getElementById(canvasIds[0]);
+    const dynamicCanvas = document.getElementById(canvasIds[1]);
+    const txtCanvas = document.getElementById(canvasIds[2]);
+
+    const canvasGroup = [staticCanvas, dynamicCanvas, txtCanvas];
 
     const staticCtx = staticCanvas.getContext('2d');
     const dynamicCtx = dynamicCanvas.getContext('2d');
-    const uiCtx = uiCanvas.getContext('2d');
+    const txtCtx = txtCanvas.getContext('2d');
 
     const tableScale = 0.65;
 
     const resizeCanvas = (canvas, parentCanvasId) => {
-        const c = $(`#${parentCanvasId}`); // note: c.parentNode.getBoundingClientRect();
+        const c = jqObjFromStr(parentCanvasId);
         canvas.width = c.width();
         canvas.height = c.height();
     };
-    
+
+    const resizeAllCanvas = (parentCanvasId) => {
+        for (const c in canvasGroup) {
+            resizeCanvas(c, parentCanvasId); // TODO: fix this creating a new jqobject each iter
+        }
+    };
+
     const initTableSeating = (t) => {
         const newSeats = [
             new Seat(0, 32, 'black'),
@@ -41,24 +55,18 @@ $(document).ready(() => {
             new Seat(7, 32, 'black'),
             new Seat(8, 32, 'black'),
         ];
-        
+
         for (const s of newSeats) {
-            const addedSuccess = t.addSeat(s);
-            
-            if (addedSuccess) {
-                console.log(`debug: added a seat successfully: ${s.position}`);
-            } else {
-                console.log(`err: failed to add a seat ${s.position}`);
-            }
+            t.addSeat(s);
         }
-        
+
         return newSeats;
     };
-    
+
     const renderTable = (cnv, t, scale) => {
         t.render(cnv, cnv.width, cnv.height, scale);
     };
-    
+
     const renderSeats = (cnv, t) => {
         for (const [pos, s] of t.seats) {
             const point = t.pointOnTable(pos);
@@ -73,15 +81,13 @@ $(document).ready(() => {
     resizeCanvas(staticCanvas, 'container-canvas');
 
     const tableObject = new Table(staticCtx);
-    
+
     renderTable(staticCanvas, tableObject, tableScale);
-    
+
     const seatObjects = initTableSeating(tableObject);
-    
+
     renderSeats(staticCanvas, tableObject);
-    
-    // renderTableAndSeating(staticCanvas, tableObject, tableScale);
-    
+
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;
     const defaultPlayerBalance = 500;
@@ -210,7 +216,7 @@ $(document).ready(() => {
     const tickrate = 1000 / 2;
 
     const renderLoop = setInterval(() => {
-        
+
     }, tickrate);
 
 
@@ -228,19 +234,19 @@ $(document).ready(() => {
     socket.emit('joined-table', { name: playerObject.name, balance: playerObject.state.balance });
 
     socket.on('player-assigned-seat', data => {
-        playerState.assignedSeat.index = data.seat;
-        setCurrentTableCenterLabel('player seated ...');
+        // playerState.assignedSeat.index = data.seat;
+        // setCurrentTableCenterLabel('player seated ...');
         tableObject.seatPlayer();
     });
 
     socket.on('table-seating-state', data => {
-        tableState.seats = data.seating;
-        setCurrentTableCenterLabel('waiting for players ...');
-        renderQueue.push(() => {
-            updateCanvasDimensions();
-            updateTableDimensions(playerState.assignedSeat.index);
-            render(true, true, true, true);
-        });
+        // tableState.seats = data.seating;
+        // setCurrentTableCenterLabel('waiting for players ...');
+        // renderQueue.push(() => {
+        //     updateCanvasDimensions();
+        //     updateTableDimensions(playerState.assignedSeat.index);
+        //     render(true, true, true, true);
+        // });
     });
 
     socket.on('game-start', data => {
@@ -273,7 +279,7 @@ $(document).ready(() => {
         console.log('window resized');
 
         resizeCanvas(staticCanvas, 'container-canvas');
-    
+
         renderTable(staticCanvas, tableObject, tableScale);
         renderSeats(staticCanvas, tableObject);
     });
