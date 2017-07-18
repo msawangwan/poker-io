@@ -5,7 +5,9 @@ const thetaLower = toradian(325);
 
 const maxSeats = 9; // TODO: load from config
 
-function Table(parentCtx) {
+function Table(id) {
+    this.id = id;
+
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', 'canvas-table');
 

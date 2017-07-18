@@ -44,8 +44,7 @@ Seat.prototype.calcTransform = function (globalx, globaly, tableradius, tableoff
     t.origin.local.x = Math.floor(t.w * 0.5);
     t.origin.local.y = Math.floor(t.h * 0.5);
 
-    // t.origin.global.x = globalx + tableOffset + tableOffset * 2;
-    t.origin.global.x = globalx + tableoffset * 3 + t.radius / 2;
+    t.origin.global.x = globalx + tableradius * 2 + tableoffset / 2 + t.radius * 2;
     t.origin.global.y = globaly + tableradius + t.radius * 2;
 
     this.transform = t;

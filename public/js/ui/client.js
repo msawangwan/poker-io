@@ -63,20 +63,35 @@ $(document).ready(() => {
         return newSeats;
     };
 
-    const updateTransforms = (table, seats) => {
+    const updateTransforms = (parentcanvas, table, scaler, renderTable, renderSeats) => {
+        if (renderTable) {
+            table.calcTransform(parentcanvas.width, parentcanvas.height, scaler);
+            table.transformState.changed = true;
+        }
 
+        if (renderSeats) {
+            for (const [i, s] of table.seats) {
+                const p = table.pointOnTable(i);
+                s.calcTransform(p.x, p.y, table.transform.radius, table.transform.offset);
+                s.transformState.changed = true;
+            }
+        }
     };
 
-    const renderTable = (cnv, t, scale) => {
-        t.calcTransform(cnv.width, cnv.height, scale);
-        t.render(cnv);
-    };
+    const renderTransforms = (parentcanvas, table) => {
+        if (table.transformState.changed) {
+            table.render(parentcanvas);
 
-    const renderSeats = (cnv, t) => {
-        for (const [pos, s] of t.seats) {
-            const point = t.pointOnTable(pos);
-            s.calcTransform(point.x, point.y, t.transform.radius, t.transform.offset);
-            s.render(cnv);
+            for (const [i, s] of table.seats) {
+                if (s.transformState.changed) {
+                    s.render(parentcanvas);
+                    s.transformState.changed = false;
+                    s.transformState.rendered = true;
+                }
+            }
+
+            table.transformState.changed = false;
+            table.transformState.rendered = true;
         }
     };
 
@@ -86,13 +101,11 @@ $(document).ready(() => {
 
     resizeCanvas(staticCanvas, 'container-canvas');
 
-    const tableObject = new Table(staticCtx);
-
-    renderTable(staticCanvas, tableObject, tableScale);
-
+    const tableObject = new Table(0);
     const seatObjects = initTableSeating(tableObject);
 
-    renderSeats(staticCanvas, tableObject);
+    updateTransforms(staticCanvas, tableObject, tableScale, true, true);
+    renderTransforms(staticCanvas, tableObject);
 
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;
@@ -286,10 +299,7 @@ $(document).ready(() => {
 
         resizeCanvas(staticCanvas, 'container-canvas');
 
-
-        // tableObject.calcDimensions(staticCanvas.width, staticCanvas.height, tableScale);
-        // tableObject.render(staticCanvas);
-        renderTable(staticCanvas, tableObject, tableScale);
-        renderSeats(staticCanvas, tableObject);
+        updateTransforms(staticCanvas, tableObject, tableScale, true, true);
+        renderTransforms(staticCanvas, tableObject);
     });
 });
