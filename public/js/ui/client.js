@@ -33,9 +33,14 @@ const initTableSeating = (t) => {
 };
 
 const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
+    const parentEle = document.getElementById(parentCanvasId);
+    const w = parentEle.offsetWidth;
+    const h = parentEle.offsetHeight;
 
     for (const c of canvasEleGroup) {
-        resizeCanvas(c, parentCanvasId);
+        c.width = w;
+        c.height = h;
+        // resizeCanvas(c, parentCanvasId);
     }
 }
 
@@ -106,10 +111,10 @@ $(document).ready(() => {
         'reconnection': false
     });
 
-    resizeCanvas(staticCanvas, 'container-canvas');
-    resizeCanvas(dynamicCanvas, 'container-canvas');
-    resizeCanvas(labelCanvas, 'container-canvas');
-    // resizeCanvases(containerCanvasId, canvasGroup);
+    // resizeCanvas(staticCanvas, 'container-canvas');
+    // resizeCanvas(dynamicCanvas, 'container-canvas');
+    // resizeCanvas(labelCanvas, 'container-canvas');
+    resizeCanvases(containerCanvasId, canvasGroup);
 
     const tableObject = new Table(0);
     const seatObjects = initTableSeating(tableObject);
@@ -326,10 +331,10 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         console.log('window resized');
 
-        resizeCanvas(staticCanvas, 'container-canvas');
-        resizeCanvas(dynamicCanvas, 'container-canvas');
-        resizeCanvas(labelCanvas, 'container-canvas');
-        // resizeCanvases(containerCanvasId, canvasGroup);
+        // resizeCanvas(staticCanvas, 'container-canvas');
+        // resizeCanvas(dynamicCanvas, 'container-canvas');
+        // resizeCanvas(labelCanvas, 'container-canvas');
+        resizeCanvases(containerCanvasId, canvasGroup);
 
 
         render(staticCanvas, tableObject, tableScale);
