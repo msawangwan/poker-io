@@ -28,7 +28,7 @@ function Seat(parentCtx, position, radius, color) {
 Seat.prototype.render = function (toParentCanvas, atX, atY, tableRadius, tableOffset) {
     const localctx = this.canvas.getContext('2d');
     localctx.clearRect(0, 0, this.canvas.width, this.canvas.height);;
-    
+
     this.canvas.width = this.transform.radius * 2;
     this.canvas.height = this.transform.radius * 2;
 
@@ -41,7 +41,7 @@ Seat.prototype.render = function (toParentCanvas, atX, atY, tableRadius, tableOf
     localctx.fill();
 
     const globalx = atX + tableOffset + tableOffset * 2;
-    const globaly = atY + tableRadius + this.transform.radius;
+    const globaly = atY + tableRadius + this.transform.radius * 2;
 
     toParentCanvas.getContext('2d').drawImage(this.canvas, globalx, globaly);
 
@@ -49,9 +49,6 @@ Seat.prototype.render = function (toParentCanvas, atX, atY, tableRadius, tableOf
     this.transform.origin.local.y = localy;
     this.transform.origin.global.x = globalx;
     this.transform.origin.global.y = globaly;
-    
-    console.log(tableRadius, tableOffset);
-    console.log(this.transform.origin.global);
 };
 
 Seat.prototype.sit = function () {

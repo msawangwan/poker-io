@@ -50,11 +50,11 @@ $(document).ready(() => {
     ];
 
     const drawTableAndStuff = (table, seats, canvas, scale) => {
-        table.render(staticCanvas, canvas.width, canvas.height, scale);
+        table.render(canvas, canvas.width, canvas.height, scale);
 
         for (const s of seats) {
             const point = table.pointOnTable(s.position, s.transform.radius);
-            s.render(staticCanvas, point.x, point.y, table.transform.radius, table.transform.offset);
+            s.render(canvas, point.x, point.y, table.transform.radius, table.transform.offset);
         }
     };
 
