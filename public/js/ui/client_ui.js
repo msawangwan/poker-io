@@ -48,7 +48,7 @@ $(document).ready(() => {
     ];
 
     const drawTableAndStuff = (table, seats, canvas, scale) => {
-        table.render(canvas.width, canvas.height, scale);
+        table.render(staticCanvas, canvas.width, canvas.height, scale);
 
         for (const s of seats) {
             const point = table.pointOnTable(s.position);

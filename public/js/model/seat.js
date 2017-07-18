@@ -39,7 +39,7 @@ Seat.prototype.render = function (x, y, tableRadius, tableOffset) {
     ctx.fillStyle = this.seatColor;
     ctx.fill();
 
-    const globalx = x + localx + tableOffset * 2 + this.transform.radius / 2;
+    const globalx = x + localx + tableOffset + tableRadius * 2 - this.transform.radius / 2;
     const globaly = y + localy + tableRadius;
 
     this.parentCtx.drawImage(this.canvas, globalx, globaly);

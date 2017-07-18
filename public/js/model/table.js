@@ -31,7 +31,7 @@ function Table(parentCtx) {
     this.seats = new Map();
 }
 
-Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale) {
+Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanvasHeight, scale) {
     const ctx = this.canvas.getContext('2d');
 
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -56,7 +56,8 @@ Table.prototype.render = function (parentCanvasWidth, parentCanvasHeight, scale)
     const globalx = parentCanvasWidth / 2 - localx;
     const globaly = parentCanvasHeight / 2 - localy;
 
-    this.parentCtx.drawImage(this.canvas, globalx, globaly);
+    // this.parentCtx.drawImage(this.canvas, globalx, globaly);
+    toParentCanvas.getContext('2d').drawImage(this.canvas, globalx, globaly);
 
     this.transform.local.center.x = localx;
     this.transform.local.center.y = localy;
