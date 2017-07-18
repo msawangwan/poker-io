@@ -63,6 +63,10 @@ $(document).ready(() => {
         return newSeats;
     };
 
+    const updateTransforms = (table, seats) => {
+
+    };
+
     const renderTable = (cnv, t, scale) => {
         t.calcTransform(cnv.width, cnv.height, scale);
         t.render(cnv);
@@ -73,7 +77,6 @@ $(document).ready(() => {
             const point = t.pointOnTable(pos);
             s.calcTransform(point.x, point.y, t.transform.radius, t.transform.offset);
             s.render(cnv);
-            // s.render_DEPRECATED(cnv, point.x, point.y, t.transform.radius, t.transform.offset);
         }
     };
 

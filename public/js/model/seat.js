@@ -29,9 +29,9 @@ function Seat(position, radius, color) {
         radius: radius
     };
 
-    this.renderState = {
-        rendered: false,
-        renderOnNextPass: false
+    this.transformState = {
+        changed: true,
+        rendered: false
     };
 }
 
@@ -44,7 +44,8 @@ Seat.prototype.calcTransform = function (globalx, globaly, tableradius, tableoff
     t.origin.local.x = Math.floor(t.w * 0.5);
     t.origin.local.y = Math.floor(t.h * 0.5);
 
-    t.origin.global.x = globalx + tableoffset + tableoffset * 2; // TODO: remove one of these lolz
+    // t.origin.global.x = globalx + tableOffset + tableOffset * 2;
+    t.origin.global.x = globalx + tableoffset * 3 + t.radius / 2;
     t.origin.global.y = globaly + tableradius + t.radius * 2;
 
     this.transform = t;
@@ -64,32 +65,6 @@ Seat.prototype.render = function (toParentCanvas) {
     localctx.fill();
 
     toParentCanvas.getContext('2d').drawImage(this.canvas, t.origin.global.x, t.origin.global.y);
-};
-
-Seat.prototype.render_DEPRECATED = function (toParentCanvas, atX, atY, tableRadius, tableOffset) {
-    const localctx = this.canvas.getContext('2d');
-    localctx.clearRect(0, 0, this.canvas.width, this.canvas.height);;
-
-    this.canvas.width = this.transform.radius * 2;
-    this.canvas.height = this.transform.radius * 2;
-
-    const localx = Math.floor(this.canvas.width * 0.5);
-    const localy = Math.floor(this.canvas.height * 0.5);
-
-    localctx.beginPath();
-    localctx.arc(localx, localy, this.transform.radius, Math.PI * 2, false);
-    localctx.fillStyle = this.seatColor;
-    localctx.fill();
-
-    const globalx = atX + tableOffset + tableOffset * 2;
-    const globaly = atY + tableRadius + this.transform.radius * 2;
-
-    toParentCanvas.getContext('2d').drawImage(this.canvas, globalx, globaly);
-
-    this.transform.origin.local.x = localx;
-    this.transform.origin.local.y = localy;
-    this.transform.origin.global.x = globalx;
-    this.transform.origin.global.y = globaly;
 };
 
 Seat.prototype.sit = function () {

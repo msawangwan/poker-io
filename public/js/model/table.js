@@ -30,9 +30,9 @@ function Table(parentCtx) {
         offset: 0,
     };
 
-    this.renderState = {
-        rendered: false,
-        renderOnNextPass: false
+    this.transformState = {
+        changed: true,
+        rendered: false
     };
 }
 
