@@ -40,15 +40,14 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     for (const c of canvasEleGroup) {
         c.width = w;
         c.height = h;
-        // resizeCanvas(c, parentCanvasId);
     }
 }
 
-const resizeCanvas = (canvas, parentCanvasId) => {
-    const c = jqObjFromStr(parentCanvasId);
-    canvas.width = c.width();
-    canvas.height = c.height();
-};
+// const resizeCanvas = (canvas, parentCanvasId) => {
+//     const c = jqObjFromStr(parentCanvasId);
+//     canvas.width = c.width();
+//     canvas.height = c.height();
+// };
 
 const updateTransforms = (parentw, parenth, table, scaler) => {
     if (!table.transformState.changed) {
@@ -83,10 +82,6 @@ const renderTransforms = (parentcanv, table) => {
     }
 };
 
-const renderLabels = (renderer) => {
-
-};
-
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
 
@@ -111,9 +106,6 @@ $(document).ready(() => {
         'reconnection': false
     });
 
-    // resizeCanvas(staticCanvas, 'container-canvas');
-    // resizeCanvas(dynamicCanvas, 'container-canvas');
-    // resizeCanvas(labelCanvas, 'container-canvas');
     resizeCanvases(containerCanvasId, canvasGroup);
 
     const tableObject = new Table(0);
@@ -128,16 +120,21 @@ $(document).ready(() => {
 
     render(staticCanvas, tableObject, tableScale);
 
-    const lid = labelRenderer.addNew('waiting for players ...', 'serif', 24, 'white');
-    labelRenderer.renderTo(
-        labelCanvas,
-        tableObject.transform.global.centeredAt.x,
-        tableObject.transform.global.centeredAt.y,
-        lid
-    );
+    const lid1 = labelRenderer.addNew('waiting for players ...', horizontalAlignment.center, 'serif', 24, 'white');
+    const lid2 = labelRenderer.addNew('HELLO WORLD TO THE LEFT ...', horizontalAlignment.center, 'serif', 24, 'white');
+    const lid3 = labelRenderer.addNew('ALL THE WAY RIGHT...', horizontalAlignment.center, 'serif', 24, 'white');
+
+    const cx = tableObject.transform.global.centeredAt.x;
+    const cy = tableObject.transform.global.centeredAt.y;
+
+    labelRenderer.renderTo(labelCanvas, cx, cy, lid1);
+    labelRenderer.renderTo(labelCanvas, cx, cy - 50, lid2);
+    labelRenderer.renderTo(labelCanvas, cx, cy + 50, lid3);
 
     setTimeout(() => {
-        const result = labelRenderer.removeExisting(labelCanvas, lid);
+        let result = labelRenderer.removeExisting(labelCanvas, lid1);
+        result = labelRenderer.removeExisting(labelCanvas, lid2);
+        result = labelRenderer.removeExisting(labelCanvas, lid3);
         console.log('removed: ' + result);
     }, 2000);
 
@@ -330,13 +327,7 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         console.log('window resized');
-
-        // resizeCanvas(staticCanvas, 'container-canvas');
-        // resizeCanvas(dynamicCanvas, 'container-canvas');
-        // resizeCanvas(labelCanvas, 'container-canvas');
         resizeCanvases(containerCanvasId, canvasGroup);
-
-
         render(staticCanvas, tableObject, tableScale);
     });
 });
