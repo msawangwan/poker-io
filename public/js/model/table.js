@@ -66,8 +66,8 @@ Table.prototype.render = function (toParentCanvas, parentCanvasWidth, parentCanv
     this.transform.global.centeredAt.y = globaly;
 };
 
-// TODO: just use (0,0) and then offset later
-Table.prototype.pointOnTable = function (position, posOffset) {
+// TODO: just use (0,0) and then offset later?
+Table.prototype.pointOnTable = function (position) {
     const ox = this.transform.global.centeredAt.x;
     const oy = this.transform.global.centeredAt.y;
     const r = this.transform.radius;
@@ -93,24 +93,24 @@ Table.prototype.pointOnTable = function (position, posOffset) {
             y = oy - r;
             break;
         case 1: // right theta upper
-            x = offsetRight + r * Math.cos(thetaUpper) - (posOffset / 2);
+            x = offsetRight + r * Math.cos(thetaUpper);
             y = oy - r * Math.sin(thetaUpper);
             break;
         case 2: // right theta lower
-            x = offsetRight + r * Math.cos(thetaLower) - (posOffset / 2);
+            x = offsetRight + r * Math.cos(thetaLower);
             y = oy - r * Math.sin(thetaLower);
             break;
         case 3: // right lower
             x = offsetRight;
-            y = oy + r + (posOffset / 2);
+            y = oy + r;
             break;
         case 4: // center lower
             x = ox;
-            y = oy + r + (posOffset / 2);
+            y = oy + r;
             break;
         case 5: // left lower
             x = offsetLeft;
-            y = oy + r + (posOffset / 2);
+            y = oy + r;
             break;
         case 6: // left theta lower
             x = offsetLeft - r * Math.cos(thetaLower);

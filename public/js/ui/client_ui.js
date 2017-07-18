@@ -53,7 +53,7 @@ $(document).ready(() => {
         table.render(canvas, canvas.width, canvas.height, scale);
 
         for (const s of seats) {
-            const point = table.pointOnTable(s.position, s.transform.radius);
+            const point = table.pointOnTable(s.position);
             s.render(canvas, point.x, point.y, table.transform.radius, table.transform.offset);
         }
     };
