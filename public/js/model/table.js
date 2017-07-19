@@ -85,15 +85,10 @@ Table.prototype.render = function (toParentCanvas) {
 };
 
 Table.prototype.pointOnTable = function (parentCanvas, position) {
-    // const ox = this.transform.global.centeredAt.x;
-    // const oy = this.transform.global.centeredAt.y;
     const ox = parentCanvas.width / 2;
     const oy = parentCanvas.height/ 2;
     const r = this.transform.radius;
     const off = this.transform.offset;
-    
-    // console.log(parentCanvas.width);
-    // console.log(parentCanvas.height);
 
     const offsetLeft = ox - off;
     const offsetRight = ox + off;

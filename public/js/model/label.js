@@ -33,42 +33,45 @@ function Label(text, font, fontsize, color, id) {
         h: 0
     };
 
-    this.transformState = {
-        changed: false,
-        rendered: false
-    };
+    this.canvasChanged = true;
+    this.drawOnNextTick = true;
 }
 
 Label.prototype.updateTransform = function (globalctx, globalx, globaly) {
-    const t = this.transform;
+    if (this.canvasChanged) {
+        const t = this.transform;
+    
+        t.textwidth = globalctx.measureText(this.text).width;
+    
+        t.w = Math.floor(t.textwidth * 10);
+        t.h = Math.floor(this.font.size * 2);
+    
+        t.local.x = this.canvas.width * 0.5 - t.textwidth; // or: t.textwidth / 2
+        t.local.y = this.canvas.height - this.canvas.height / 2; // or: just this.canvas.height / 2
+    
+        t.global.x = globalx - this.canvas.width / 2;
+        t.global.y = globaly - this.canvas.height / 2;
+    
+        this.transform = t;
+        this.parentCtx = globalctx;
+        this.drawOnNextTick = true;
+    } else {
+        this.drawOnNextTick = false;
+    }
 
-    t.textwidth = globalctx.measureText(this.text).width;
-
-    t.w = Math.floor(t.textwidth * 10);
-    t.h = Math.floor(this.font.size * 2);
-
-    t.local.x = this.canvas.width * 0.5 - t.textwidth; // or: t.textwidth / 2
-    t.local.y = this.canvas.height - this.canvas.height / 2; // or: just this.canvas.height / 2
-
-    t.global.x = globalx - this.canvas.width / 2;
-    t.global.y = globaly - this.canvas.height / 2;
-
-    this.transform = t;
-    this.parentCtx = globalctx;
-
-    this.transformState.changed = true;
-    this.transformState.rendered = false;
+    this.canvasChanged = false;
 };
 
 Label.prototype.render = function () {
-    const localctx = this.canvas.getContext('2d');
-
-    localctx.font = formatfontstr(this.font.style, this.font.size);
-    localctx.fillStyle = this.font.color;
-    localctx.fillText(this.text, this.transform.local.x, this.transform.local.y);
-
-    this.parentCtx.drawImage(this.canvas, this.transform.global.x, this.transform.global.y);
-
-    this.transformState.changed = false;
-    this.transformState.rendered = true;
+    if (this.drawOnNextTick) {
+        const localctx = this.canvas.getContext('2d');
+    
+        localctx.font = formatfontstr(this.font.style, this.font.size);
+        localctx.fillStyle = this.font.color;
+        localctx.fillText(this.text, this.transform.local.x, this.transform.local.y);
+    
+        this.parentCtx.drawImage(this.canvas, this.transform.global.x, this.transform.global.y);
+    }
+    
+    this.drawOnNextTick = false;
 };

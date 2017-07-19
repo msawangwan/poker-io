@@ -76,9 +76,9 @@ $(document).ready(() => {
     const cx = labelCanvas.width / 2;
     const cy = labelCanvas.height / 2;
 
-    const labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
+    let labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
     // labelRenderer.setTransform(labelid, cx, cy);
-    // labelRenderer.render(labelCtx);
+    labelRenderer.labels.get(labelid).label.updateTransform(labelCtx, cx, cy);
 
     const tickrate = 1000 / 2;
 
@@ -103,6 +103,8 @@ $(document).ready(() => {
                 }
             }
         }
+        
+        labelRenderer.render(labelCtx);
     }, tickrate, table, staticCanvas);
 
     const $containerbetting = $('#container-betting');
@@ -157,5 +159,10 @@ $(document).ready(() => {
         for (const [i, s] of table.seats) {
             s.canvasChanged = true;
         }
+
+        labelRenderer.remove(labelCtx, labelid);
+        
+        labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
+        labelRenderer.labels.get(labelid).label.updateTransform(labelCtx, labelCanvas.width / 2, labelCanvas.height / 2);
     });
 });
