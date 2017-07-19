@@ -73,24 +73,17 @@ $(document).ready(() => {
 
     const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    // const cx = labelCanvas.width / 2;
-    // const cy = labelCanvas.height / 2;
-
-    // let labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
-    // labelRenderer.labels.get(labelid).label.updateTransform(labelCtx, cx, cy);
-    
     const setLabelTableCenter = (renderer, id, ctx, cx, cy, txt) => {
         if (renderer.labels.has(id)) {
-            renderer.labels.remove(ctx, id);
+            renderer.remove(ctx, id);
         }
-        
         const newId = renderer.add(txt, 'serif', 18, 'black');
         renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
         
         return newId;
     };
     
-    let lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCtx.width/2, labelCtx.height/2, 'waiting for players ...');
+    let lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
 
     const tickrate = 1000 / 2;
 
@@ -173,11 +166,6 @@ $(document).ready(() => {
         }
 
         
-        lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCtx.width/2, labelCtx.height/2, 'waiting for players ...');
-
-        // labelRenderer.remove(labelCtx, labelid);
-        
-        // labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
-        // labelRenderer.labels.get(labelid).label.updateTransform(labelCtx, labelCanvas.width / 2, labelCanvas.height / 2);
+        lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
     });
 });
