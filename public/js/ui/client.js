@@ -43,7 +43,7 @@ const setLabelTableCenter = (renderer, id, ctx, cx, cy, txt) => {
 
     const newId = renderer.add(txt, 'serif', 18, 'black');
     renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
-    
+
     return newId;
 };
 
@@ -51,10 +51,10 @@ const setLabelTableSeat = (renderer, id, ctx, cx, cy, txt) => {
     if (renderer.labels.has(id)) {
         renderer.remove(ctx, id);
     }
-    
+
     const newId = renderer.add(txt, 'serif', 18, 'white');
     renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
-    
+
     return newId;
 };
 
@@ -64,6 +64,10 @@ const canvasLayerIds = [
 ];
 
 $(document).ready(() => {
+    const socket = io.connect(window.location.origin, {
+        'reconnection': false
+    });
+
     const spriteCache = new SpriteCache();
     const labelRenderer = new LabelRenderer();
 
@@ -79,18 +83,13 @@ $(document).ready(() => {
 
     const tableScale = 0.65;
 
-    // const socket = io.connect(window.location.origin, {
-    //     'reconnection': false
-    // });
-
     resizeCanvases(containerCanvasId, canvasGroup);
 
     const table = new Table(0);
     const seats = initTableSeating(table);
 
     const assignedPlayerName = assignName();
-    // const uniquePlayerId = socket.id || -100;
-    const uniquePlayerId =  -100;
+    const uniquePlayerId = socket ? socket.id : -100;
     const defaultPlayerBalance = 500;
 
     const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
@@ -101,10 +100,10 @@ $(document).ready(() => {
         }
         const newId = renderer.add(txt, 'serif', 18, 'black');
         renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
-        
+
         return newId;
     };
-    
+
     let lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
 
     const tickrate = 1000 / 2;
@@ -130,7 +129,7 @@ $(document).ready(() => {
                 }
             }
         }
-        
+
         labelRenderer.render(labelCtx);
     }, tickrate, table, staticCanvas);
 
@@ -146,7 +145,7 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
-    // socket.emit('joined-table', { name: player.name, balance: player.balance });
+    socket.emit('joined-table', { name: player.name, balance: player.balance });
 
     // socket.on('player-assigned-seat', data => {
     //     // playerState.assignedSeat.index = data.seat;
@@ -179,19 +178,19 @@ $(document).ready(() => {
     //     clearInterval(renderLoop);
     // });
 
-    setTimeout(()=> {
-        player.seat.position = 3;
-    
-        const seated = table.playerSeatedAt(player.seat.position, player);
-        if (seated) {
-            player.tookSeat(table, player.seat.position);
-            console.log('player seated');
-        } else {
-            alert('failed to sit');
-        }
-    }, 2000);
-    
-    
+    // setTimeout(() => {
+    //     player.seat.position = 3;
+
+    //     const seated = table.playerSeatedAt(player.seat.position, player);
+    //     if (seated) {
+    //         player.tookSeat(table, player.seat.position);
+    //         console.log('player seated');
+    //     } else {
+    //         alert('failed to sit');
+    //     }
+    // }, 2000);
+
+
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
 
@@ -201,7 +200,7 @@ $(document).ready(() => {
             s.canvasChanged = true;
         }
 
-        
+
         lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
     });
 });
