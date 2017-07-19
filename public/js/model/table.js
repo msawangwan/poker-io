@@ -46,8 +46,8 @@ Table.prototype.updateTransform = function (parentCanvas, scale) {
         t.local.center.x = Math.floor(t.w * 0.5);
         t.local.center.y = Math.floor(t.h * 0.5);
 
-        t.global.centeredAt.x = parentCanvas.width / 2 - t.local.center.x;
-        t.global.centeredAt.y = parentCanvas.height / 2 - t.local.center.y;
+        t.global.centeredAt.x = Math.floor(parentCanvas.width / 2 - t.local.center.x);
+        t.global.centeredAt.y = Math.floor(parentCanvas.height / 2 - t.local.center.y);
 
         t.radius = Math.floor(t.h / 4);
         t.offset = Math.floor(t.w * 0.15);
@@ -84,11 +84,16 @@ Table.prototype.render = function (toParentCanvas) {
     this.drawOnNextTick = false;
 };
 
-Table.prototype.pointOnTable = function (position) {
-    const ox = this.transform.global.centeredAt.x;
-    const oy = this.transform.global.centeredAt.y;
+Table.prototype.pointOnTable = function (parentCanvas, position) {
+    // const ox = this.transform.global.centeredAt.x;
+    // const oy = this.transform.global.centeredAt.y;
+    const ox = parentCanvas.width / 2;
+    const oy = parentCanvas.height/ 2;
     const r = this.transform.radius;
     const off = this.transform.offset;
+    
+    // console.log(parentCanvas.width);
+    // console.log(parentCanvas.height);
 
     const offsetLeft = ox - off;
     const offsetRight = ox + off;

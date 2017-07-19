@@ -57,9 +57,9 @@ $(document).ready(() => {
 
     const tableScale = 0.65;
 
-    const socket = io.connect(window.location.origin, {
-        'reconnection': false
-    });
+    // const socket = io.connect(window.location.origin, {
+    //     'reconnection': false
+    // });
 
     resizeCanvases(containerCanvasId, canvasGroup);
 
@@ -67,7 +67,8 @@ $(document).ready(() => {
     const seats = initTableSeating(table);
 
     const assignedPlayerName = assignName();
-    const uniquePlayerId = socket.id || -100;
+    // const uniquePlayerId = socket.id || -100;
+    const uniquePlayerId =  -100;
     const defaultPlayerBalance = 500;
 
     const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
@@ -83,13 +84,11 @@ $(document).ready(() => {
 
     const renderLoop = setInterval(() => {
         if (table.canvasChanged) {
-            console.log('updated table');
             table.updateTransform(staticCanvas, tableScale);
 
             for (const [i, s] of table.seats) {
                 if (s.canvasChanged) {
-                    console.log('updated seats');
-                    const p = table.pointOnTable(i);
+                    const p = table.pointOnTable(staticCanvas, i);
                     s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
                 }
             }
@@ -117,38 +116,38 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
-    socket.emit('joined-table', { name: playerObject.name, balance: playerObject.balance });
+    // socket.emit('joined-table', { name: playerObject.name, balance: playerObject.balance });
 
-    socket.on('player-assigned-seat', data => {
-        // playerState.assignedSeat.index = data.seat;
-        table.seatPlayer();
-    });
+    // socket.on('player-assigned-seat', data => {
+    //     // playerState.assignedSeat.index = data.seat;
+    //     table.seatPlayer();
+    // });
 
-    socket.on('table-seating-state', data => {
-        // tableState.seats = data.seating;
-    });
+    // socket.on('table-seating-state', data => {
+    //     // tableState.seats = data.seating;
+    // });
 
-    socket.on('game-start', data => {
-        socket.emit('player-readyup');
-    });
+    // socket.on('game-start', data => {
+    //     socket.emit('player-readyup');
+    // });
 
-    socket.on('player-readyup-accepted', data => {
-        socket.emit('player-ready-for-shuffle', { dealId: data.dealId });
-    });
+    // socket.on('player-readyup-accepted', data => {
+    //     socket.emit('player-ready-for-shuffle', { dealId: data.dealId });
+    // });
 
-    socket.on('deck-shuffled', data => {
-        socket.emit('player-waiting-for-deal');
-    });
+    // socket.on('deck-shuffled', data => {
+    //     socket.emit('player-waiting-for-deal');
+    // });
 
-    socket.on('hand-dealt', data => {
-        playerState.holeCards.a = data.playerhand[0];
-        playerState.holeCards.b = data.playerhand[1];
-        playerState.holeCards.strings = data.playerhand[2];
-    });
+    // socket.on('hand-dealt', data => {
+    //     playerState.holeCards.a = data.playerhand[0];
+    //     playerState.holeCards.b = data.playerhand[1];
+    //     playerState.holeCards.strings = data.playerhand[2];
+    // });
 
-    socket.on('connect_error', () => {
-        clearInterval(renderLoop);
-    });
+    // socket.on('connect_error', () => {
+    //     clearInterval(renderLoop);
+    // });
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
