@@ -36,6 +36,28 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     }
 };
 
+const setLabelTableCenter = (renderer, id, ctx, cx, cy, txt) => {
+    if (renderer.labels.has(id)) {
+        renderer.remove(ctx, id);
+    }
+
+    const newId = renderer.add(txt, 'serif', 18, 'black');
+    renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
+    
+    return newId;
+};
+
+const setLabelTableSeat = (renderer, id, ctx, cx, cy, txt) => {
+    if (renderer.labels.has(id)) {
+        renderer.remove(ctx, id);
+    }
+    
+    const newId = renderer.add(txt, 'serif', 18, 'white');
+    renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
+    
+    return newId;
+};
+
 const containerCanvasId = 'container-canvas';
 const canvasLayerIds = [
     'static-canvas', 'dynamic-canvas', 'label-canvas'
@@ -71,7 +93,7 @@ $(document).ready(() => {
     const uniquePlayerId =  -100;
     const defaultPlayerBalance = 500;
 
-    const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
+    const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
     const setLabelTableCenter = (renderer, id, ctx, cx, cy, txt) => {
         if (renderer.labels.has(id)) {
@@ -83,7 +105,7 @@ $(document).ready(() => {
         return newId;
     };
     
-    let lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
+    let lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
 
     const tickrate = 1000 / 2;
 
@@ -112,6 +134,15 @@ $(document).ready(() => {
         labelRenderer.render(labelCtx);
     }, tickrate, table, staticCanvas);
 
+    player.seat.position = 3;
+    
+    const seated = table.playerSeatedAt(player.seat.position, player);
+    if (seated) {
+        console.log('player seated');
+    } else {
+        alert('failed to sit');
+    }
+
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
     const $bettextfield = $('#bet-amount-text-field');
@@ -123,7 +154,7 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
-    // socket.emit('joined-table', { name: playerObject.name, balance: playerObject.balance });
+    // socket.emit('joined-table', { name: player.name, balance: player.balance });
 
     // socket.on('player-assigned-seat', data => {
     //     // playerState.assignedSeat.index = data.seat;
@@ -166,6 +197,6 @@ $(document).ready(() => {
         }
 
         
-        lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
+        lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
     });
 });

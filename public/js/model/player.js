@@ -31,6 +31,10 @@ function Player(name, id, balance) {
     };
 }
 
+Player.prototype.tookSeat = function(atpos, seatx, seaty) {
+    
+}
+
 Player.prototype.renderHoleCards = function (globalctx, spritecache) {
     // const ca = this.hand.a;
     // const cb = this.hand.b;

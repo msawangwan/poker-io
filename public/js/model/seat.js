@@ -5,7 +5,7 @@ function Seat(position, radius, color) {
     this.seatColor = color;
 
     this.vacant = true;
-    this.occupant = undefined;
+    this.player = undefined;
 
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', this.id);

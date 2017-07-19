@@ -43,12 +43,14 @@ Label.prototype.updateTransform = function (globalctx, globalx, globaly) {
     
         t.textwidth = globalctx.measureText(this.text).width;
     
-        t.w = Math.floor(t.textwidth * 10);
+        t.w = Math.floor(t.textwidth) ;
         t.h = Math.floor(this.font.size * 2);
     
-        t.local.x = this.canvas.width * 0.5 - t.textwidth; // or: t.textwidth / 2
-        t.local.y = this.canvas.height - this.canvas.height / 2; // or: just this.canvas.height / 2
+        // t.local.x = this.canvas.width * 0.5  - t.textwidth / this.font.size * 0.5
+        t.local.x = this.canvas.width * 0.5  - t.textwidth + this.font.size;
+        t.local.y = this.canvas.height - this.canvas.height / 2;
     
+        // t.global.x = globalx -  t.w;
         t.global.x = globalx - this.canvas.width / 2;
         t.global.y = globaly - this.canvas.height / 2;
     
