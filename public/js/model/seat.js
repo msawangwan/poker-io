@@ -10,9 +10,6 @@ function Seat(position, radius, color) {
     this.canvas = document.createElement('canvas');
     this.canvas.setAttribute('id', this.id);
 
-    // this.canvas.setAttribute('grid-area', 'canvas');
-    // document.getElementById('container-canvas').appendChild(this.canvas);
-
     this.canvas.width = radius * 2;
     this.canvas.height = radius * 2;
 
@@ -38,7 +35,7 @@ function Seat(position, radius, color) {
     };
 }
 
-Seat.prototype.calcTransform = function (globalx, globaly, tableradius, tableoffset) {
+Seat.prototype.updateTransform = function (globalx, globaly, tableradius, tableoffset) {
     const t = this.transform;
 
     t.w = t.radius * 2;
@@ -51,6 +48,9 @@ Seat.prototype.calcTransform = function (globalx, globaly, tableradius, tableoff
     t.origin.global.y = globaly + tableradius + t.radius * 2;
 
     this.transform = t;
+
+    this.transformState.changed = true;
+    this.transformState.rendered = false;
 };
 
 Seat.prototype.render = function (toParentCanvas) {
@@ -67,6 +67,9 @@ Seat.prototype.render = function (toParentCanvas) {
     localctx.fill();
 
     toParentCanvas.getContext('2d').drawImage(this.canvas, t.origin.global.x, t.origin.global.y);
+
+    this.transformState.changed = false;
+    this.transformState.rendered = true;
 };
 
 Seat.prototype.sit = function () {

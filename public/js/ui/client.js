@@ -45,12 +45,12 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
 
 const updateTransforms = (parentw, parenth, table, scaler) => {
     if (!table.transformState.changed) {
-        table.calcTransform(parentw, parenth, scaler);
+        table.updateTransform(parentw, parenth, scaler);
 
         for (const [i, s] of table.seats) {
             if (!s.transformState.changed) {
                 const p = table.pointOnTable(i);
-                s.calcTransform(p.x, p.y, table.transform.radius, table.transform.offset);
+                s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
                 s.transformState.changed = true;
             }
         }
@@ -127,7 +127,8 @@ $(document).ready(() => {
 
     const [cx, cy] = getCenter(tableObject);
 
-    labelRenderer.addNew('waiting for players ...', cx, cy, 'serif', 24, 'black');
+    const labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
+    labelRenderer.setTransform(labelid, cx, cy);
     labelRenderer.render(labelCtx);
 
     const drawPlayerHand = () => {

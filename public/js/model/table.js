@@ -38,7 +38,7 @@ function Table(id) {
     };
 }
 
-Table.prototype.calcTransform = function (parentCanvasWidth, parentCanvasHeight, scale) {
+Table.prototype.updateTransform = function (parentCanvasWidth, parentCanvasHeight, scale) {
     const t = this.transform;
 
     t.w = Math.floor(parentCanvasWidth * scale);
@@ -54,6 +54,9 @@ Table.prototype.calcTransform = function (parentCanvasWidth, parentCanvasHeight,
     t.offset = Math.floor(t.w * 0.15);
 
     this.transform = t;
+
+    this.transformState.changed = true;
+    this.transformState.rendered = false;
 };
 
 Table.prototype.render = function (toParentCanvas) {
@@ -72,6 +75,9 @@ Table.prototype.render = function (toParentCanvas) {
     localctx.fill();
 
     toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
+
+    this.transformState.changed = false;
+    this.transformState.rendered = true;
 };
 
 Table.prototype.pointOnTable = function (position) {
