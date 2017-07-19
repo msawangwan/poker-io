@@ -86,7 +86,7 @@ Table.prototype.render = function (toParentCanvas) {
 
 Table.prototype.pointOnTable = function (parentCanvas, position) {
     const ox = parentCanvas.width / 2;
-    const oy = parentCanvas.height/ 2;
+    const oy = parentCanvas.height / 2;
     const r = this.transform.radius;
     const off = this.transform.offset;
 
@@ -155,19 +155,10 @@ Table.prototype.getTablePosByIndex = function (index) {
         console.log('wtf');
         return undefined;
     }
-    
+
     const seat = this.seats.get(index);
-    console.log(seat.transform.origin.global);
-    return this.seats.get(index);
-    // console.log(seat);
-    // return {
-    //     x: seat.transform.origin.global.x,
-    //     y: seat.transform.origin.global.y
-    // };
-    // console.log(seat.transform.origin);
-    // const x = seat.transform.origin.global.x;
-    // console.log(x);
-    // return [x, seat.transform.origin.global.y];
+
+    return [seat.transform.global.origin.x, seat.transform.global.origin.y];
 };
 
 Table.prototype.addSeat = function (seat) {
@@ -182,39 +173,40 @@ Table.prototype.addSeat = function (seat) {
 
 Table.prototype.playerSeatedAt = function (position, player) {
     let desired = undefined;
-    
+
     for (const [si, s] of this.seats) {
         if (si == position) {
             desired = s;
             break;
         }
     }
-    
+
     if (!desired.vacant) {
         return false;
     }
-    
+
     desired.vacant = false;
     desired.player = player;
-    
+    desired.canvasChanged = true;
+
     return true;
 };
 
 Table.prototype.playerLeftSeat = function (position, player) {
     let desired = undefined;
-    
+
     for (const [si, s] of this.seats) {
         if (si == position) {
             desired = s;
         }
     }
-    
+
     if (desired.vacant) {
         return false; // no player sits there
     }
-    
+
     desired.vacant = true;
     desired.player = undefined;
-    
+
     return true;
 };

@@ -17,6 +17,7 @@ const assignName = () => {
 function Player(name, id, balance) {
     this.name = name;
     this.id = id;
+    this.gameid = null;
 
     this.balance = balance || 10000;
 
@@ -31,11 +32,11 @@ function Player(name, id, balance) {
     };
 }
 
-Player.prototype.tookSeat = function(atTable, pos) {
+Player.prototype.tookSeat = function (atTable, pos) {
     if (!this.seat.position) {
         console.log('player has no seat');
     }
-    
+
     const point = atTable.getTablePosByIndex(pos);
     console.log(point.transform.origin);
     const ggg = point.transform.origin;

@@ -111,22 +111,22 @@ $(document).ready(() => {
     const renderLoop = setInterval(() => {
         if (table.canvasChanged) {
             table.updateTransform(staticCanvas, tableScale);
+        }
 
-            for (const [i, s] of table.seats) {
-                if (s.canvasChanged) {
-                    const p = table.pointOnTable(staticCanvas, i);
-                    s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
-                }
+        for (const [i, s] of table.seats) {
+            if (s.canvasChanged) {
+                const p = table.pointOnTable(staticCanvas, i);
+                s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
             }
         }
 
         if (table.drawOnNextTick) {
             table.render(staticCanvas);
+        }
 
-            for (const [i, s] of table.seats) {
-                if (s.drawOnNextTick) {
-                    s.render(staticCanvas);
-                }
+        for (const [i, s] of table.seats) {
+            if (s.drawOnNextTick) {
+                s.render(staticCanvas);
             }
         }
 
@@ -147,49 +147,14 @@ $(document).ready(() => {
 
     socket.emit('joined-table', { name: player.name, balance: player.balance });
 
-    // socket.on('player-assigned-seat', data => {
-    //     // playerState.assignedSeat.index = data.seat;
-    //     table.seatPlayer();
-    // });
 
-    // socket.on('table-seating-state', data => {
-    //     // tableState.seats = data.seating;
-    // });
+    socket.on('player-seated', (data) => {
+        console.log(data);
+        player.gameid = data.gameId;
+        player.seat.position = data.seatIndex;
 
-    // socket.on('game-start', data => {
-    //     socket.emit('player-readyup');
-    // });
-
-    // socket.on('player-readyup-accepted', data => {
-    //     socket.emit('player-ready-for-shuffle', { dealId: data.dealId });
-    // });
-
-    // socket.on('deck-shuffled', data => {
-    //     socket.emit('player-waiting-for-deal');
-    // });
-
-    // socket.on('hand-dealt', data => {
-    //     playerState.holeCards.a = data.playerhand[0];
-    //     playerState.holeCards.b = data.playerhand[1];
-    //     playerState.holeCards.strings = data.playerhand[2];
-    // });
-
-    // socket.on('connect_error', () => {
-    //     clearInterval(renderLoop);
-    // });
-
-    // setTimeout(() => {
-    //     player.seat.position = 3;
-
-    //     const seated = table.playerSeatedAt(player.seat.position, player);
-    //     if (seated) {
-    //         player.tookSeat(table, player.seat.position);
-    //         console.log('player seated');
-    //     } else {
-    //         alert('failed to sit');
-    //     }
-    // }, 2000);
-
+        table.playerSeatedAt(data.seatIndex, player);
+    });
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
@@ -199,7 +164,6 @@ $(document).ready(() => {
         for (const [i, s] of table.seats) {
             s.canvasChanged = true;
         }
-
 
         lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
     });
