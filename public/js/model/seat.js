@@ -43,9 +43,6 @@ Seat.prototype.updateTransform = function (globalx, globaly, tableradius, tableo
         t.origin.local.x = Math.floor(t.w * 0.5);
         t.origin.local.y = Math.floor(t.h * 0.5);
 
-        // t.origin.global.x = globalx + tableradius * 2 + tableoffset / 2 + t.radius * 2;
-        // t.origin.global.y = globaly + tableradius + t.radius * 2;
-
         t.origin.global.x = Math.floor(globalx - t.w / 2);
         t.origin.global.y = Math.floor(globaly - t.h / 2);
 
