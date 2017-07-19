@@ -38,17 +38,16 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
 
 const updateTransforms = (parentw, parenth, table, scaler) => {
     if (!table.transformState.changed) {
+        console.log('updated table');
         table.updateTransform(parentw, parenth, scaler);
 
         for (const [i, s] of table.seats) {
             if (!s.transformState.changed) {
+                console.log('updated seats');
                 const p = table.pointOnTable(i);
                 s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
-                s.transformState.changed = true;
             }
         }
-
-        table.transformState.changed = true;
     }
 };
 
@@ -59,15 +58,18 @@ const renderTransforms = (parentcanv, table) => {
         for (const [i, s] of table.seats) {
             if (s.transformState.changed) {
                 s.render(parentcanv);
-                s.transformState.changed = false;
-                s.transformState.rendered = true;
             }
         }
-
-        table.transformState.changed = false;
-        table.transformState.rendered = true;
     }
 };
+
+const updateLabels = (parentcanv, labelrenderer) => {
+    for (const [id, l] in labelrenderer.labels) {
+        if (l.transformState.changed) {
+            l.render();
+        }
+    }
+}
 
 const containerCanvasId = 'container-canvas';
 const canvasLayerIds = [
@@ -99,16 +101,12 @@ $(document).ready(() => {
     const tableObject = new Table(0);
     const seatObjects = initTableSeating(tableObject);
 
-    const render = (c, t, ts) => {
-        updateTransforms(c.width, c.height, t, ts);
-        renderTransforms(c, t);
-    };
+    // const render = (c, t, ts) => {
+    //     updateTransforms(c.width, c.height, t, ts);
+    //     renderTransforms(c, t);
+    // };
 
-    const getTableCenter = (table) => {
-        return [table.transform.global.centeredAt.x, table.transform.global.centeredAt.y];
-    };
-
-    render(staticCanvas, tableObject, tableScale);
+    // render(staticCanvas, tableObject, tableScale);
 
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;
@@ -116,21 +114,39 @@ $(document).ready(() => {
 
     const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    // const [cx, cy] = getCenter(labelCanvas.width, labelCanvas.height);
     const cx = labelCanvas.width / 2;
     const cy = labelCanvas.height / 2;
 
     const labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
-    labelRenderer.setTransform(labelid, cx, cy);
-    labelRenderer.render(labelCtx);
+    // labelRenderer.setTransform(labelid, cx, cy);
+    // labelRenderer.render(labelCtx);
 
     const tickrate = 1000 / 2;
 
     const renderLoop = setInterval(() => {
-        // updateTransforms(c.width, c.height, t, ts);
-        // renderTransforms(c, t);
-        // labelRenderer.render(labelCtx);
-    }, tickrate);
+        if (tableObject.canvasChanged) {
+            console.log('updated table');
+            tableObject.updateTransform(staticCanvas, tableScale);
+
+            for (const [i, s] of tableObject.seats) {
+                if (s.canvasChanged) {
+                    console.log('updated seats');
+                    const p = tableObject.pointOnTable(i);
+                    s.updateTransform(p.x, p.y, tableObject.transform.radius, tableObject.transform.offset);
+                }
+            }
+        }
+
+        if (tableObject.drawOnNextTick) {
+            tableObject.render(staticCanvas);
+
+            for (const [i, s] of tableObject.seats) {
+                if (s.drawOnNextTick) {
+                    s.render(staticCanvas);
+                }
+            }
+        }
+    }, tickrate, tableObject, staticCanvas);
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -177,8 +193,12 @@ $(document).ready(() => {
     });
 
     $(window).on('resize', () => {
-        console.log('window resized');
         resizeCanvases(containerCanvasId, canvasGroup);
-        render(staticCanvas, tableObject, tableScale);
+
+        tableObject.canvasChanged = true;
+
+        for (const [i, s] of tableObject.seats) {
+            s.canvasChanged = true;
+        }
     });
 });

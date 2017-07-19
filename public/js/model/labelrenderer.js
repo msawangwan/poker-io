@@ -23,7 +23,7 @@ LabelRenderer.prototype.render = function (globalctx) {
     }
 };
 
-LabelRenderer.prototype.setTransform = function (labelid, x, y) {
+LabelRenderer.prototype.updateTransform = function (labelid, x, y) {
     if (this.labels.has(labelid)) {
         const l = this.labels.get(labelid);
 

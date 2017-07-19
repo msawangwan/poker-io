@@ -32,52 +32,56 @@ function Table(id) {
         offset: 0,
     };
 
-    this.transformState = {
-        changed: false,
-        rendered: false
-    };
+    this.canvasChanged = true;
+    this.drawOnNextTick = true;
 }
 
-Table.prototype.updateTransform = function (parentCanvasWidth, parentCanvasHeight, scale) {
-    const t = this.transform;
+Table.prototype.updateTransform = function (parentCanvas, scale) {
+    if (this.canvasChanged) {
+        const t = this.transform;
 
-    t.w = Math.floor(parentCanvasWidth * scale);
-    t.h = Math.floor(parentCanvasHeight * scale);
+        t.w = Math.floor(parentCanvas.width * scale);
+        t.h = Math.floor(parentCanvas.height * scale);
 
-    t.local.center.x = Math.floor(t.w * 0.5);
-    t.local.center.y = Math.floor(t.h * 0.5);
+        t.local.center.x = Math.floor(t.w * 0.5);
+        t.local.center.y = Math.floor(t.h * 0.5);
 
-    t.global.centeredAt.x = parentCanvasWidth / 2 - t.local.center.x;
-    t.global.centeredAt.y = parentCanvasHeight / 2 - t.local.center.y;
+        t.global.centeredAt.x = parentCanvas.width / 2 - t.local.center.x;
+        t.global.centeredAt.y = parentCanvas.height / 2 - t.local.center.y;
 
-    t.radius = Math.floor(t.h / 4);
-    t.offset = Math.floor(t.w * 0.15);
+        t.radius = Math.floor(t.h / 4);
+        t.offset = Math.floor(t.w * 0.15);
 
-    this.transform = t;
+        this.transform = t;
 
-    this.transformState.changed = true;
-    this.transformState.rendered = false;
+        this.drawOnNextTick = true;
+    } else {
+        this.drawOnNextTick = false;
+    }
+
+    this.canvasChanged = false;
 };
 
 Table.prototype.render = function (toParentCanvas) {
-    const t = this.transform;
+    if (this.drawOnNextTick) {
+        const t = this.transform;
 
-    this.canvas.width = t.w;
-    this.canvas.height = t.h;
+        this.canvas.width = t.w;
+        this.canvas.height = t.h;
 
-    const localctx = this.canvas.getContext('2d');
+        const localctx = this.canvas.getContext('2d');
 
-    localctx.clearRect(0, 0, t.w, t.h);
-    localctx.beginPath();
-    localctx.arc(t.local.center.x - t.offset, t.local.center.y, t.radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-    localctx.arc(t.local.center.x + t.offset, t.local.center.y, t.radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-    localctx.fillStyle = 'green';
-    localctx.fill();
+        localctx.clearRect(0, 0, t.w, t.h);
+        localctx.beginPath();
+        localctx.arc(t.local.center.x - t.offset, t.local.center.y, t.radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+        localctx.arc(t.local.center.x + t.offset, t.local.center.y, t.radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+        localctx.fillStyle = 'green';
+        localctx.fill();
 
-    toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
+        toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
+    }
 
-    this.transformState.changed = false;
-    this.transformState.rendered = true;
+    this.drawOnNextTick = false;
 };
 
 Table.prototype.pointOnTable = function (position) {

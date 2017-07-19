@@ -39,7 +39,7 @@ function Label(text, font, fontsize, color, id) {
     };
 }
 
-Label.prototype.calcTransform = function (globalctx, globalx, globaly) {
+Label.prototype.updateTransform = function (globalctx, globalx, globaly) {
     const t = this.transform;
 
     t.textwidth = globalctx.measureText(this.text).width;
