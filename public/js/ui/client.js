@@ -36,41 +36,6 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     }
 };
 
-const updateTransforms = (parentw, parenth, table, scaler) => {
-    if (!table.transformState.changed) {
-        console.log('updated table');
-        table.updateTransform(parentw, parenth, scaler);
-
-        for (const [i, s] of table.seats) {
-            if (!s.transformState.changed) {
-                console.log('updated seats');
-                const p = table.pointOnTable(i);
-                s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
-            }
-        }
-    }
-};
-
-const renderTransforms = (parentcanv, table) => {
-    if (table.transformState.changed) {
-        table.render(parentcanv);
-
-        for (const [i, s] of table.seats) {
-            if (s.transformState.changed) {
-                s.render(parentcanv);
-            }
-        }
-    }
-};
-
-const updateLabels = (parentcanv, labelrenderer) => {
-    for (const [id, l] in labelrenderer.labels) {
-        if (l.transformState.changed) {
-            l.render();
-        }
-    }
-}
-
 const containerCanvasId = 'container-canvas';
 const canvasLayerIds = [
     'static-canvas', 'dynamic-canvas', 'label-canvas'
@@ -98,15 +63,8 @@ $(document).ready(() => {
 
     resizeCanvases(containerCanvasId, canvasGroup);
 
-    const tableObject = new Table(0);
-    const seatObjects = initTableSeating(tableObject);
-
-    // const render = (c, t, ts) => {
-    //     updateTransforms(c.width, c.height, t, ts);
-    //     renderTransforms(c, t);
-    // };
-
-    // render(staticCanvas, tableObject, tableScale);
+    const table = new Table(0);
+    const seats = initTableSeating(table);
 
     const assignedPlayerName = assignName();
     const uniquePlayerId = socket.id || -100;
@@ -124,29 +82,29 @@ $(document).ready(() => {
     const tickrate = 1000 / 2;
 
     const renderLoop = setInterval(() => {
-        if (tableObject.canvasChanged) {
+        if (table.canvasChanged) {
             console.log('updated table');
-            tableObject.updateTransform(staticCanvas, tableScale);
+            table.updateTransform(staticCanvas, tableScale);
 
-            for (const [i, s] of tableObject.seats) {
+            for (const [i, s] of table.seats) {
                 if (s.canvasChanged) {
                     console.log('updated seats');
-                    const p = tableObject.pointOnTable(i);
-                    s.updateTransform(p.x, p.y, tableObject.transform.radius, tableObject.transform.offset);
+                    const p = table.pointOnTable(i);
+                    s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
                 }
             }
         }
 
-        if (tableObject.drawOnNextTick) {
-            tableObject.render(staticCanvas);
+        if (table.drawOnNextTick) {
+            table.render(staticCanvas);
 
-            for (const [i, s] of tableObject.seats) {
+            for (const [i, s] of table.seats) {
                 if (s.drawOnNextTick) {
                     s.render(staticCanvas);
                 }
             }
         }
-    }, tickrate, tableObject, staticCanvas);
+    }, tickrate, table, staticCanvas);
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -163,7 +121,7 @@ $(document).ready(() => {
 
     socket.on('player-assigned-seat', data => {
         // playerState.assignedSeat.index = data.seat;
-        tableObject.seatPlayer();
+        table.seatPlayer();
     });
 
     socket.on('table-seating-state', data => {
@@ -195,9 +153,9 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
 
-        tableObject.canvasChanged = true;
+        table.canvasChanged = true;
 
-        for (const [i, s] of tableObject.seats) {
+        for (const [i, s] of table.seats) {
             s.canvasChanged = true;
         }
     });
