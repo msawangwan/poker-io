@@ -134,14 +134,6 @@ $(document).ready(() => {
         labelRenderer.render(labelCtx);
     }, tickrate, table, staticCanvas);
 
-    player.seat.position = 3;
-    
-    const seated = table.playerSeatedAt(player.seat.position, player);
-    if (seated) {
-        console.log('player seated');
-    } else {
-        alert('failed to sit');
-    }
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -187,6 +179,19 @@ $(document).ready(() => {
     //     clearInterval(renderLoop);
     // });
 
+    setTimeout(()=> {
+        player.seat.position = 3;
+    
+        const seated = table.playerSeatedAt(player.seat.position, player);
+        if (seated) {
+            player.tookSeat(table, player.seat.position);
+            console.log('player seated');
+        } else {
+            alert('failed to sit');
+        }
+    }, 2000);
+    
+    
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
 

@@ -152,12 +152,22 @@ Table.prototype.pointOnTable = function (parentCanvas, position) {
 
 Table.prototype.getTablePosByIndex = function (index) {
     if (!this.seats.has(index)) {
+        console.log('wtf');
         return undefined;
     }
     
-    const p = this.seats.get(index).transform.global;
-    
-    return [p.x, p.y];
+    const seat = this.seats.get(index);
+    console.log(seat.transform.origin.global);
+    return this.seats.get(index);
+    // console.log(seat);
+    // return {
+    //     x: seat.transform.origin.global.x,
+    //     y: seat.transform.origin.global.y
+    // };
+    // console.log(seat.transform.origin);
+    // const x = seat.transform.origin.global.x;
+    // console.log(x);
+    // return [x, seat.transform.origin.global.y];
 };
 
 Table.prototype.addSeat = function (seat) {
@@ -179,8 +189,6 @@ Table.prototype.playerSeatedAt = function (position, player) {
             break;
         }
     }
-    
-    console.log(desired);
     
     if (!desired.vacant) {
         return false;
@@ -209,4 +217,4 @@ Table.prototype.playerLeftSeat = function (position, player) {
     desired.player = undefined;
     
     return true;
-}
+};
