@@ -5,13 +5,6 @@ const jqObjFromStr = idstring => $(`#${idstring}`);
 
 const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
 
-const cardbackpair = './asset/cards-hand-card-back.png';
-const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
-const cardpixelwidth = 72.15;
-const cardpixelheight = 83.25;
-const cardbackpixelwidth = 269;
-const cardbackpixelheight = 188;
-
 const initTableSeating = (t) => {
     const newSeats = [
         new Seat(0, 32, 'black'),
@@ -76,16 +69,14 @@ const renderTransforms = (parentcanv, table) => {
     }
 };
 
+const containerCanvasId = 'container-canvas';
+const canvasLayerIds = [
+    'static-canvas', 'dynamic-canvas', 'label-canvas'
+];
+
 $(document).ready(() => {
     const spriteCache = new SpriteCache();
     const labelRenderer = new LabelRenderer();
-
-    const hAlign = ['left', 'right', 'center']; // for text labels
-
-    const containerCanvasId = 'container-canvas';
-    const canvasLayerIds = [
-        'static-canvas', 'dynamic-canvas', 'label-canvas'
-    ];
 
     const staticCanvas = document.getElementById(canvasLayerIds[0]);
     const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
@@ -113,7 +104,7 @@ $(document).ready(() => {
         renderTransforms(c, t);
     };
 
-    const getCenter = (table) => {
+    const getTableCenter = (table) => {
         return [table.transform.global.centeredAt.x, table.transform.global.centeredAt.y];
     };
 
@@ -125,83 +116,13 @@ $(document).ready(() => {
 
     const playerObject = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    const [cx, cy] = getCenter(tableObject);
+    // const [cx, cy] = getCenter(labelCanvas.width, labelCanvas.height);
+    const cx = labelCanvas.width / 2;
+    const cy = labelCanvas.height / 2;
 
     const labelid = labelRenderer.add('waiting for players ...', 'serif', 24, 'black');
     labelRenderer.setTransform(labelid, cx, cy);
     labelRenderer.render(labelCtx);
-
-    const drawPlayerHand = () => {
-        if (!playerState.holeCards.a || !playerState.holeCards.b) {
-            return false;
-        }
-
-        const cardA = playerState.holeCards.a;
-        const cardB = playerState.holeCards.b;
-
-        const cardAsuite = playerState.holeCards.strings.af.suite;
-        const cardAvalue = playerState.holeCards.strings.af.value;
-        const cardBsuite = playerState.holeCards.strings.bf.suite;
-        const cardBvalue = playerState.holeCards.strings.bf.value;
-
-        const c1Key = spriteCache.makeKey(cardAsuite, cardAvalue);
-        const c2Key = spriteCache.makeKey(cardBsuite, cardBvalue);
-
-        const scalefactor = 0.75;
-
-        const cardSprite1 = spriteCache.load(cardspritesheet, c1Key, {
-            row: cardA.value,
-            col: cardA.suite,
-            width: cardpixelwidth,
-            height: cardpixelheight
-        });
-
-        const cardSprite2 = spriteCache.load(cardspritesheet, c2Key, {
-            row: cardB.value,
-            col: cardB.suite,
-            width: cardpixelwidth,
-            height: cardpixelheight
-        });
-
-
-        spriteCache.draw(cardSprite1, ctx, playerState.assignedSeat.x, playerState.assignedSeat.y, scalefactor, scalefactor);
-        spriteCache.draw(cardSprite2, ctx, (playerState.assignedSeat.x + (cardSprite2.width * scalefactor)), playerState.assignedSeat.y, scalefactor, scalefactor);
-
-        return true;
-    };
-
-    const drawAllOpponentActiveHand = (seatCoordinates, seatStates) => {
-        if (!seatStates) {
-            return false;
-        }
-
-        for (const [position, coord] of seatCoordinates.entries()) {
-            if (position > 0) { // note: valid player seat positions are exclusive to numbers 1-9
-                const seat = seatStates[position - 1];
-
-                if (!seat[1].vacant) {
-                    const p = seat[1].player;
-
-                    if (p.id === socket.id) {
-                        continue;
-                    }
-
-                    const key = spriteCache.makeKey(`cardback::${position}`)
-
-                    const handBackside = spriteCache.load(cardbackpair, key, {
-                        row: 0,
-                        col: 0,
-                        width: cardbackpixelwidth,
-                        height: cardbackpixelheight
-                    });
-
-                    spriteCache.draw(handBackside, ctx, coord.x, coord.y, 0.25, 0.25);
-                }
-            }
-        }
-
-        return true;
-    };
 
     const tickrate = 1000 / 2;
 
@@ -222,7 +143,7 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
-    socket.emit('joined-table', { name: playerObject.name, balance: playerObject.state.balance });
+    socket.emit('joined-table', { name: playerObject.name, balance: playerObject.balance });
 
     socket.on('player-assigned-seat', data => {
         // playerState.assignedSeat.index = data.seat;
