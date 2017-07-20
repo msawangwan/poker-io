@@ -46,6 +46,16 @@ class TableObject {
             this.draw();
 
             this.labels.center.draw('text here', this.textcanvas, this.parentcanvas.width / 2, this.parentcanvas.height / 2);
+
+            for (const [si, so] of this.seats) {
+                if (!so.seat.vacant) {
+                    continue;
+                }
+
+                const p = this.pointOnTable(si);
+
+                so.labels.playername.draw(so.seat.playername, this.textcanvas, p.x, p.y)
+            }
         }
     };
 
@@ -69,7 +79,6 @@ class TableObject {
 
         const ctx = this.canvas.getContext('2d');
 
-        // ctx.clearRect(0, 0, this.dimensions.w, this.dimensions.h);
         ctx.beginPath();
         ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
         ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
@@ -84,7 +93,13 @@ class TableObject {
             return false;
         }
 
-        this.seats.set(seatindex, new Seat(seatindex, 32, 'black'));
+        this.seats.set(seatindex, {
+            seat: new Seat(seatindex, 32, 'black'),
+            labels: {
+                playername: new Label('serif', 18, ' white'),
+                playerbalance: new Label('serif', 18, ' white')
+            }
+        });
 
         return true;
     };
