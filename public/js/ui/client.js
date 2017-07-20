@@ -47,6 +47,7 @@ $(document).ready(() => {
     });
 
     const spriteCache = new SpriteCache();
+    const labelManager = new LabelManager();
     const labelRenderer = new LabelRenderer();
 
     const staticCanvas = document.getElementById(canvasLayerIds[0]);
@@ -76,6 +77,10 @@ $(document).ready(() => {
     let labelIdPlayerName = labelRenderer.add('...', 'serif', 18, 'white');
     let labelIdPlayerBalance = labelRenderer.add('...', 'serif', 18, 'white');
 
+    const calcx = canvasw => canvasw / 2;
+    const calcy = canvash => canvash / 2;
+
+    labelManager.add('table-center', labe)
     labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
 
     const tickrate = 1000 / 2;
