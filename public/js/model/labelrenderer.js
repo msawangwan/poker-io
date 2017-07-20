@@ -7,29 +7,22 @@ function LabelRenderer() {
     this.labelNode = document.getElementById('temp-container');
 }
 
-LabelRenderer.prototype.render = function () {
-    for (const [id, active] of this.labels) {
-        if (active.label.drawOnNextTick) {
-            active.label.render();
+LabelRenderer.prototype.render = function (ctx) {
+    for (const [id, next] of this.labels) {
+        if (next.drawOnNextTick) {
+            next.render(ctx);
         }
     }
 };
 
 LabelRenderer.prototype.add = function (text, fontstyle, fontsize, color) {
     const id = this.labelid();
-
-    this.labels.set(id, {
-        label: new Label(text, fontstyle, fontsize, color, id),
-        pos: {
-            x: 0, y: 0
-        }
-    });
-
+    this.labels.set(id, new Label(text, fontstyle, fontsize, color, id));
     return id;
 };
 
 LabelRenderer.prototype.remove = function (globalctx, id) {
-    const label = this.labels.get(id).label;
+    const label = this.labels.get(id);
 
     if (label) {
         globalctx.clearRect(label.transform.global.x, label.transform.global.y, label.canvas.width, label.canvas.height);
@@ -43,4 +36,20 @@ LabelRenderer.prototype.remove = function (globalctx, id) {
     }
 
     return false;
+};
+
+LabelRenderer.prototype.update = function (id, ctx, x, y, text) {
+    let old = null;
+
+    if (this.labels.has(id)) {
+        old = this.labels.get(id);
+        this.remove(ctx, id);
+    }
+
+    const newid = this.add(text, old.font.style, old.font.size, old.font.color);
+    console.log(old);
+    console.log(this.labels.get(newid));
+    this.labels.get(newid).updateTransform(ctx, x, y);
+
+    return newid;
 };

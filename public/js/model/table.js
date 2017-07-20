@@ -152,13 +152,12 @@ Table.prototype.pointOnTable = function (parentCanvas, position) {
 
 Table.prototype.getTablePosByIndex = function (index) {
     if (!this.seats.has(index)) {
-        console.log('wtf');
         return undefined;
     }
 
     const seat = this.seats.get(index);
 
-    return [seat.transform.global.origin.x, seat.transform.global.origin.y];
+    return [seat.transform.origin.global.x, seat.transform.origin.global.y];
 };
 
 Table.prototype.addSeat = function (seat) {
@@ -187,7 +186,6 @@ Table.prototype.playerSeatedAt = function (position, player) {
 
     desired.vacant = false;
     desired.player = player;
-    desired.canvasChanged = true;
 
     return true;
 };

@@ -14,61 +14,36 @@ const assignName = () => {
     return name;
 };
 
-function Player(name, id, balance) {
-    this.name = name;
-    this.id = id;
-    this.gameid = null;
+class Player {
+    constructor(name, id, balance) {
+        this.name = name;
+        this.id = id;
+        this.gameid = null;
 
-    this.balance = balance || 10000;
+        this.balance = balance || 10000;
 
-    this.seat = {
-        position: undefined,
-        x: 0,
-        y: 0
-    }
+        this.seat = {
+            position: undefined,
+            x: 0,
+            y: 0
+        }
 
-    this.hand = {
-        card_one: undefined, card_two: undefined
+        this.hand = {
+            card_one: undefined, card_two: undefined
+        };
+    };
+
+    sitAt(table, pos) {
+        this.seat.position = pos;
+
+        setTimeout(() => {
+            this.updateSeatCoordinates(table, pos);
+        }, 1500);
+    };
+
+    updateSeatCoordinates(table, pos) {
+        const [px, py] = table.getTablePosByIndex(pos);
+        this.seat.x = px;
+        this.seat.y = py;
     };
 }
-
-Player.prototype.tookSeat = function (atTable, pos) {
-    if (!this.seat.position) {
-        console.log('player has no seat');
-    }
-
-    const point = atTable.getTablePosByIndex(pos);
-    console.log(point.transform.origin);
-    const ggg = point.transform.origin;
-    console.log(ggg.global);
-};
-
-Player.prototype.renderHoleCards = function (globalctx, spritecache) {
-    // const ca = this.hand.a;
-    // const cb = this.hand.b;
-
-    // const c1Key = spriteCache.makeKey(ca.suite, ca.value);
-    // const c2Key = spriteCache.makeKey(cb.suite, cb.value);
-
-    // const scalefactor = 0.75;
-
-    // const cardSprite1 = spriteCache.load(cardspritesheet, c1Key, {
-    //     row: ca.value,
-    //     col: ca.suite,
-    //     width: cardpixelwidth,
-    //     height: cardpixelheight
-    // });
-
-    // const cardSprite2 = spriteCache.load(cardspritesheet, c2Key, {
-    //     row: cb.value,
-    //     col: cb.suite,
-    //     width: cardpixelwidth,
-    //     height: cardpixelheight
-    // });
-
-
-    // spriteCache.draw(cardSprite1, globalctx, this.assignedSeat.x, this.assignedSeat.y, scalefactor, scalefactor);
-    // spriteCache.draw(cardSprite2, globalctx, (this.assignedSeat.x + (cardSprite2.width * scalefactor)), this.assignedSeat.y, scalefactor, scalefactor);
-
-    // return true;
-};
