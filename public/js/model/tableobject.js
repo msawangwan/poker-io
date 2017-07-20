@@ -1,10 +1,11 @@
 const scalingvalue = 0.65;
 
 class TableObject {
-    constructor(maxseats, parentcanvas) {
+    constructor(maxseats, parentcanvas, textcanvas) {
         this.maxseats = maxseats;
 
         this.parentcanvas = parentcanvas;
+        this.textcanvas = textcanvas;
 
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', 'canvas-table');
@@ -24,7 +25,7 @@ class TableObject {
         };
 
         this.labels = {
-            center: null
+            center: new LabelObject(textcanvas, 'serif', 24, 'white', 'poopy', this.canvasorigin.x, this.canvasorigin.y)
         };
 
         this.drawOnNextUpdate = false;
@@ -38,8 +39,10 @@ class TableObject {
 
             this.resize();
             this.draw();
+            this.labels.center = new LabelObject(this.textcanvas, 'serif', 24, 'white', 'poopy', this.canvasorigin.x, this.canvasorigin.y);
+            this.labels.center.draw();
         }
-    }
+    };
 
     resize() {
         this.dimensions.w = Math.floor(this.parentcanvas.width * scalingvalue);
@@ -70,4 +73,8 @@ class TableObject {
 
         this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     };
+
+    write() {
+
+    }
 }

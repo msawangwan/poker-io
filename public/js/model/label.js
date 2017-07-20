@@ -2,9 +2,9 @@ $(document).ready(() => {
     const DOMlabels = document.getElementById('temp-container');
 });
 
-const formatfontstr = (f, fs) => (f && fs) ? `${fs}px ${f}` : defaultFont;
+// const formatfontstr = (f, fs) => (f && fs) ? `${fs}px ${f}` : defaultFont;
 
-let nextId = -1;
+// let nextId = -1;
 
 class Label {
     constructor(fontstyle, fontsize, color) {

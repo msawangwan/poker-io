@@ -73,7 +73,7 @@ $(document).ready(() => {
 
     const tickrate = 1000 / 2;
 
-    const ta = new TableObject(9, staticCanvas);
+    const ta = new TableObject(9, staticCanvas, labelCanvas);
     ta.drawOnNextUpdate = true;
 
     const renderLoop = setInterval(() => {
