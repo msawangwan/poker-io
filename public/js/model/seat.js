@@ -31,6 +31,17 @@ function Seat(position, radius, color) {
 
     this.canvasChanged = true;
     this.drawOnNextTick = true;
+    
+    this.labels = {
+        playername: {
+            label: null,
+            text: ' ... '
+        },
+        playerbalance: {
+            label: null,
+            text: ' ... '
+        }
+    };
 }
 
 Seat.prototype.updateTransform = function (globalx, globaly, tableradius, tableoffset) {

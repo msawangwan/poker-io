@@ -74,19 +74,19 @@ $(document).ready(() => {
 
     const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    let labelTableCenter = new Label('...', 'serif', 18, 'white');
+    // let labelTableCenter = new Label('...', 'serif', 18, 'white');
 
-    labelCache.add(labelTableCenter.id, labelTableCenter);
+    // labelCache.add(labelTableCenter.id, labelTableCenter);
 
-    let labelIdTableCenter = labelRenderer.add('...', 'serif', 18, 'white');
-    let labelIdPlayerName = labelRenderer.add('...', 'serif', 18, 'white');
-    let labelIdPlayerBalance = labelRenderer.add('...', 'serif', 18, 'white');
+    // let labelIdTableCenter = labelRenderer.add('...', 'serif', 18, 'white');
+    // let labelIdPlayerName = labelRenderer.add('...', 'serif', 18, 'white');
+    // let labelIdPlayerBalance = labelRenderer.add('...', 'serif', 18, 'white');
 
-    const calcx = canvasw => canvasw / 2;
-    const calcy = canvash => canvash / 2;
+    // const calcx = canvasw => canvasw / 2;
+    // const calcy = canvash => canvash / 2;
 
-    labelManager.add('table-center', labe)
-    labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
+    // labelManager.add('table-center', labe)
+    // labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
 
     const tickrate = 1000 / 2;
 
@@ -148,6 +148,13 @@ $(document).ready(() => {
         socket.emit('player-ready', { seated: result });
     });
 
+    setTimeout(() => {
+        console.log('set label');
+        table.labels.center.label = new Label('waiting for players ...', 'serif', 18, 'white');
+    
+        
+    }, 3500);
+
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
 
@@ -156,7 +163,7 @@ $(document).ready(() => {
         for (const [i, s] of table.seats) {
             s.canvasChanged = true;
         }
-        labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
+        // labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
         // lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
     });
 });

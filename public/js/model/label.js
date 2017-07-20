@@ -3,7 +3,8 @@ $(document).ready(() => {
 });
 
 const formatfontstr = (f, fs) => (f && fs) ? `${fs}px ${f}` : defaultFont;
-const nextId = -1;
+
+let nextId = -1;
 
 class Label {
     constructor(text, fontstyle, fontsize, color) {
@@ -16,7 +17,7 @@ class Label {
         this.text = text;
 
         this.font = {
-            style: font,
+            style: fontstyle,
             size: fontsize,
             color: color
         };
