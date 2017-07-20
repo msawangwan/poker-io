@@ -25,7 +25,7 @@ class TableObject {
         };
 
         this.labels = {
-            center: new LabelObject(textcanvas, 'serif', 24, 'white', 'poopy', this.canvasorigin.x, this.canvasorigin.y)
+            center: new LabelObject('serif', 24, 'black')
         };
 
         this.drawOnNextUpdate = false;
@@ -39,8 +39,7 @@ class TableObject {
 
             this.resize();
             this.draw();
-            this.labels.center = new LabelObject(this.textcanvas, 'serif', 24, 'white', 'poopy', this.canvasorigin.x, this.canvasorigin.y);
-            this.labels.center.draw();
+            this.labels.center.draw('.', this.textcanvas, this.parentcanvas.width / 2, this.parentcanvas.height / 2);
         }
     };
 
