@@ -7,19 +7,19 @@ const formatfontstr = (f, fs) => (f && fs) ? `${fs}px ${f}` : defaultFont;
 let nextId = -1;
 
 class Label {
-    constructor(text, fontstyle, fontsize, color) {
+    constructor(fontstyle, fontsize, color) {
         this.id = nextId += 1;
 
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', this.id);
         this.canvas.style['background-color'] = 'rgba(255,0,0,0)';
 
-        this.text = text;
+        this.text = '...';
 
         this.font = {
-            style: fontstyle,
-            size: fontsize,
-            color: color
+            style: fontstyle || 'serif',
+            size: fontsize || 12,
+            color: color || 'black'
         };
 
         this.transform = {
@@ -75,5 +75,10 @@ class Label {
         }
 
         this.drawOnNextTick = false;
+    };
+    
+    setText(text) {
+        this.text = text;
+        this.canvasChanged = true;
     };
 }

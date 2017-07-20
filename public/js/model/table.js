@@ -8,6 +8,7 @@ const maxSeats = 9; // TODO: load from config
 class Table {
     constructor(id) {
         this.id = id;
+        // this.parentCanvas = parentCanvas;
     
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', 'canvas-table');
@@ -38,8 +39,11 @@ class Table {
         
         this.labels = {
             center: {
-                label: null,
-                text: ' .... '
+                label: new Label('serif', 18, 'white'),
+                ctx: null,
+                refcanvas: null,
+                text: ' .... ',
+                textChanged: false
             }
         };
     };
@@ -87,9 +91,60 @@ class Table {
             localctx.fill();
     
             toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
+            console.log('redraw table');
+            if (this.labels.center.label) {
+                console.log('redraw label');
+                this.labels.center.label.textChanged = true;
+            }
         }
     
         this.drawOnNextTick = false;
+    };
+    
+    setLabel(labelname, parentCtx, referenceCanvas) {
+        switch (labelname) {
+            case 'center':
+                this.labels.center.ctx = parentCtx;
+                this.labels.center.refcanvas = referenceCanvas;
+                
+                break;
+            default:
+                console.log('no matching label found for: ' + labelname);
+        }
+    };
+    
+    updateLabel(labelname, text) {
+        switch (labelname) {
+            case 'center':
+                console.log('set label for table center: ' + text);
+
+                this.labels.center.label.setText(text);
+                this.labels.center.textChanged = true;
+                
+                break;
+            default:
+                console.log('no matching label found for: ' + labelname);
+        }
+    };
+    
+    renderLabels(ctx) {
+        if (this.labels.center.textChanged) {
+            console.log('render label');
+            this.labels.center.textChanged = false;
+            const p = this.pointOnTable(this.labels.center.refcanvas, -1);
+            console.log(p.x, p.y);
+            console.log(this.transform.global.centeredAt.x, this.transform.global.centeredAt.y);
+            console.log(this.transform.local.center.x, this.transform.local.center.y);
+            // this.labels.center.label.updateTransform(this.labels.center.ctx, p.x, p.y + this.transform.radius);
+            this.labels.center.label.updateTransform(this.labels.center.ctx, p.x, p.y);
+            // this.labels.center.label.updateTransform(this.labels.center.ctx, this.transform.global.centeredAt.x, this.transform.global.centeredAt.y);
+        }
+        // switch(labelname) {
+        //     case 'center':
+        //         break;
+        //     default:
+        //         console.log('no matching label found for: ' + labelname);
+        // }
     };
     
     pointOnTable(parentCanvas, position) {
@@ -217,27 +272,3 @@ class Table {
         return true;
     };
 }
-
-// function Table(id) {
-// }
-
-// Table.prototype.updateTransform = function (parentCanvas, scale) {
-// };
-
-// Table.prototype.render = function (toParentCanvas) {
-// };
-
-// Table.prototype.pointOnTable = function (parentCanvas, position) {
-// };
-
-// Table.prototype.getTablePosByIndex = function (index) {
-// };
-
-// Table.prototype.addSeat = function (seat) {
-// };
-
-// Table.prototype.playerSeatedAt = function (position, player) {
-// };
-
-// Table.prototype.playerLeftSeat = function (position, player) {
-// };

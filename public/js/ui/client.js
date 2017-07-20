@@ -111,8 +111,16 @@ $(document).ready(() => {
                 s.render(staticCanvas);
             }
         }
+        
+        table.renderLabels(labelCtx);
 
-        labelRenderer.render(labelCtx);
+        // labelRenderer.render(labelCtx);
+        
+        // for (const l of alllabels) {
+        //     if (l.drawOnNextTick) {
+        //         l.render(labelCtx);
+        //     }
+        // }
     }, tickrate, table, staticCanvas);
 
 
@@ -148,12 +156,17 @@ $(document).ready(() => {
         socket.emit('player-ready', { seated: result });
     });
 
+    // const alllabels = [];
+    // const tablecenterlabel = new Label('serif', 18, 'white');
+        
+    // alllabels.push(tablecenterlabel);
+
     setTimeout(() => {
         console.log('set label');
-        table.labels.center.label = new Label('waiting for players ...', 'serif', 18, 'white');
     
-        
-    }, 3500);
+        table.setLabel('center', labelCtx, staticCanvas);
+        table.updateLabel('center', 'waiting for players ...');
+    }, 1500);
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
