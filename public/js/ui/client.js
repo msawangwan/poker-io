@@ -73,39 +73,16 @@ $(document).ready(() => {
 
     const tickrate = 1000 / 2;
 
-    const ta = new TableObject(9, staticCanvas, labelCanvas);
-    ta.drawOnNextUpdate = true;
+    const tableObject = new TableObject(9, staticCanvas, labelCanvas);
 
-    const renderLoop = setInterval(() => {
-        // if (table.canvasChanged) {
-        //     table.updateTransform(staticCanvas, tableScale);
-        // }
+    let seatindex = 0;
 
-        // for (const [i, s] of table.seats) {
-        //     if (s.canvasChanged) {
-        //         const p = table.pointOnTable(staticCanvas, i);
-        //         s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
-        //     }
-        // }
+    while (seatindex < tableObject.maxseats) {
+        tableObject.emptySeat(seatindex);
+        seatindex += 1;
+    }
 
-        // if (table.drawOnNextTick) {
-        //     table.render(staticCanvas);
-        // }
-
-        // for (const [i, s] of table.seats) {
-        //     if (s.drawOnNextTick) {
-        //         s.render(staticCanvas);
-        //     }
-        // }
-
-        // for (const [id, l] of table.labelCache.store) {
-        //     if (l.label.drawOnNextTick) {
-        //         table.labelCache.render(id, labelCtx);
-        //     }
-        // }
-        ta.render();
-    }, tickrate, table, staticCanvas);
-
+    tableObject.drawOnNextUpdate = true;
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -134,23 +111,19 @@ $(document).ready(() => {
         socket.emit('player-ready', { seated: result });
     });
 
-    setTimeout(() => {
-        console.log('set label');
-        table.setLabelText(table.centerlabel, 'waiting for players');
+    setTimeout(() => { // start
+        console.log('debug: start');
     }, 1500);
+
+    setTimeout(() => { // update
+        console.log('debug: update');
+        const renderLoop = setInterval(() => {
+            tableObject.render();
+        }, tickrate, table, staticCanvas);
+    }, 3000);
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
-
-        // ta.resize();
-        // ta.draw();
-        // table.canvasChanged = true;
-
-        ta.drawOnNextUpdate = true;
-        // table.resizeLabel(table.centerlabel, labelCtx, labelCanvas);
-
-        // for (const [i, s] of table.seats) {
-        //     s.canvasChanged = true;
-        // }
+        tableObject.drawOnNextUpdate = true;
     });
 });

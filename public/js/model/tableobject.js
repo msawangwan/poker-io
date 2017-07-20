@@ -1,3 +1,8 @@
+const toradian = theta => theta * (Math.PI / 180);
+
+const thetaUpper = toradian(25);
+const thetaLower = toradian(325);
+
 const scalingvalue = 0.65;
 
 class TableObject {
@@ -25,7 +30,7 @@ class TableObject {
         };
 
         this.labels = {
-            center: new LabelObject('serif', 24, 'black')
+            center: new Label('serif', 24, 'black')
         };
 
         this.drawOnNextUpdate = false;
@@ -39,7 +44,8 @@ class TableObject {
 
             this.resize();
             this.draw();
-            this.labels.center.draw('.', this.textcanvas, this.parentcanvas.width / 2, this.parentcanvas.height / 2);
+
+            this.labels.center.draw('text here', this.textcanvas, this.parentcanvas.width / 2, this.parentcanvas.height / 2);
         }
     };
 
@@ -63,7 +69,7 @@ class TableObject {
 
         const ctx = this.canvas.getContext('2d');
 
-        ctx.clearRect(0, 0, this.dimensions.w, this.dimensions.h);
+        // ctx.clearRect(0, 0, this.dimensions.w, this.dimensions.h);
         ctx.beginPath();
         ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
         ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
@@ -73,7 +79,79 @@ class TableObject {
         this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     };
 
-    write() {
+    emptySeat(seatindex) {
+        if (this.seats.size > this.maxseats) {
+            return false;
+        }
 
-    }
+        this.seats.set(seatindex, new Seat(seatindex, 32, 'black'));
+
+        return true;
+    };
+
+    pointOnTable(position) {
+        const ox = this.parentcanvas.width / 2;
+        const oy = this.parentcanvas.height / 2;
+        const r = this.dimensions.r;
+        const off = this.dimensions.off;
+
+        const offsetLeft = ox - off;
+        const offsetRight = ox + off;
+
+        let x = -1;
+        let y = -1;
+
+        switch (position) {
+            case -2: // center
+                x = ox;
+                y = oy;
+                break;
+            case -1: // center upper
+                x = ox;
+                y = oy - r;
+                break;
+            case 0: // right upper
+                x = offsetRight;
+                y = oy - r;
+                break;
+            case 1: // right theta upper
+                x = offsetRight + r * Math.cos(thetaUpper);
+                y = oy - r * Math.sin(thetaUpper);
+                break;
+            case 2: // right theta lower
+                x = offsetRight + r * Math.cos(thetaLower);
+                y = oy - r * Math.sin(thetaLower);
+                break;
+            case 3: // right lower
+                x = offsetRight;
+                y = oy + r;
+                break;
+            case 4: // center lower
+                x = ox;
+                y = oy + r;
+                break;
+            case 5: // left lower
+                x = offsetLeft;
+                y = oy + r;
+                break;
+            case 6: // left theta lower
+                x = offsetLeft - r * Math.cos(thetaLower);
+                y = oy - r * Math.sin(thetaLower);
+                break;
+            case 7: // left theta upper
+                x = offsetLeft - r * Math.cos(thetaUpper);
+                y = oy - r * Math.sin(thetaUpper);
+                break;
+            case 8: // left upper
+                x = offsetLeft;
+                y = oy - r;
+                break;
+            default:
+                break;
+        }
+
+        return {
+            x: x, y: y
+        };
+    };
 }

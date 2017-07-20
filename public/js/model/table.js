@@ -1,7 +1,7 @@
-const toradian = theta => theta * (Math.PI / 180);
+// const toradian = theta => theta * (Math.PI / 180);
 
-const thetaUpper = toradian(25);
-const thetaLower = toradian(325);
+// const thetaUpper = toradian(25);
+// const thetaLower = toradian(325);
 
 const maxSeats = 9; // TODO: load from config
 
@@ -36,9 +36,8 @@ class Table {
         this.canvasChanged = true;
         this.drawOnNextTick = true;
 
-        this.labelCache = new LabelCache();
 
-        this.centerlabel = this.labelCache.addNewLabel('serif', 18, 'white');
+        // this.centerlabel = this.labelCache.addNewLabel('serif', 18, 'white');
     };
 
     resize(newCanvas) {
@@ -111,24 +110,6 @@ class Table {
         }
 
         this.drawOnNextTick = false;
-    };
-
-    setLabelText(labelid, labeltext) {
-        this.labelCache.setLabelText(labelid, labeltext);
-    };
-
-    resizeLabel(labelid, ctx, can) {
-        let x = 0;
-        let y = 0;
-
-        if (labelid === this.centerlabel) {
-            const p = this.pointOnTable(can, -1);
-            x = p.x;
-            y = p.y + this.transform.radius;
-            // y = p.y;
-        }
-
-        this.labelCache.updateLabelTransform(labelid, ctx, x, y);
     };
 
     pointOnTable(parentCanvas, position) {

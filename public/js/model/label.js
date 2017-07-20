@@ -1,87 +1,51 @@
-$(document).ready(() => {
-    const DOMlabels = document.getElementById('temp-container');
-});
+const formatfontstr = (f, fs) => `${fs}px ${f}`;
 
-// const formatfontstr = (f, fs) => (f && fs) ? `${fs}px ${f}` : defaultFont;
-
-// let nextId = -1;
+let nextId = -1;
 
 class Label {
-    constructor(fontstyle, fontsize, color) {
-        this.id = nextId += 1;
+    constructor(font, fontsize, fontcolor) {
+        this.id = nextId + 1;
 
         this.canvas = document.createElement('canvas');
-        this.canvas.setAttribute('id', this.id);
-        this.canvas.style['background-color'] = 'rgba(255,0,0,0)';
+        this.canvas.setAttribute('id', `label-canvas-${this.id}`);
 
-        this.text = '...';
+        this.ctx = this.canvas.getContext('2d');
 
-        this.font = {
-            style: fontstyle || 'serif',
-            size: fontsize || 12,
-            color: color || 'black'
+        this.style = {
+            font: font,
+            fontsize: fontsize,
+            fontcolor: fontcolor,
+            textalign: 'center',
+            textbaseline: 'middle'
         };
-
-        this.transform = {
-            local: {
-                x: 0, y: 0
-            },
-            global: {
-                x: 0, y: 0
-            },
-            textwidth: 0,
-            w: 0,
-            h: 0
-        };
-
-        this.textSet = false;
-        this.canvasChanged = true;
-        this.drawOnNextTick = true;
     };
 
-    updateTransform(globalctx, globalx, globaly) {
-        if (this.canvasChanged) {
-            const t = this.transform;
+    draw(text, textcanvas, x, y) {
+        const ctx = this.canvas.getContext('2d');
 
-            t.textwidth = globalctx.measureText(this.text).width;
+        ctx.font = formatfontstr(this.style.font, this.style.fontsize);
+        ctx.fillStyle = this.style.fontcolor;
+        ctx.textAlign = this.style.textalign;
+        ctx.textBaseline = this.style.textbaseline;
+        ctx.fillText(text, this.canvas.width / 2, this.canvas.height / 2);
 
-            t.w = Math.floor(t.textwidth);
-            t.h = Math.floor(this.font.size * 2);
+        this.canvas.width = Label.powOfTwo(ctx.measureText(text).width);
+        this.canvas.height = Label.powOfTwo(this.style.fontsize * 2);
 
-            t.local.x = this.canvas.width * 0.5 - t.textwidth + this.font.size;
-            t.local.y = this.canvas.height - this.canvas.height * 0.5;
+        ctx.font = formatfontstr(this.style.font, this.style.fontsize);
+        ctx.fillStyle = this.style.fontcolor;
+        ctx.textAlign = this.style.textalign;
+        ctx.textBaseline = this.style.textbaseline;
+        ctx.fillText(text, this.canvas.width / 2, this.canvas.height / 2);
 
-            t.global.x = globalx - this.canvas.width * 0.5;
-            t.global.y = globaly - this.canvas.height * 0.5;
+        textcanvas.getContext('2d').drawImage(this.canvas, x - this.canvas.width / 2, y - this.canvas.height / 2);
+    };
 
-            this.transform = t;
-
-            this.drawOnNextTick = true;
-        } else {
-            this.drawOnNextTick = false;
+    static powOfTwo(v, power) {
+        let p = power || 1;
+        while (p < v) {
+            p *= 2;
         }
-
-        this.canvasChanged = false;
-    };
-
-    render(globalctx, text) {
-        if (this.drawOnNextTick) {
-            globalctx.clearRect(this.transform.global.x, this.transform.global.y, this.canvas.width, this.canvas.height);
-
-            const localctx = this.canvas.getContext('2d');
-
-            localctx.font = formatfontstr(this.font.style, this.font.size);
-            localctx.fillStyle = this.font.color;
-            localctx.fillText(text, this.transform.local.x, this.transform.local.y);
-
-            globalctx.drawImage(this.canvas, this.transform.global.x, this.transform.global.y);
-        }
-
-        this.drawOnNextTick = false;
-    };
-
-    setText(text) {
-        this.text = text;
-        this.canvasChanged = true;
+        return p;
     };
 }
