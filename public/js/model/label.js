@@ -41,6 +41,10 @@ class Label {
         textcanvas.getContext('2d').drawImage(this.canvas, x - this.canvas.width / 2, y - this.canvas.height / 2);
     };
 
+    remove() {
+        console.log('not implemented yet');
+    };
+
     static powOfTwo(v, power) {
         let p = power || 1;
         while (p < v) {

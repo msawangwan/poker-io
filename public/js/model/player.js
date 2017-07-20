@@ -1,18 +1,4 @@
-const generateName = () => `player ${Math.floor(Math.random() * 100)}`;
-
 const namedb = new Set();
-
-const assignName = () => {
-    let name = generateName();
-
-    while (namedb.has(name)) { // TODO: lolz this is cray stoopid
-        name = generateName();
-    }
-
-    namedb.add(name);
-
-    return name;
-};
 
 class Player {
     constructor(name, id, balance) {
@@ -46,4 +32,26 @@ class Player {
         this.seat.x = px;
         this.seat.y = py;
     };
+
+    static nullPlayerInstance() {
+        return nullInstance;
+    }
+
+    static generateGuestName() {
+        return `player ${Math.floor(Math.random() * 100)}`;
+    }
+
+    static assignGuestName() {
+        let name = Player.generateGuestName();
+
+        while (namedb.has(name)) { // TODO: lolz this is cray stoopid
+            name = Player.generateGuestName();
+        }
+
+        namedb.add(name);
+
+        return name;
+    };
 }
+
+const nullInstance = new Player('(empty)', -1, 0);
