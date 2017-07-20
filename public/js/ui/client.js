@@ -36,28 +36,6 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     }
 };
 
-// const setLabelTableCenter = (renderer, id, ctx, cx, cy, txt) => {
-//     if (renderer.labels.has(id)) {
-//         renderer.remove(ctx, id);
-//     }
-
-//     const newId = renderer.add(txt, 'serif', 18, 'black');
-//     renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
-
-//     return newId;
-// };
-
-// const setLabelTableSeat = (renderer, id, ctx, cx, cy, txt) => {
-//     if (renderer.labels.has(id)) {
-//         renderer.remove(ctx, id);
-//     }
-
-//     const newId = renderer.add(txt, 'serif', 18, 'white');
-//     renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
-
-//     return newId;
-// };
-
 const containerCanvasId = 'container-canvas';
 const canvasLayerIds = [
     'static-canvas', 'dynamic-canvas', 'label-canvas'
@@ -94,18 +72,10 @@ $(document).ready(() => {
 
     const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    // const setLabelTableCenter = (renderer, id, ctx, cx, cy, txt) => {
-    //     if (renderer.labels.has(id)) {
-    //         renderer.remove(ctx, id);
-    //     }
-    //     const newId = renderer.add(txt, 'serif', 18, 'black');
-    //     renderer.labels.get(newId).label.updateTransform(ctx, cx, cy);
-
-    //     return newId;
-    // };
-
-    // let lableTableCenterId = setLabelTableCenter(labelRenderer, -10, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
     let labelIdTableCenter = labelRenderer.add('...', 'serif', 18, 'white');
+    let labelIdPlayerName = labelRenderer.add('...', 'serif', 18, 'white');
+    let labelIdPlayerBalance = labelRenderer.add('...', 'serif', 18, 'white');
+
     labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
 
     const tickrate = 1000 / 2;
@@ -159,8 +129,6 @@ $(document).ready(() => {
         if (result) {
             player.sitAt(table, data.seatIndex);
 
-            let playerLabel = -1000;
-            let balanceLabel = -10001;
             setTimeout(() => {
                 // playerLabel = setLabelTableSeat(labelRenderer, playerLabel, labelCtx, player.seat.x, player.seat.y, player.name);
                 // balanceLabel = setLabelTableSeat(labelRenderer, balanceLabel, labelCtx, player.seat.x, player.seat.y, player.balance);
