@@ -47,6 +47,7 @@ $(document).ready(() => {
     });
 
     const spriteCache = new SpriteCache();
+    const labelCache = new LabelCache();
     const labelManager = new LabelManager();
     const labelRenderer = new LabelRenderer();
 
@@ -72,6 +73,10 @@ $(document).ready(() => {
     const defaultPlayerBalance = 500;
 
     const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
+
+    let labelTableCenter = new Label('...', 'serif', 18, 'white');
+
+    labelCache.add(labelTableCenter.id, labelTableCenter);
 
     let labelIdTableCenter = labelRenderer.add('...', 'serif', 18, 'white');
     let labelIdPlayerName = labelRenderer.add('...', 'serif', 18, 'white');
