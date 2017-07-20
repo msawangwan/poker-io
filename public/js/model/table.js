@@ -8,13 +8,12 @@ const maxSeats = 9; // TODO: load from config
 class Table {
     constructor(id) {
         this.id = id;
-        // this.parentCanvas = parentCanvas;
-    
+
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', 'canvas-table');
-    
+
         this.seats = new Map();
-    
+
         this.transform = {
             local: {
                 center: {
@@ -33,63 +32,76 @@ class Table {
             radius: 0,
             offset: 0,
         };
-    
+
         this.canvasChanged = true;
         this.drawOnNextTick = true;
-        
-        this.labels = {
-            center: {
-                label: new Label('serif', 18, 'white'),
-                ctx: null,
-                refcanvas: null,
-                text: ' .... ',
-                textChanged: false
-            }
-        };
+
+        this.labelCache = new LabelCache();
+
+        this.centerlabel = this.labelCache.addNewLabel('serif', 18, 'white');
     };
-    
+
+    resize(newCanvas) {
+        const t = this.transform;
+
+        t.w = Math.floor(parentCanvas.width * scale);
+        t.h = Math.floor(parentCanvas.height * scale);
+
+        t.local.center.x = Math.floor(t.w * 0.5);
+        t.local.center.y = Math.floor(t.h * 0.5);
+
+        t.global.centeredAt.x = Math.floor(parentCanvas.width / 2 - t.local.center.x);
+        t.global.centeredAt.y = Math.floor(parentCanvas.height / 2 - t.local.center.y);
+
+        t.radius = Math.floor(t.h / 4);
+        t.offset = Math.floor(t.w * 0.15);
+
+        this.transform = t;
+
+    }
+
     updateTransform(parentCanvas, scale) {
         if (this.canvasChanged) {
             const t = this.transform;
-    
+
             t.w = Math.floor(parentCanvas.width * scale);
             t.h = Math.floor(parentCanvas.height * scale);
-    
+
             t.local.center.x = Math.floor(t.w * 0.5);
             t.local.center.y = Math.floor(t.h * 0.5);
-    
+
             t.global.centeredAt.x = Math.floor(parentCanvas.width / 2 - t.local.center.x);
             t.global.centeredAt.y = Math.floor(parentCanvas.height / 2 - t.local.center.y);
-    
+
             t.radius = Math.floor(t.h / 4);
             t.offset = Math.floor(t.w * 0.15);
-    
+
             this.transform = t;
-    
+
             this.drawOnNextTick = true;
         } else {
             this.drawOnNextTick = false;
         }
-    
+
         this.canvasChanged = false;
     };
-    
-    render (toParentCanvas) {
+
+    render(toParentCanvas) {
         if (this.drawOnNextTick) {
             const t = this.transform;
-    
+
             this.canvas.width = t.w;
             this.canvas.height = t.h;
-    
+
             const localctx = this.canvas.getContext('2d');
-    
+
             localctx.clearRect(0, 0, t.w, t.h);
             localctx.beginPath();
             localctx.arc(t.local.center.x - t.offset, t.local.center.y, t.radius, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
             localctx.arc(t.local.center.x + t.offset, t.local.center.y, t.radius, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
             localctx.fillStyle = 'green';
             localctx.fill();
-    
+
             toParentCanvas.getContext('2d').drawImage(this.canvas, t.global.centeredAt.x, t.global.centeredAt.y);
             console.log('redraw table');
             if (this.labels.center.label) {
@@ -97,68 +109,40 @@ class Table {
                 this.labels.center.label.textChanged = true;
             }
         }
-    
+
         this.drawOnNextTick = false;
     };
-    
-    setLabel(labelname, parentCtx, referenceCanvas) {
-        switch (labelname) {
-            case 'center':
-                this.labels.center.ctx = parentCtx;
-                this.labels.center.refcanvas = referenceCanvas;
-                
-                break;
-            default:
-                console.log('no matching label found for: ' + labelname);
-        }
-    };
-    
-    updateLabel(labelname, text) {
-        switch (labelname) {
-            case 'center':
-                console.log('set label for table center: ' + text);
 
-                this.labels.center.label.setText(text);
-                this.labels.center.textChanged = true;
-                
-                break;
-            default:
-                console.log('no matching label found for: ' + labelname);
-        }
+    setLabelText(labelid, labeltext) {
+        this.labelCache.setLabelText(labelid, labeltext);
     };
-    
-    renderLabels(ctx) {
-        if (this.labels.center.textChanged) {
-            console.log('render label');
-            this.labels.center.textChanged = false;
-            const p = this.pointOnTable(this.labels.center.refcanvas, -1);
-            console.log(p.x, p.y);
-            console.log(this.transform.global.centeredAt.x, this.transform.global.centeredAt.y);
-            console.log(this.transform.local.center.x, this.transform.local.center.y);
-            // this.labels.center.label.updateTransform(this.labels.center.ctx, p.x, p.y + this.transform.radius);
-            this.labels.center.label.updateTransform(this.labels.center.ctx, p.x, p.y);
-            // this.labels.center.label.updateTransform(this.labels.center.ctx, this.transform.global.centeredAt.x, this.transform.global.centeredAt.y);
+
+    resizeLabel(labelid, ctx, can) {
+        let x = 0;
+        let y = 0;
+
+        if (labelid === this.centerlabel) {
+            const p = this.pointOnTable(can, -1);
+            x = p.x;
+            y = p.y + this.transform.radius;
+            // y = p.y;
         }
-        // switch(labelname) {
-        //     case 'center':
-        //         break;
-        //     default:
-        //         console.log('no matching label found for: ' + labelname);
-        // }
+
+        this.labelCache.updateLabelTransform(labelid, ctx, x, y);
     };
-    
+
     pointOnTable(parentCanvas, position) {
         const ox = parentCanvas.width / 2;
         const oy = parentCanvas.height / 2;
         const r = this.transform.radius;
         const off = this.transform.offset;
-    
+
         const offsetLeft = ox - off;
         const offsetRight = ox + off;
-    
+
         let x = -1;
         let y = -1;
-    
+
         switch (position) {
             case -2: // center
                 x = ox;
@@ -207,68 +191,68 @@ class Table {
             default:
                 break;
         }
-    
+
         return {
             x: x, y: y
         };
     };
-    
-    getTablePosByIndex (index) {
+
+    getTablePosByIndex(index) {
         if (!this.seats.has(index)) {
             return undefined;
         }
-    
+
         const seat = this.seats.get(index);
-    
+
         return [seat.transform.origin.global.x, seat.transform.origin.global.y];
     };
-    
-    addSeat (seat) {
+
+    addSeat(seat) {
         if (this.seats.size > maxSeats) {
             return false;
         }
-    
+
         this.seats.set(seat.position, seat);
-    
+
         return true;
     };
-    
+
     playerSeatedAt(position, player) {
         let desired = undefined;
-    
+
         for (const [si, s] of this.seats) {
             if (si == position) {
                 desired = s;
                 break;
             }
         }
-    
+
         if (!desired.vacant) {
             return false;
         }
-    
+
         desired.vacant = false;
         desired.player = player;
-    
+
         return true;
     };
-    
-    playerLeftSeat (position, player) {
+
+    playerLeftSeat(position, player) {
         let desired = undefined;
-    
+
         for (const [si, s] of this.seats) {
             if (si == position) {
                 desired = s;
             }
         }
-    
+
         if (desired.vacant) {
             return false; // no player sits there
         }
-    
+
         desired.vacant = true;
         desired.player = undefined;
-    
+
         return true;
     };
 }

@@ -34,6 +34,7 @@ class Label {
             h: 0
         };
 
+        this.textSet = false;
         this.canvasChanged = true;
         this.drawOnNextTick = true;
     };
@@ -63,20 +64,22 @@ class Label {
         this.canvasChanged = false;
     };
 
-    render(globalctx) {
+    render(globalctx, text) {
         if (this.drawOnNextTick) {
+            globalctx.clearRect(this.transform.global.x, this.transform.global.y, this.canvas.width, this.canvas.height);
+
             const localctx = this.canvas.getContext('2d');
 
             localctx.font = formatfontstr(this.font.style, this.font.size);
             localctx.fillStyle = this.font.color;
-            localctx.fillText(this.text, this.transform.local.x, this.transform.local.y);
+            localctx.fillText(text, this.transform.local.x, this.transform.local.y);
 
             globalctx.drawImage(this.canvas, this.transform.global.x, this.transform.global.y);
         }
 
         this.drawOnNextTick = false;
     };
-    
+
     setText(text) {
         this.text = text;
         this.canvasChanged = true;

@@ -47,9 +47,6 @@ $(document).ready(() => {
     });
 
     const spriteCache = new SpriteCache();
-    const labelCache = new LabelCache();
-    const labelManager = new LabelManager();
-    const labelRenderer = new LabelRenderer();
 
     const staticCanvas = document.getElementById(canvasLayerIds[0]);
     const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
@@ -74,53 +71,39 @@ $(document).ready(() => {
 
     const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
 
-    // let labelTableCenter = new Label('...', 'serif', 18, 'white');
-
-    // labelCache.add(labelTableCenter.id, labelTableCenter);
-
-    // let labelIdTableCenter = labelRenderer.add('...', 'serif', 18, 'white');
-    // let labelIdPlayerName = labelRenderer.add('...', 'serif', 18, 'white');
-    // let labelIdPlayerBalance = labelRenderer.add('...', 'serif', 18, 'white');
-
-    // const calcx = canvasw => canvasw / 2;
-    // const calcy = canvash => canvash / 2;
-
-    // labelManager.add('table-center', labe)
-    // labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
-
     const tickrate = 1000 / 2;
 
+    const ta = new TableObject(9, staticCanvas);
+    ta.drawOnNextUpdate = true;
+
     const renderLoop = setInterval(() => {
-        if (table.canvasChanged) {
-            table.updateTransform(staticCanvas, tableScale);
-        }
+        // if (table.canvasChanged) {
+        //     table.updateTransform(staticCanvas, tableScale);
+        // }
 
-        for (const [i, s] of table.seats) {
-            if (s.canvasChanged) {
-                const p = table.pointOnTable(staticCanvas, i);
-                s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
-            }
-        }
-
-        if (table.drawOnNextTick) {
-            table.render(staticCanvas);
-        }
-
-        for (const [i, s] of table.seats) {
-            if (s.drawOnNextTick) {
-                s.render(staticCanvas);
-            }
-        }
-        
-        table.renderLabels(labelCtx);
-
-        // labelRenderer.render(labelCtx);
-        
-        // for (const l of alllabels) {
-        //     if (l.drawOnNextTick) {
-        //         l.render(labelCtx);
+        // for (const [i, s] of table.seats) {
+        //     if (s.canvasChanged) {
+        //         const p = table.pointOnTable(staticCanvas, i);
+        //         s.updateTransform(p.x, p.y, table.transform.radius, table.transform.offset);
         //     }
         // }
+
+        // if (table.drawOnNextTick) {
+        //     table.render(staticCanvas);
+        // }
+
+        // for (const [i, s] of table.seats) {
+        //     if (s.drawOnNextTick) {
+        //         s.render(staticCanvas);
+        //     }
+        // }
+
+        // for (const [id, l] of table.labelCache.store) {
+        //     if (l.label.drawOnNextTick) {
+        //         table.labelCache.render(id, labelCtx);
+        //     }
+        // }
+        ta.render();
     }, tickrate, table, staticCanvas);
 
 
@@ -146,37 +129,28 @@ $(document).ready(() => {
 
         if (result) {
             player.sitAt(table, data.seatIndex);
-
-            setTimeout(() => {
-                // playerLabel = setLabelTableSeat(labelRenderer, playerLabel, labelCtx, player.seat.x, player.seat.y, player.name);
-                // balanceLabel = setLabelTableSeat(labelRenderer, balanceLabel, labelCtx, player.seat.x, player.seat.y, player.balance);
-            }, 2000);
         }
 
         socket.emit('player-ready', { seated: result });
     });
 
-    // const alllabels = [];
-    // const tablecenterlabel = new Label('serif', 18, 'white');
-        
-    // alllabels.push(tablecenterlabel);
-
     setTimeout(() => {
         console.log('set label');
-    
-        table.setLabel('center', labelCtx, staticCanvas);
-        table.updateLabel('center', 'waiting for players ...');
+        table.setLabelText(table.centerlabel, 'waiting for players');
     }, 1500);
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
 
-        table.canvasChanged = true;
+        // ta.resize();
+        // ta.draw();
+        // table.canvasChanged = true;
 
-        for (const [i, s] of table.seats) {
-            s.canvasChanged = true;
-        }
-        // labelRenderer.update(labelIdTableCenter, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players ...');
-        // lableTableCenterId = setLabelTableCenter(labelRenderer, lableTableCenterId, labelCtx, labelCanvas.width / 2, labelCanvas.height / 2, 'waiting for players');
+        ta.drawOnNextUpdate = true;
+        // table.resizeLabel(table.centerlabel, labelCtx, labelCanvas);
+
+        // for (const [i, s] of table.seats) {
+        //     s.canvasChanged = true;
+        // }
     });
 });

@@ -3,23 +3,31 @@ class LabelCache {
         this.store = new Map();
     };
 
-    cache(labelid, label) {
-        this.store.set(labelid, label);
+    addNewLabel(fontstyle, fontsize, fontcolor) {
+        const label = new Label(fontstyle, fontsize, fontcolor);
+
+        this.store.set(label.id, {
+            label: label, text: '...'
+        });
+
+        return label.id;
     };
 
-    purge(labelid, parentctx) {
-        const label = this.store.get(labelid);
-        if (label) {
-            parentctx.clearRect(label.transform.global.x, label.transform.global.y, label.canvas.width, label.canvas.height);
-            const node = document.getElementById(label.id);
-            if (node) {
-                node.parentNode.removeChild(node);
-                this.store.delete(labelid);
-
-                return true;
-            }
-        }
-
-        return false;
+    setLabelText(labelid, text) {
+        this.store.get(labelid).text = text;
+        this.store.get(labelid).label.canvasChanged = true;
     };
+
+    updateLabelTransform(labelid, ctx, x, y) {
+        const label = this.store.get(labelid).label;
+        ctx.clearRect(label.transform.global.x, label.transform.global.y, label.canvas.width, label.canvas.height);
+
+        label.canvasChanged = true;
+        label.updateTransform(ctx, x, y);
+    };
+
+    render(labelid, ctx) {
+        const l = this.store.get(labelid);
+        l.label.render(ctx, l.text);
+    }
 }
