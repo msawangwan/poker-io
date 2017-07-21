@@ -141,8 +141,9 @@ class Table {
             return false;
         }
 
+        s.occupy(player);
         this.redraw();
-        s.player = player;
+        // s.player = player;
 
         return true;
     };

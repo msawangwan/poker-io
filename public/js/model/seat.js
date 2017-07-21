@@ -101,7 +101,7 @@ class Seat {
 
         this.player = player;
 
-        this.redrawHandlers(player.id, () => {
+        this.redrawHandlers.set(player.id, () => {
             player.redraw();
         });
 

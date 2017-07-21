@@ -79,9 +79,6 @@ class Player {
         this.holecards.a = new Card(a.value, a.suite, this.cardcanvas);
         this.holecards.b = new Card(b.value, b.suite, this.cardcanvas);
 
-        // setTimeout(() => {
-        //     this.drawOnNextUpdate = true;
-        // });
         this.redrawHandlers.set('holecards', () => {
             this.holecards.a.drawOnNextUpdate = true;
             this.holecards.b.drawOnNextUpdate = true;
