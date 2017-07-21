@@ -49,8 +49,6 @@ class Table {
 
             const msg = this.messageHistory[this.messageHistory.length - 1];
 
-            console.log(msg);
-
             this.labels.center.draw(
                 this.messageHistory[this.messageHistory.length - 1],
                 this.textcanvas,
@@ -74,7 +72,7 @@ class Table {
         this.postion.x = Math.floor(this.parentcanvas.width / 2 - this.canvasorigin.x);
         this.postion.y = Math.floor(this.parentcanvas.height / 2 - this.canvasorigin.y);
 
-        this.dimensions.r = Math.floor(this.dimensions.h / 4);
+        this.dimensions.r = Math.floor(this.dimensions.h * 0.45);
         this.dimensions.off = Math.floor(this.dimensions.w * 0.15);
     };
 
