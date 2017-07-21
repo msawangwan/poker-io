@@ -28,7 +28,7 @@ class Player {
     };
 
     updateSeatCoordinates(table, pos) {
-        const [px, py] = table.getTablePosByIndex(pos);
+        const { px, py } = table.pointOnTable(pos);
         this.seat.x = px;
         this.seat.y = py;
     };

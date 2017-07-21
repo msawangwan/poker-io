@@ -47,17 +47,20 @@ class Table {
             this.resize();
             this.draw();
 
+            const msg = this.messageHistory[this.messageHistory.length - 1];
+
+            console.log(msg);
+
             this.labels.center.draw(
                 this.messageHistory[this.messageHistory.length - 1],
                 this.textcanvas,
                 this.parentcanvas.width / 2,
                 this.parentcanvas.height / 2
             );
+        }
 
-            // note: move out of if
-            for (const [si, so] of this.seats) {
-                so.render();
-            }
+        for (const [si, so] of this.seats) {
+            so.render();
         }
     };
 
@@ -113,6 +116,8 @@ class Table {
 
         s.player = player;
         s.drawOnNextUpdate = true;
+
+        return true;
     };
 
     pointOnTable(position) {

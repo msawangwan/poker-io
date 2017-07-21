@@ -19,6 +19,8 @@ const canvasLayerIds = [
     'static-canvas', 'dynamic-canvas', 'label-canvas'
 ];
 
+const tickrate = 1000 / 2;
+
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
         'reconnection': false
@@ -36,17 +38,17 @@ $(document).ready(() => {
     const dynamicCtx = dynamicCanvas.getContext('2d');
     const labelCtx = labelCanvas.getContext('2d');
 
-    const tableScale = 0.65;
-
     resizeCanvases(containerCanvasId, canvasGroup);
 
-    const assignedPlayerName = Player.assignGuestName();
-    const uniquePlayerId = socket ? socket.id : -100;
-    const defaultPlayerBalance = 500;
+    // const assignedPlayerName = Player.assignGuestName();
+    // const uniquePlayerId = socket ? socket.id : -100;
+    // const defaultPlayerBalance = 500;
 
-    const player = new Player(assignedPlayerName, uniquePlayerId, defaultPlayerBalance);
-
-    const tickrate = 1000 / 2;
+    const player = new Player(
+        Player.assignGuestName(),
+        socket ? socket.id : -100,
+        500
+    );
 
     const table = new Table(9, staticCanvas, labelCanvas);
 
@@ -76,16 +78,13 @@ $(document).ready(() => {
     socket.on('player-seated', (data) => {
         player.gameid = data.gameId;
 
-        console.log(data.seatIndex);
-
         const result = table.sit(data.seatIndex, player);
 
         if (result) {
             player.sitAt(table, data.seatIndex);
 
-            table.messageHistory.push('waiting for players ...');
-
             Promise.resolve().then(() => {
+                table.messageHistory.push('waiting for players ...');
                 table.drawOnNextUpdate = true;
             });
         }
