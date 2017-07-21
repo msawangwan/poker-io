@@ -147,9 +147,6 @@ class Table {
         const r = this.dimensions.r;
         const off = this.dimensions.off;
 
-        console.log('calculating x and y for pos:');
-        console.log(position);
-
         const offsetLeft = ox - off;
         const offsetRight = ox + off;
 
@@ -206,11 +203,8 @@ class Table {
                 break;
         }
 
-        console.log(`x ${x} and y ${y}`);
-
-        // if (this.onseatCoordsChangeHandlers.has(position)) {
-        //     this.onseatCoordsChangeHandlers.get(position)(x, y);
-        // }
+        x = Math.floor(x);
+        y = Math.floor(y);
 
         for (const [p, h] of this.onseatCoordsChangeHandlers) {
             if (p === position) {

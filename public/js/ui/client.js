@@ -98,7 +98,7 @@ $(document).ready(() => {
 
         if (playerSeated) {
             player.state.takeSeatAt(table.state, data.seatIndex);
-            table.state.setCenterLabelText('waiting for players');
+            table.state.setCenterLabelText('waiting for players ...');
         }
 
         socket.emit('player-ready', { seated: playerSeated });
