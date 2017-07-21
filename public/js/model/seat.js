@@ -1,92 +1,78 @@
-// function Seat(position, radius, color) {
-//     this.position = position;
-//     this.id = `canvas-seat-${position}`;
+class Seat {
+    constructor(table, index, radius, color, parentcanvas, textcanvas) {
+        this.table = table;
 
-//     this.seatColor = color;
+        this.index = index;
+        this.id = `canvas-seat-${index}`;
 
-//     this.vacant = true;
-//     this.player = undefined;
+        this.color = color;
 
-//     this.canvas = document.createElement('canvas');
-//     this.canvas.setAttribute('id', this.id);
+        this.vacant = true;
+        this.player = Player.nullPlayerInstance();
 
-//     this.canvas.width = radius * 2;
-//     this.canvas.height = radius * 2;
+        this.parentcanvas = parentcanvas;
+        this.textcanvas = textcanvas;
 
-//     this.transform = {
-//         origin: {
-//             local: {
-//                 x: 0,
-//                 y: 0
-//             },
-//             global: {
-//                 x: 0,
-//                 y: 0
-//             }
-//         },
-//         w: 0,
-//         h: 0,
-//         radius: radius
-//     };
+        this.canvas = document.createElement('canvas');
+        this.canvas.setAttribute('id', this.id);
 
-//     this.canvasChanged = true;
-//     this.drawOnNextTick = true;
+        this.canvas.width = radius * 2;
+        this.canvas.height = radius * 2;
 
-//     this.labels = {
-//         playername: {
-//             label: null,
-//             text: ' ... '
-//         },
-//         playerbalance: {
-//             label: null,
-//             text: ' ... '
-//         }
-//     };
-// }
+        this.position = {
+            x: 0, y: 0
+        };
 
-// Seat.prototype.updateTransform = function (globalx, globaly, tableradius, tableoffset) {
-//     if (this.canvasChanged) {
-//         const t = this.transform;
+        this.dimensions = {
+            w: 0, h: 0, r: radius
+        };
 
-//         t.w = this.canvas.width;
-//         t.h = this.canvas.height;
+        this.labels = {
+            player: {
+                name: new Label('serif', 24, 'red'),
+                balance: new Label('serif', 18, 'red')
+            }
+        };
 
-//         t.origin.local.x = Math.floor(t.w * 0.5);
-//         t.origin.local.y = Math.floor(t.h * 0.5);
+        this.drawOnNextUpdate = false;
+    };
 
-//         t.origin.global.x = Math.floor(globalx - t.w / 2);
-//         t.origin.global.y = Math.floor(globaly - t.h / 2);
+    render() {
+        if (this.drawOnNextUpdate) {
+            console.log('drawing seat');
 
-//         this.transform = t;
+            this.drawOnNextUpdate = false;
 
-//         this.drawOnNextTick = true;
-//     } else {
-//         this.drawOnNextTick = false;
-//     }
+            this.resize();
+            this.draw();
 
-//     this.canvasChanged = false;
-// };
+            const p = this.table.pointOnTable(this.index);
 
-// Seat.prototype.render = function (toParentCanvas) {
-//     if (this.drawOnNextTick) {
-//         const t = this.transform;
+            this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
+            this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize);
+        }
+    };
 
-//         this.canvas.width = t.w;
-//         this.canvas.height = t.h;
+    resize() {
+        this.dimensions.w = this.canvas.width;
+        this.dimensions.h = this.canvas.height;
 
-//         const localctx = this.canvas.getContext('2d');
+        const p = this.table.pointOnTable(this.index);
 
-//         localctx.clearRect(0, 0, t.w, t.h);
-//         localctx.arc(t.origin.local.x, t.origin.local.y, t.radius, Math.PI * 2, false);
-//         localctx.fillStyle = this.seatColor;
-//         localctx.fill();
+        this.position.x = Math.floor(p.x - this.dimensions.w / 2);
+        this.position.y = Math.floor(p.y - this.dimensions.h / 2);
+    };
 
-//         toParentCanvas.getContext('2d').drawImage(this.canvas, t.origin.global.x, t.origin.global.y);
-//     }
+    draw() {
+        this.canvas.width = this.dimensions.w;
+        this.canvas.height = this.dimensions.h;
 
-//     this.drawOnNextTick = false;
-// };
+        const ctx = this.canvas.getContext('2d');
 
-// Seat.prototype.sit = function () {
+        ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.dimensions.r, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
 
-// };
+        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.position.x, this.position.y);
+    };
+}

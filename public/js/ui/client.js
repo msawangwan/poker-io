@@ -82,20 +82,32 @@ $(document).ready(() => {
 
         if (result) {
             player.sitAt(table, data.seatIndex);
+
+            table.messageHistory.push('waiting for players ...');
+
+            Promise.resolve().then(() => {
+                table.drawOnNextUpdate = true;
+            });
         }
 
         socket.emit('player-ready', { seated: result });
     });
 
+    let renderLoop = null;
+
     setTimeout(() => { // start
-        console.log('debug: start');
+        console.log('debug: entered start ...');
+        console.log('debug: ... exited start ...');
     }, 1500);
 
     setTimeout(() => { // update
-        console.log('debug: update');
-        const renderLoop = setInterval(() => {
+        console.log('debug: ... started update ...');
+
+        renderLoop = setInterval(() => {
             table.render();
         }, tickrate, table, staticCanvas);
+
+        console.log('debug: ... updating running ...');
     }, 3000);
 
     $(window).on('resize', () => {

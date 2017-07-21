@@ -33,6 +33,8 @@ class Table {
             center: new Label('serif', 24, 'black')
         };
 
+        this.messageHistory = ['... seating ...'];
+
         this.drawOnNextUpdate = false;
     };
 
@@ -45,22 +47,14 @@ class Table {
             this.resize();
             this.draw();
 
-            this.labels.center.draw('text here', this.textcanvas, this.parentcanvas.width / 2, this.parentcanvas.height / 2);
+            this.labels.center.draw(
+                this.messageHistory[this.messageHistory.length - 1],
+                this.textcanvas,
+                this.parentcanvas.width / 2,
+                this.parentcanvas.height / 2
+            );
 
-            const t = this;
-
-            // for (const [si, so] of this.seats) {
-            //     if (!so.vacant) {
-            //         continue;
-            //     }
-
-            //     const p = Table.pointOnTable(t, si);
-            //     // const p = this.pointOnTable(si);
-
-            //     so.labels.player.name.draw(so.player.name, this.textcanvas, p.x, p.y);
-            //     so.labels.player.balance.draw(so.player.balance, this.textcanvas, p.x, p.y + so.labels.player.balance.style.fontsize);
-            // }
-
+            // note: move out of if
             for (const [si, so] of this.seats) {
                 so.render();
             }
@@ -105,7 +99,7 @@ class Table {
             return false;
         }
 
-        this.seats.set(seatindex, new SeatObject(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
+        this.seats.set(seatindex, new Seat(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
 
         return true;
     };
