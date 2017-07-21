@@ -18,7 +18,10 @@ class Table {
         this.seats = new Map();
         this.onseatCoordsChangeHandlers = new Map();
 
-        this.getSeats = (vacant) => [...this.seats].filter(([i, s]) => s.vacant === vacant);
+        // this.players 
+
+        // this.viewingPlayer = null;
+        // this.otherPlayers = [];
 
         this.postion = {
             x: 0, y: 0
@@ -100,6 +103,14 @@ class Table {
 
     seat(seatindex) {
         return this.seats.get(seatindex);
+    };
+
+    seatsVacant(vacant) {
+        return [...this.seats].filter(([i, s]) => s.vacant === vacant);
+    };
+
+    seatCount(vacant) {
+        return this.seatsVacant(vacant).length;
     };
 
     emptySeat(seatindex) {

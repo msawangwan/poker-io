@@ -113,7 +113,7 @@ body {
 .main-content-subsection:nth-child(2) {
     grid-area: input;
 
-    background: var(--color-scheme-tone-dark);
+    background: #a4a4a4;
 
     width: 100%;
     z-index: -10;
@@ -122,7 +122,7 @@ body {
 .main-content-subsection:nth-child(3) {
     grid-area: sidebar;
 
-    background: var(--color-scheme-shade-light);
+    background: #e6e6e6;
 
     z-index: -10;
 }

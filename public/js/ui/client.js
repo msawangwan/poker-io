@@ -88,20 +88,21 @@ $(document).ready(() => {
         }
 
         table.state.drawOnNextUpdate = true;
+
         socket.emit('joined-table', { name: player.state.name, balance: player.state.balance });
     };
 
     const onsit = (data) => {
         player.state.gameid = data.gameId;
 
-        const playerSeated = table.state.sit(data.seatIndex, player.state);
+        const seated = table.state.sit(data.seatIndex, player.state);
 
-        if (playerSeated) {
+        if (seated) {
             player.state.takeSeatAt(table.state, data.seatIndex);
             table.state.setCenterLabelText('waiting for players ...');
         }
 
-        socket.emit('player-ready', { seated: playerSeated });
+        socket.emit('player-ready', { seated: seated });
 
         if (flags.DEBUG) {
             Promise.resolve().then(() => {
@@ -112,8 +113,26 @@ $(document).ready(() => {
     };
 
     const onsitother = (data) => {
+        if (table.state.seatCount(false) === data.seatCount) {
+            console.log('seat count has not changed')
+        } else {
+            console.log('server seat count doesnt match, updating');
 
-    }
+            const otherplayer = new Player(
+                data.seatedPlayer.name,
+                data.seatedPlayer.id,
+                data.seatedPlayer.balance,
+                dynamicCanvas
+            );
+
+            const seated = table.state.sit(data.seatedPlayer.seatIndex, otherplayer);
+
+            if (seated) {
+                console.log('other player seated');
+                otherplayer.takeSeatAt(table.state, data.seatedPlayer.seatIndex);
+            }
+        }
+    };
 
     const oncardsdealt = (data) => {
         player.state.gotHand(data.cards.a, data.cards.b);
@@ -121,6 +140,7 @@ $(document).ready(() => {
 
     socket.on('connect', onconnect);
     socket.on('player-seated', onsit);
+    socket.on('a-player-was-seated', onsitother);
     socket.on('cards-dealt', oncardsdealt);
 
     let renderLoop = null;
