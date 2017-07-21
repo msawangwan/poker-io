@@ -1,7 +1,3 @@
-const concatnl = (...messages) => messages.map(m => `\t${m}\n`).join('');
-const div = content => $('<div></div>').text(content);
-const jqObjFromStr = idstring => $(`#${idstring}`);
-
 const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     const parentEle = document.getElementById(parentCanvasId);
     const w = parentEle.offsetWidth;
@@ -13,13 +9,9 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     }
 };
 
-const containerCanvasId = 'container-canvas';
-
-const canvasLayerIds = [
-    'static-canvas', 'dynamic-canvas', 'label-canvas'
-];
-
 const tickrate = 1000 / 2;
+const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
+const containerCanvasId = 'container-canvas';
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
@@ -47,6 +39,8 @@ $(document).ready(() => {
         socket ? socket.id : -100,
         500
     );
+    
+    console.log(player);
 
     let seatindex = 0;
 
