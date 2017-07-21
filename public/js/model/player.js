@@ -1,5 +1,5 @@
 class Player {
-    constructor(name, id, balance) {
+    constructor(name, id, balance, cardcanvas) {
         if (name === emptyPlayer.name && id === emptyPlayer.id) {
             console.log ('empty player created');
         } else if (!name || !id) {
@@ -7,6 +7,8 @@ class Player {
         } else {
             console.log('created a new player: ' + name)
         }
+        
+        this.cardcanvas = cardcanvas;
         
         this.name = name || Player.assignGuestName();
         this.id = id || -1;
@@ -28,8 +30,10 @@ class Player {
 
     render() {
         if (this.drawOnNextUpdate) {
-            // this.holecards.a.render();
-            // this.holecards.b.render();
+            console.log('drawing player');
+            this.drawOnNextUpdate = false;
+            this.holecards.a.renderAt(this.seat.x, this.seat.y, this.cardcanvas.getContext('2d'));
+            this.holecards.b.renderAt();
         }
     };
 
@@ -41,18 +45,19 @@ class Player {
 
             this.seat.x = px;
             this.seat.y = py;
-            
-            // this.table.drawOnNextUpdate = true;
-            // this.seat.drawOnNextUpdate = true;
         }, 1500);
     };
 
     gotHand(a, b) {
-        console.log(a);
-        console.log(b);
         this.holecards.a = new Card(a.value, a.suite);
         this.holecards.b = new Card(b.value, b.suite);
 
+        setTimeout(() => {
+            this.drawOnNextUpdate = true;
+        });
+
+        console.log(a);
+        console.log(b);
         console.log(this.holecards.a.pretty);
         console.log(this.holecards.b.pretty);
     };
@@ -87,11 +92,13 @@ const namedb = new Set();
 const emptyPlayer = {
     name: '(empty)',
     id: -1,
-    balance: 0
+    balance: 0,
+    canvas: undefined
 }
 
 const nullInstance = new Player(
     emptyPlayer.name,
     emptyPlayer.id,
-    emptyPlayer.balance
+    emptyPlayer.balance,
+    emptyPlayer.canvas
 );

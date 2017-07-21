@@ -1,3 +1,4 @@
+
 const validSuites = ['hearts', 'diamonds', 'clubs', 'spades'];
 const validValues = ['two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king', 'ace'];
 
@@ -9,6 +10,12 @@ const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
 
+let spriteCache = null;
+
+$(document).ready(() => {
+    spriteCache = new SpriteCache();
+});
+
 class Card {
     constructor(value, suite) {
         this.value = value;
@@ -16,21 +23,20 @@ class Card {
 
         this.key = `${this.value}::${this.suite}`;
         this.pretty = `${Card.valueStr(this.value)} of ${Card.suiteStr(this.suite)}`;
-        // this.pretty = `${validValues[this.value]} of ${validSuites[this.suite]}`;
 
         this.sprite = null;
 
         this.drawOnNextTick = false;
     };
 
-    renderAt(x, y, ctx, cache) {
+    renderAt(x, y, ctx) {
         if (this.drawOnNextTick) {
-            cache.draw(this.sprite, ctx, x, y, scalefactor, scalefactor)
+            spriteCache.draw(this.sprite, ctx, x, y, scalefactor, scalefactor)
         }
     };
 
-    loadFrom(cache) {
-        this.sprite = cache.load(cardspritesheet, this.key, {
+    loadFromCache() {
+        this.sprite = spriteCache.load(cardspritesheet, this.key, {
             row: this.value,
             col: this.suite,
             width: cardpixelwidth,

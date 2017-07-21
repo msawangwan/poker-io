@@ -23,8 +23,6 @@ $(document).ready(() => {
         'reconnection': false
     });
 
-    const spriteCache = new SpriteCache();
-
     const staticCanvas = document.getElementById(canvasLayerIds[0]);
     const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
     const labelCanvas = document.getElementById(canvasLayerIds[2]);
@@ -42,7 +40,8 @@ $(document).ready(() => {
     const player = new Player(
         Player.assignGuestName(),
         socket ? socket.id : -1,
-        500
+        500,
+        dynamicCanvas
     );
 
     let seatindex = 0;
@@ -75,7 +74,6 @@ $(document).ready(() => {
         if (result) {
             player.takeSeatAt(table, data.seatIndex);
             Promise.resolve().then(() => {
-                // table.messageHistory.push('waiting for players ...');
                 table.setCenterLabelText('waiting for players');
             });
         }
