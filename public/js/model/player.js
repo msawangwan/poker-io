@@ -55,8 +55,17 @@ class Player {
 
     takeSeatAt(table, pos) {
         this.seat.position = pos;
+
+        const seatPositionCb = (x, y) => {
+            console.log('callback called we got new coords');
+            console.log(x, y);
+
+            this.seat.x = x;
+            this.seat.y = y;
+        };
+
         setTimeout(() => {
-            const { x, y } = table.pointOnTable(pos);
+            const { x, y } = table.pointOnTable(pos, seatPositionCb);
 
             this.seat.x = x;
             this.seat.y = y;

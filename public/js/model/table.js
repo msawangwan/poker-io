@@ -16,6 +16,7 @@ class Table {
         this.canvas.setAttribute('id', 'canvas-table');
 
         this.seats = new Map();
+        this.onseatCoordsChangeHandlers = new Map();
 
         this.postion = {
             x: 0, y: 0
@@ -135,11 +136,19 @@ class Table {
         });
     };
 
-    pointOnTable(position) {
+    pointOnTable(position, onchangeHandle) {
+        if (onchangeHandle) {
+            console.log('registering seat coord change handler');
+            this.onseatCoordsChangeHandlers.set(position, onchangeHandle);
+        }
+
         const ox = this.parentcanvas.width / 2;
         const oy = this.parentcanvas.height / 2;
         const r = this.dimensions.r;
         const off = this.dimensions.off;
+
+        console.log('calculating x and y for pos:');
+        console.log(position);
 
         const offsetLeft = ox - off;
         const offsetRight = ox + off;
@@ -195,6 +204,18 @@ class Table {
             default:
                 console.log('err: invalid table position');
                 break;
+        }
+
+        console.log(`x ${x} and y ${y}`);
+
+        // if (this.onseatCoordsChangeHandlers.has(position)) {
+        //     this.onseatCoordsChangeHandlers.get(position)(x, y);
+        // }
+
+        for (const [p, h] of this.onseatCoordsChangeHandlers) {
+            if (p === position) {
+                h(x, y);
+            }
         }
 
         return {
