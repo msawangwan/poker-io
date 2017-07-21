@@ -60,6 +60,10 @@ class Player {
     static nullPlayerInstance() {
         return nullInstance;
     };
+    
+    static isEmpty(p) {
+        return p.name === Player.nullPlayerInstance().name && p.id === Player.nullPlayerInstance().id;
+    };
 
     static generateGuestName() {
         return `player ${Math.floor(Math.random() * 100)}`;

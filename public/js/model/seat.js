@@ -43,13 +43,18 @@ class Seat {
 
             this.drawOnNextUpdate = false;
 
+
             this.resize();
             this.draw();
 
             const p = this.table.pointOnTable(this.index);
 
-            this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
-            this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize * 1.25);
+            if (!Player.isEmpty(this.player)) {
+                this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
+                this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize * 1.25);
+            } else {
+                this.labels.player.name.draw('...', this.textcanvas, p.x, p.y);
+            }
         }
     };
 
