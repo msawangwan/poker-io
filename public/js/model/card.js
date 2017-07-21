@@ -20,8 +20,12 @@ $(document).ready(() => {
 
 class Card {
     constructor(value, suite, parentcanvas) {
-        this.value = value;
-        this.suite = suite;
+        if (this.value === -1 && this.suite === -1) {
+            console.log('card is opponent card');
+        } else {
+            this.value = value;
+            this.suite = suite;
+        }
 
         this.parentcanvas = parentcanvas;
 

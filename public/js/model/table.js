@@ -18,6 +18,8 @@ class Table {
         this.seats = new Map();
         this.onseatCoordsChangeHandlers = new Map();
 
+        this.getSeats = (vacant) => [...this.seats].filter(([i, s]) => s.vacant === vacant);
+
         this.postion = {
             x: 0, y: 0
         };

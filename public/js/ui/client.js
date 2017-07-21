@@ -111,6 +111,10 @@ $(document).ready(() => {
         }
     };
 
+    const onsitother = (data) => {
+
+    }
+
     const oncardsdealt = (data) => {
         player.state.gotHand(data.cards.a, data.cards.b);
     };

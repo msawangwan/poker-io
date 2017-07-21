@@ -43,8 +43,6 @@ class Player {
                 this.holecards.a.drawOnNextUpdate = true;
                 this.holecards.b.drawOnNextUpdate = true;
             });
-
-            console.log(this.seat);
         }
 
         if (this.hasHolecards()) {
@@ -63,14 +61,11 @@ class Player {
 
         setTimeout(() => {
             table.pointOnTable(pos, onSeatCoordsChangedHandler);
-            // const { x, y } = table.pointOnTable(pos, onSeatCoordsChangedHandler);
-
-            // this.seat.x = x;
-            // this.seat.y = y;
         }, 1500);
     };
 
     gotHand(a, b) {
+        // TODO: cache these card instances
         this.holecards.a = new Card(a.value, a.suite, this.cardcanvas);
         this.holecards.b = new Card(b.value, b.suite, this.cardcanvas);
 
@@ -80,6 +75,10 @@ class Player {
 
         console.log(a, this.holecards.a.pretty);
         console.log(b, this.holecards.b.pretty);
+    };
+
+    static opponentPlayerInstance(name, id, balance, canvas) {
+        return new Player(name, id, balance, canvas);
     };
 
     static nullPlayerInstance() {
@@ -116,9 +115,20 @@ const emptyPlayer = {
     canvas: undefined
 }
 
+// const opponentPlayer = {
+//     name: '',
+//     id: -1,
+//     balance: 0,
+//     canvas: undefined
+// };
+
 const nullInstance = new Player(
     emptyPlayer.name,
     emptyPlayer.id,
     emptyPlayer.balance,
     emptyPlayer.canvas
 );
+
+// const opponentInstance = new Player(
+//     oppo
+// )
