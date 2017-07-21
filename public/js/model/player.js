@@ -1,12 +1,17 @@
-const namedb = new Set();
-
 class Player {
     constructor(name, id, balance) {
-        this.name = name;
-        this.id = id;
-
+        if (name === emptyPlayer.name && id === emptyPlayer.id) {
+            console.log ('empty player created');
+        } else if (!name || !id) {
+            console.log('defaulting to auto character')
+        } else {
+            console.log('created a new player: ' + name)
+        }
+        
+        this.name = name || Player.assignGuestName();
+        this.id = id || 0;
+        this.balance = balance || 0;
         this.gameid = null;
-        this.balance = balance;
 
         this.seat = {
             position: undefined,
@@ -70,4 +75,16 @@ class Player {
     };
 }
 
-const nullInstance = new Player('(empty)', -1, 0);
+const namedb = new Set();
+
+const emptyPlayer = {
+    name: '(empty)',
+    id: -1,
+    balance: 0
+}
+
+const nullInstance = new Player(
+    emptyPlayer.name,
+    emptyPlayer.id,
+    emptyPlayer.balance
+);

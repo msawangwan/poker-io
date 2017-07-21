@@ -34,13 +34,15 @@ $(document).ready(() => {
 
     const table = new Table(9, staticCanvas, labelCanvas);
 
+
     const player = new Player(
         Player.assignGuestName(),
-        socket ? socket.id : -100,
+        socket ? socket.id : -1,
         500
     );
     
     console.log(player);
+    // player.drawOnNextUpdate = true;
 
     let seatindex = 0;
 
