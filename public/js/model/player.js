@@ -37,14 +37,6 @@ class Player {
             console.log('drawing player');
 
             this.drawOnNextUpdate = false;
-
-            console.log(this.holecards);
-
-
-            // Promise.resolve().then(() => {
-            //     this.holecards.a.drawOnNextUpdate = true;
-            //     this.holecards.b.drawOnNextUpdate = true;
-            // });
         }
 
         if (this.hasHolecards()) {
@@ -75,9 +67,8 @@ class Player {
     };
 
     gotHand(a, b) {
-        // TODO: cache these card instances
-        this.holecards.a = new Card(a.value, a.suite, this.cardcanvas);
-        this.holecards.b = new Card(b.value, b.suite, this.cardcanvas);
+        this.holecards.a = new Card(a.value, a.suite, this.cardcanvas); // TODO: cache these card instances
+        this.holecards.b = new Card(b.value, b.suite, this.cardcanvas); // TODO: cache these card instances
 
         this.redrawHandlers.set('holecards', () => {
             this.holecards.a.drawOnNextUpdate = true;
@@ -85,9 +76,6 @@ class Player {
         });
 
         this.redraw();
-
-        console.log(a, this.holecards.a.pretty);
-        console.log(b, this.holecards.b.pretty);
     };
 
     static opponentPlayerInstance(name, id, balance, canvas) {
