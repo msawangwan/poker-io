@@ -72,8 +72,12 @@ class Table {
         this.postion.x = Math.floor(this.parentcanvas.width / 2 - this.canvasorigin.x);
         this.postion.y = Math.floor(this.parentcanvas.height / 2 - this.canvasorigin.y);
 
-        this.dimensions.r = Math.floor(this.dimensions.h * 0.45);
-        this.dimensions.off = Math.floor(this.dimensions.w * 0.15);
+        // TODO: these should be defined elsewhere and the canvas also needs to be sized
+        const wide = { small: 0.25, med: 0.35, large: 0.45 };
+        const long = { small: 0.15, med: 0.30, large: 0.50 };
+
+        this.dimensions.r = Math.floor(this.dimensions.h * wide.large);
+        this.dimensions.off = Math.floor(this.dimensions.w * long.small);
     };
 
     draw() {
@@ -112,8 +116,8 @@ class Table {
             console.log('table: couldnt not find seat at index: ' + seatindex);
             return false;
         }
-        
-        Promise.resolve().then(()=>{
+
+        Promise.resolve().then(() => {
             this.drawOnNextUpdate = true;
             s.drawOnNextUpdate = true;
         });
@@ -122,11 +126,11 @@ class Table {
 
         return true;
     };
-    
+
     setCenterLabelText(t) {
         this.messageHistory.push(t);
-        
-        Promise.resolve().then(()=> {
+
+        Promise.resolve().then(() => {
             this.drawOnNextUpdate = true;
         });
     };

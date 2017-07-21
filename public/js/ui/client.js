@@ -15,8 +15,33 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
 };
 
 const tickrate = 1000 / 2;
+const startupt = 1500;
 const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
 const containerCanvasId = 'container-canvas';
+
+const testdata = {
+    gamedata: {
+        gameid: 0,
+        seatIndex: 3
+    },
+    cards: {
+        a: { value: 5, suite: 0 },
+        b: { value: 8, suite: 2 }
+    }
+}
+
+const table = {
+    state: null
+};
+
+const player = {
+    state: null
+};
+
+// const state = {
+//     player: null,
+//     table: null
+// };
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
@@ -35,24 +60,24 @@ $(document).ready(() => {
     const dynamicCtx = dynamicCanvas.getContext('2d');
     const labelCtx = labelCanvas.getContext('2d');
 
-    const table = new Table(9, staticCanvas, labelCanvas);
+    // const table = new Table(9, staticCanvas, labelCanvas);
 
-    const player = new Player(
-        Player.assignGuestName(),
-        socket ? socket.id : -1,
-        500,
-        dynamicCanvas
-    );
+    // const player = new Player(
+    //     Player.assignGuestName(),
+    //     socket ? socket.id : -1,
+    //     500,
+    //     dynamicCanvas
+    // );
 
-    let seatindex = 0;
+    // let seatindex = 0;
 
-    while (seatindex < table.maxseats) {
-        table.emptySeat(seatindex);
-        table.seat(seatindex).drawOnNextUpdate = true;
-        seatindex += 1;
-    }
+    // while (seatindex < table.maxseats) {
+    //     table.emptySeat(seatindex);
+    //     table.seat(seatindex).drawOnNextUpdate = true;
+    //     seatindex += 1;
+    // }
 
-    table.drawOnNextUpdate = true;
+    // table.drawOnNextUpdate = true;
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -65,28 +90,55 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
-    const onsit = (data) => {
-        player.gameid = data.gameId;
+    const onconnect = (data) => {
+        console.log('client connected');
 
-        const result = table.sit(data.seatIndex, player);
-        console.log('result ' + result);
+        table.state = new Table(9, staticCanvas, labelCanvas);
 
-        if (result) {
-            player.takeSeatAt(table, data.seatIndex);
-            Promise.resolve().then(() => {
-                table.setCenterLabelText('waiting for players');
-            });
+        player.state = new Player(
+            Player.assignGuestName(),
+            socket ? socket.id : -1,
+            500,
+            dynamicCanvas
+        );
+
+        let seatindex = 0;
+
+        while (seatindex < table.state.maxseats) {
+            table.state.emptySeat(seatindex);
+            table.state.seat(seatindex).drawOnNextUpdate = true;
+            seatindex += 1;
         }
 
-        socket.emit('player-ready', { seated: result });
+        table.state.drawOnNextUpdate = true;
+        socket.emit('joined-table', { name: player.state.name, balance: player.state.balance });
+    };
+
+    const onsit = (data) => {
+        player.state.gameid = data.gameId;
+
+        const playerSeated = table.state.sit(data.seatIndex, player.state);
+
+        if (playerSeated) {
+            player.state.takeSeatAt(table.state, data.seatIndex);
+            table.state.setCenterLabelText('waiting for players');
+        }
+
+        socket.emit('player-ready', { seated: playerSeated });
+
+        if (flags.DEBUG) {
+            Promise.resolve().then(() => {
+                console.log('debug: deal fake hand on sit');
+                oncardsdealt({ cards: testdata.cards });
+            });
+        }
     };
 
     const oncardsdealt = (data) => {
-        player.gotHand(data.cards.a, data.cards.b);
+        player.state.gotHand(data.cards.a, data.cards.b);
     };
 
-    socket.emit('joined-table', { name: player.name, balance: player.balance });
-
+    socket.on('connect', onconnect);
     socket.on('player-seated', onsit);
     socket.on('cards-dealt', oncardsdealt);
 
@@ -94,49 +146,42 @@ $(document).ready(() => {
 
     setTimeout(() => { // start
         console.log('debug: entered start ...');
-        console.log('debug: ... exited start ...');
-    }, 1500);
 
-    setTimeout(() => { // update
-        console.log('debug: ... started update ...');
+        setTimeout(() => { // update
+            console.log('debug: ... started update ...');
 
-        renderLoop = setInterval(() => {
-            table.render();
-        }, tickrate, table, staticCanvas);
+            setTimeout(() => { // debug
+                console.log('debug ... starting debug check...');
 
-        console.log('debug: ... updating running ...');
-    }, 3000);
+                flags.NOCONN = !socket.connected;
 
-    if (flags.DEBUG && flags.NOCONN) {
-        setTimeout(() => { // debug
-            console.log('debug ... executing statements with debug data ...');
-    
-            console.log('player sits at table');
-            
-            onsit({
-                gameid: 0,
-                seatIndex: 3
-            });
-    
-            console.log('call the oncardsdealt callback');
-    
-            oncardsdealt({
-                cards: {
-                    a: { value: 5, suite: 0 },
-                    b: { value: 8, suite: 2 }
+                if (flags.DEBUG && flags.NOCONN) {
+                    console.log('player sits at table');
+                    onsit(testdata.gamedata);
+
+                    console.log('call the oncardsdealt callback');
+                    oncardsdealt({ cards: testdata.cards });
                 }
-            });
-    
-            console.log('debug ... finished executing statements with debug data ...');
-        }, 3500);
-    }
+
+                console.log('debug ... exit debug check ...');
+            }, startupt);
+
+            renderLoop = setInterval(() => {
+                table.state.render();
+            }, tickrate, table.state, staticCanvas);
+
+            console.log('debug: ... updating running ...');
+        }, startupt);
+
+        console.log('debug: ... exited start ...');
+    }, startupt);
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
 
-        table.drawOnNextUpdate = true;
+        table.state.drawOnNextUpdate = true;
 
-        for (const [si, so] of table.seats) {
+        for (const [si, so] of table.state.seats) {
             so.drawOnNextUpdate = true;
         };
     });
