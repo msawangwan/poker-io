@@ -27,6 +27,8 @@ class Player {
 
         this.hasHolecards = () => this.holecards.a !== null && this.holecards.b !== null;
 
+        this.redrawHandlers = new Map();
+
         this.drawOnNextUpdate = false;
     };
 
@@ -39,15 +41,23 @@ class Player {
             console.log(this.holecards);
 
 
-            Promise.resolve().then(() => {
-                this.holecards.a.drawOnNextUpdate = true;
-                this.holecards.b.drawOnNextUpdate = true;
-            });
+            // Promise.resolve().then(() => {
+            //     this.holecards.a.drawOnNextUpdate = true;
+            //     this.holecards.b.drawOnNextUpdate = true;
+            // });
         }
 
         if (this.hasHolecards()) {
             this.holecards.a.renderAt(this.seat.x, this.seat.y);
             this.holecards.b.renderAt(this.seat.x, this.seat.y, true);
+        }
+    };
+
+    redraw() {
+        this.drawOnNextUpdate = true;
+
+        for (const [k, h] of this.redrawHandlers) {
+            h();
         }
     };
 
@@ -69,9 +79,15 @@ class Player {
         this.holecards.a = new Card(a.value, a.suite, this.cardcanvas);
         this.holecards.b = new Card(b.value, b.suite, this.cardcanvas);
 
-        setTimeout(() => {
-            this.drawOnNextUpdate = true;
+        // setTimeout(() => {
+        //     this.drawOnNextUpdate = true;
+        // });
+        this.redrawHandlers.set('holecards', () => {
+            this.holecards.a.drawOnNextUpdate = true;
+            this.holecards.b.drawOnNextUpdate = true;
         });
+
+        this.redraw();
 
         console.log(a, this.holecards.a.pretty);
         console.log(b, this.holecards.b.pretty);
@@ -113,14 +129,7 @@ const emptyPlayer = {
     id: -1,
     balance: 0,
     canvas: undefined
-}
-
-// const opponentPlayer = {
-//     name: '',
-//     id: -1,
-//     balance: 0,
-//     canvas: undefined
-// };
+};
 
 const nullInstance = new Player(
     emptyPlayer.name,
@@ -128,7 +137,3 @@ const nullInstance = new Player(
     emptyPlayer.balance,
     emptyPlayer.canvas
 );
-
-// const opponentInstance = new Player(
-//     oppo
-// )

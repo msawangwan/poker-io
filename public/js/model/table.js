@@ -17,8 +17,8 @@ class Table {
 
         this.seats = new Map();
 
-        this.onseatCoordsChangeHandlers = new Map();
-        this.onrenderChangedHandlers = new Map();
+        this.pointCalcHandlers = new Map();
+        this.redrawHandlers = new Map();
 
         this.postion = {
             x: 0, y: 0
@@ -98,11 +98,11 @@ class Table {
         this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     };
 
-    notifyRedrawRequired(rerender) {
-        this.drawOnNextUpdate = rerender;
+    redraw() {
+        this.drawOnNextUpdate = true;
 
-        for (const [k, h] of this.onrenderChangedHandlers) {
-            h(rerender);
+        for (const [k, h] of this.redrawHandlers) {
+            h();
         }
     };
 
@@ -125,8 +125,9 @@ class Table {
 
         this.seats.set(seatindex, new Seat(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
 
-        this.onrenderChangedHandlers.set(seatindex, (rerender) => {
-            this.seats.get(seatindex).drawOnNextUpdate = rerender; // attach handler to seat
+        this.redrawHandlers.set(seatindex, () => {
+            this.seats.get(seatindex).redraw(); // attach handler to seat
+            // this.seats.get(seatindex).drawOnNextUpdate = rerender;
         });
 
         return true;
@@ -140,13 +141,7 @@ class Table {
             return false;
         }
 
-        this.notifyRedrawRequired(true);
-
-        // Promise.resolve().then(() => {
-        // this.drawOnNextUpdate = true;
-        // s.drawOnNextUpdate = true;
-        // });
-
+        this.redraw();
         s.player = player;
 
         return true;
@@ -154,17 +149,13 @@ class Table {
 
     setCenterLabelText(t) {
         this.messageHistory.push(t);
-
-        this.notifyRedrawRequired(true);
-        // Promise.resolve().then(() => {
-        //     this.drawOnNextUpdate = true;
-        // });
+        this.redraw();
     };
 
     pointOnTable(position, onchangeHandle) {
         if (onchangeHandle) {
             console.log('registering seat coord change handler');
-            this.onseatCoordsChangeHandlers.set(position, onchangeHandle);
+            this.pointCalcHandlers.set(position, onchangeHandle);
         }
 
         const ox = this.parentcanvas.width / 2;
@@ -231,7 +222,7 @@ class Table {
         x = Math.floor(x);
         y = Math.floor(y);
 
-        for (const [p, h] of this.onseatCoordsChangeHandlers) {
+        for (const [p, h] of this.pointCalcHandlers) {
             if (p === position) {
                 h(x, y);
             }

@@ -34,6 +34,8 @@ class Seat {
             }
         };
 
+        this.redrawHandlers = new Map();
+
         this.drawOnNextUpdate = false;
     };
 
@@ -48,7 +50,6 @@ class Seat {
             this.draw();
 
             const p = this.table.pointOnTable(this.index);
-
 
             if (Player.isEmpty(this.player)) {
                 this.labels.player.name.draw('...', this.textcanvas, p.x, p.y);
@@ -84,4 +85,28 @@ class Seat {
 
         this.parentcanvas.getContext('2d').drawImage(this.canvas, this.position.x, this.position.y);
     };
+
+    redraw() {
+        this.drawOnNextUpdate = true;
+
+        for (const [i, h] of this.redrawHandlers) {
+            h();
+        }
+    }
+
+    occupy(player) {
+        if (!this.vacant) {
+            return false;
+        }
+
+        this.player = player;
+
+        this.redrawHandlers(player.id, () => {
+            player.redraw();
+        });
+
+        this.redraw();
+
+        return true;
+    }
 }

@@ -83,12 +83,10 @@ $(document).ready(() => {
 
         while (seatindex < table.state.maxseats) {
             table.state.emptySeat(seatindex);
-            // table.state.seat(seatindex).drawOnNextUpdate = true;
             seatindex += 1;
         }
 
-        table.state.notifyRedrawRequired(true);
-        // table.state.drawOnNextUpdate = true;
+        table.state.redraw();
 
         socket.emit('joined-table', { name: player.state.name, balance: player.state.balance });
     };
@@ -175,12 +173,6 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
-
-        table.state.notifyRedrawRequired(true);
-        // table.state.drawOnNextUpdate = true;
-
-        // for (const [si, so] of table.state.seats) {
-        //     so.drawOnNextUpdate = true;
-        // };
+        table.state.redraw();
     });
 });
