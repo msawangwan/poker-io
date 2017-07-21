@@ -96,6 +96,10 @@ class Table {
         this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     };
 
+    seat(seatindex) {
+        return this.seats.get(seatindex);
+    };
+
     emptySeat(seatindex) {
         if (this.seats.size > this.maxseats) {
             return false;
@@ -104,6 +108,17 @@ class Table {
         this.seats.set(seatindex, new SeatObject(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
 
         return true;
+    };
+
+    sit(seatindex, player) {
+        const s = this.seats.get(seatindex);
+
+        if (!s) {
+            return false;
+        }
+
+        s.player = player;
+        s.drawOnNextUpdate = true;
     };
 
     pointOnTable(position) {

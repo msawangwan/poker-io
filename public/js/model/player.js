@@ -6,8 +6,6 @@ class Player {
         this.id = id;
 
         this.gameid = null;
-
-        // this.balance = balance || 10000;
         this.balance = balance;
 
         this.seat = {

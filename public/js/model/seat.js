@@ -1,92 +1,92 @@
-function Seat(position, radius, color) {
-    this.position = position;
-    this.id = `canvas-seat-${position}`;
+// function Seat(position, radius, color) {
+//     this.position = position;
+//     this.id = `canvas-seat-${position}`;
 
-    this.seatColor = color;
+//     this.seatColor = color;
 
-    this.vacant = true;
-    this.player = undefined;
+//     this.vacant = true;
+//     this.player = undefined;
 
-    this.canvas = document.createElement('canvas');
-    this.canvas.setAttribute('id', this.id);
+//     this.canvas = document.createElement('canvas');
+//     this.canvas.setAttribute('id', this.id);
 
-    this.canvas.width = radius * 2;
-    this.canvas.height = radius * 2;
+//     this.canvas.width = radius * 2;
+//     this.canvas.height = radius * 2;
 
-    this.transform = {
-        origin: {
-            local: {
-                x: 0,
-                y: 0
-            },
-            global: {
-                x: 0,
-                y: 0
-            }
-        },
-        w: 0,
-        h: 0,
-        radius: radius
-    };
+//     this.transform = {
+//         origin: {
+//             local: {
+//                 x: 0,
+//                 y: 0
+//             },
+//             global: {
+//                 x: 0,
+//                 y: 0
+//             }
+//         },
+//         w: 0,
+//         h: 0,
+//         radius: radius
+//     };
 
-    this.canvasChanged = true;
-    this.drawOnNextTick = true;
-    
-    this.labels = {
-        playername: {
-            label: null,
-            text: ' ... '
-        },
-        playerbalance: {
-            label: null,
-            text: ' ... '
-        }
-    };
-}
+//     this.canvasChanged = true;
+//     this.drawOnNextTick = true;
 
-Seat.prototype.updateTransform = function (globalx, globaly, tableradius, tableoffset) {
-    if (this.canvasChanged) {
-        const t = this.transform;
+//     this.labels = {
+//         playername: {
+//             label: null,
+//             text: ' ... '
+//         },
+//         playerbalance: {
+//             label: null,
+//             text: ' ... '
+//         }
+//     };
+// }
 
-        t.w = this.canvas.width;
-        t.h = this.canvas.height;
+// Seat.prototype.updateTransform = function (globalx, globaly, tableradius, tableoffset) {
+//     if (this.canvasChanged) {
+//         const t = this.transform;
 
-        t.origin.local.x = Math.floor(t.w * 0.5);
-        t.origin.local.y = Math.floor(t.h * 0.5);
+//         t.w = this.canvas.width;
+//         t.h = this.canvas.height;
 
-        t.origin.global.x = Math.floor(globalx - t.w / 2);
-        t.origin.global.y = Math.floor(globaly - t.h / 2);
+//         t.origin.local.x = Math.floor(t.w * 0.5);
+//         t.origin.local.y = Math.floor(t.h * 0.5);
 
-        this.transform = t;
+//         t.origin.global.x = Math.floor(globalx - t.w / 2);
+//         t.origin.global.y = Math.floor(globaly - t.h / 2);
 
-        this.drawOnNextTick = true;
-    } else {
-        this.drawOnNextTick = false;
-    }
+//         this.transform = t;
 
-    this.canvasChanged = false;
-};
+//         this.drawOnNextTick = true;
+//     } else {
+//         this.drawOnNextTick = false;
+//     }
 
-Seat.prototype.render = function (toParentCanvas) {
-    if (this.drawOnNextTick) {
-        const t = this.transform;
+//     this.canvasChanged = false;
+// };
 
-        this.canvas.width = t.w;
-        this.canvas.height = t.h;
+// Seat.prototype.render = function (toParentCanvas) {
+//     if (this.drawOnNextTick) {
+//         const t = this.transform;
 
-        const localctx = this.canvas.getContext('2d');
+//         this.canvas.width = t.w;
+//         this.canvas.height = t.h;
 
-        localctx.clearRect(0, 0, t.w, t.h);
-        localctx.arc(t.origin.local.x, t.origin.local.y, t.radius, Math.PI * 2, false);
-        localctx.fillStyle = this.seatColor;
-        localctx.fill();
+//         const localctx = this.canvas.getContext('2d');
 
-        toParentCanvas.getContext('2d').drawImage(this.canvas, t.origin.global.x, t.origin.global.y);
-    }
+//         localctx.clearRect(0, 0, t.w, t.h);
+//         localctx.arc(t.origin.local.x, t.origin.local.y, t.radius, Math.PI * 2, false);
+//         localctx.fillStyle = this.seatColor;
+//         localctx.fill();
 
-    this.drawOnNextTick = false;
-};
+//         toParentCanvas.getContext('2d').drawImage(this.canvas, t.origin.global.x, t.origin.global.y);
+//     }
 
-Seat.prototype.sit = function () {
+//     this.drawOnNextTick = false;
+// };
 
-};
+// Seat.prototype.sit = function () {
+
+// };

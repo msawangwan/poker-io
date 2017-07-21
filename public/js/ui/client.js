@@ -1,29 +1,6 @@
-// const toRadians = theta => theta * (Math.PI / 180);
-
+const concatnl = (...messages) => messages.map(m => `\t${m}\n`).join('');
 const div = content => $('<div></div>').text(content);
 const jqObjFromStr = idstring => $(`#${idstring}`);
-
-const jointext = (...messages) => messages.map(m => `\t${m}\n`).join('');
-
-// const initTableSeating = (t) => {
-//     const newSeats = [
-//         new Seat(0, 32, 'black'),
-//         new Seat(1, 32, 'black'),
-//         new Seat(2, 32, 'black'),
-//         new Seat(3, 32, 'black'),
-//         new Seat(4, 32, 'black'),
-//         new Seat(5, 32, 'black'),
-//         new Seat(6, 32, 'black'),
-//         new Seat(7, 32, 'black'),
-//         new Seat(8, 32, 'black'),
-//     ];
-
-//     for (const s of newSeats) {
-//         t.addSeat(s);
-//     }
-
-//     return newSeats;
-// };
 
 const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     const parentEle = document.getElementById(parentCanvasId);
@@ -77,15 +54,11 @@ $(document).ready(() => {
 
     while (seatindex < table.maxseats) {
         table.emptySeat(seatindex);
-        table.seats.get(seatindex).drawOnNextUpdate = true;
+        table.seat(seatindex).drawOnNextUpdate = true;
         seatindex += 1;
     }
 
     table.drawOnNextUpdate = true;
-
-    // for (const [si, so] of table.seats) {
-    //     so.drawOnNextUpdate = true;
-    // };
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -101,17 +74,17 @@ $(document).ready(() => {
     socket.emit('joined-table', { name: player.name, balance: player.balance });
 
     socket.on('player-seated', (data) => {
-        // player.gameid = data.gameId;
+        player.gameid = data.gameId;
 
-        // console.log(data.seatIndex);
+        console.log(data.seatIndex);
 
-        // const result = table.playerSeatedAt(data.seatIndex, player);
+        const result = table.sit(data.seatIndex, player);
 
-        // if (result) {
-        //     player.sitAt(table, data.seatIndex);
-        // }
+        if (result) {
+            player.sitAt(table, data.seatIndex);
+        }
 
-        // socket.emit('player-ready', { seated: result });
+        socket.emit('player-ready', { seated: result });
     });
 
     setTimeout(() => { // start
@@ -127,7 +100,9 @@ $(document).ready(() => {
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
+
         table.drawOnNextUpdate = true;
+
         for (const [si, so] of table.seats) {
             so.drawOnNextUpdate = true;
         };
