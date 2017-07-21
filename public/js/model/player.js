@@ -14,10 +14,19 @@ class Player {
             y: 0
         }
 
-        this.hand = {
-            card_one: undefined, card_two: undefined
+        this.holecards = {
+            a: null, b: null
         };
+
+        this.drawOnNextUpdate = false;
     };
+
+    render() {
+        if (this.drawOnNextUpdate) {
+            this.holecards.a.render();
+            this.holecards.b.render();
+        }
+    }
 
     sitAt(table, pos) {
         this.seat.position = pos;

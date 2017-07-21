@@ -34,23 +34,19 @@ $(document).ready(() => {
 
     const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
 
+    resizeCanvases(containerCanvasId, canvasGroup);
+
     const staticCtx = staticCanvas.getContext('2d');
     const dynamicCtx = dynamicCanvas.getContext('2d');
     const labelCtx = labelCanvas.getContext('2d');
 
-    resizeCanvases(containerCanvasId, canvasGroup);
-
-    // const assignedPlayerName = Player.assignGuestName();
-    // const uniquePlayerId = socket ? socket.id : -100;
-    // const defaultPlayerBalance = 500;
+    const table = new Table(9, staticCanvas, labelCanvas);
 
     const player = new Player(
         Player.assignGuestName(),
         socket ? socket.id : -100,
         500
     );
-
-    const table = new Table(9, staticCanvas, labelCanvas);
 
     let seatindex = 0;
 
