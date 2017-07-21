@@ -43,6 +43,8 @@ class Player {
                 this.holecards.a.drawOnNextUpdate = true;
                 this.holecards.b.drawOnNextUpdate = true;
             });
+
+            console.log(this.seat);
         }
 
         if (this.hasHolecards()) {
@@ -53,12 +55,11 @@ class Player {
 
     takeSeatAt(table, pos) {
         this.seat.position = pos;
-
         setTimeout(() => {
-            const { px, py } = table.pointOnTable(pos);
+            const { x, y } = table.pointOnTable(pos);
 
-            this.seat.x = px;
-            this.seat.y = py;
+            this.seat.x = x;
+            this.seat.y = y;
         }, 1500);
     };
 
