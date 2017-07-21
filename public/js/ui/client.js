@@ -1,3 +1,8 @@
+const flags = {
+    DEBUG: true,
+    NOCONN: true
+};
+
 const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     const parentEle = document.getElementById(parentCanvasId);
     const w = parentEle.offsetWidth;
@@ -34,15 +39,11 @@ $(document).ready(() => {
 
     const table = new Table(9, staticCanvas, labelCanvas);
 
-
     const player = new Player(
         Player.assignGuestName(),
         socket ? socket.id : -1,
         500
     );
-    
-    console.log(player);
-    // player.drawOnNextUpdate = true;
 
     let seatindex = 0;
 
@@ -69,13 +70,13 @@ $(document).ready(() => {
         player.gameid = data.gameId;
 
         const result = table.sit(data.seatIndex, player);
+        console.log('result ' + result);
 
         if (result) {
             player.takeSeatAt(table, data.seatIndex);
-
             Promise.resolve().then(() => {
-                table.messageHistory.push('waiting for players ...');
-                table.drawOnNextUpdate = true;
+                // table.messageHistory.push('waiting for players ...');
+                table.setCenterLabelText('waiting for players');
             });
         }
 
@@ -108,20 +109,29 @@ $(document).ready(() => {
         console.log('debug: ... updating running ...');
     }, 3000);
 
-    setTimeout(() => { // debug
-        console.log('debug ... executing statements with debug data ...');
-
-        console.log('call the oncardsdealt callback');
-
-        oncardsdealt({
-            cards: {
-                a: { value: 5, suite: 0 },
-                b: { value: 8, suite: 2 }
-            }
-        });
-
-        console.log('debug ... finished executing statements with debug data ...');
-    }, 3500);
+    if (flags.DEBUG && flags.NOCONN) {
+        setTimeout(() => { // debug
+            console.log('debug ... executing statements with debug data ...');
+    
+            console.log('player sits at table');
+            
+            onsit({
+                gameid: 0,
+                seatIndex: 3
+            });
+    
+            console.log('call the oncardsdealt callback');
+    
+            oncardsdealt({
+                cards: {
+                    a: { value: 5, suite: 0 },
+                    b: { value: 8, suite: 2 }
+                }
+            });
+    
+            console.log('debug ... finished executing statements with debug data ...');
+        }, 3500);
+    }
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);

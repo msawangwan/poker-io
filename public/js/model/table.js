@@ -111,13 +111,26 @@ class Table {
         const s = this.seats.get(seatindex);
 
         if (!s) {
+            console.log('table: couldnt not find seat at index: ' + seatindex);
             return false;
         }
+        
+        Promise.resolve().then(()=>{
+            this.drawOnNextUpdate = true;
+            s.drawOnNextUpdate = true;
+        });
 
         s.player = player;
-        s.drawOnNextUpdate = true;
 
         return true;
+    };
+    
+    setCenterLabelText(t) {
+        this.messageHistory.push(t);
+        
+        Promise.resolve().then(()=> {
+            this.drawOnNextUpdate = true;
+        });
     };
 
     pointOnTable(position) {

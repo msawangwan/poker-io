@@ -29,8 +29,8 @@ class Seat {
 
         this.labels = {
             player: {
-                name: new Label('serif', 24, 'red'),
-                balance: new Label('serif', 18, 'red')
+                name: new Label('serif', 18, 'red'),
+                balance: new Label('serif', 12, 'red')
             }
         };
 
@@ -49,7 +49,7 @@ class Seat {
             const p = this.table.pointOnTable(this.index);
 
             this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
-            this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize);
+            this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize * 1.25);
         }
     };
 

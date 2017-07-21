@@ -9,7 +9,7 @@ class Player {
         }
         
         this.name = name || Player.assignGuestName();
-        this.id = id || 0;
+        this.id = id || -1;
         this.balance = balance || 0;
         this.gameid = null;
 
@@ -28,8 +28,8 @@ class Player {
 
     render() {
         if (this.drawOnNextUpdate) {
-            this.holecards.a.render();
-            this.holecards.b.render();
+            // this.holecards.a.render();
+            // this.holecards.b.render();
         }
     };
 
@@ -41,6 +41,9 @@ class Player {
 
             this.seat.x = px;
             this.seat.y = py;
+            
+            // this.table.drawOnNextUpdate = true;
+            // this.seat.drawOnNextUpdate = true;
         }, 1500);
     };
 

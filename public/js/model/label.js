@@ -3,7 +3,7 @@ const formatfontstr = (f, fs) => `${fs}px ${f}`;
 let nextId = -1;
 
 class Label {
-    constructor(font, fontsize, fontcolor) {
+    constructor(font, fontsize, fontcolor, bgcolor) {
         this.id = nextId + 1;
 
         this.canvas = document.createElement('canvas');
@@ -18,9 +18,13 @@ class Label {
             textalign: 'center',
             textbaseline: 'middle'
         };
+        
+        this.bg = {
+            color: bgcolor || 'white'
+        };
     };
 
-    draw(text, textcanvas, x, y) {
+    draw(text, textcanvas, x, y, drawbg) {
         const ctx = this.canvas.getContext('2d');
 
         ctx.font = formatfontstr(this.style.font, this.style.fontsize);
@@ -32,6 +36,12 @@ class Label {
         this.canvas.width = Label.powOfTwo(ctx.measureText(text).width);
         this.canvas.height = Label.powOfTwo(this.style.fontsize * 2);
 
+        if (drawbg) {
+            ctx.fillStyle = this.bg.color;
+            ctx.fillRect(0,0, this.canvas.width, this.canvas.height);
+            this.canvas.style.opacity = 0.1;
+        }
+        
         ctx.font = formatfontstr(this.style.font, this.style.fontsize);
         ctx.fillStyle = this.style.fontcolor;
         ctx.textAlign = this.style.textalign;
