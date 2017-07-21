@@ -47,15 +47,22 @@ class Table {
 
             this.labels.center.draw('text here', this.textcanvas, this.parentcanvas.width / 2, this.parentcanvas.height / 2);
 
+            const t = this;
+
+            // for (const [si, so] of this.seats) {
+            //     if (!so.vacant) {
+            //         continue;
+            //     }
+
+            //     const p = Table.pointOnTable(t, si);
+            //     // const p = this.pointOnTable(si);
+
+            //     so.labels.player.name.draw(so.player.name, this.textcanvas, p.x, p.y);
+            //     so.labels.player.balance.draw(so.player.balance, this.textcanvas, p.x, p.y + so.labels.player.balance.style.fontsize);
+            // }
+
             for (const [si, so] of this.seats) {
-                if (!so.vacant) {
-                    continue;
-                }
-
-                const p = this.pointOnTable(si);
-
-                so.labels.player.name.draw(so.player.name, this.textcanvas, p.x, p.y)
-                so.labels.player.balance.draw(so.player.balance, this.textcanvas, p.x, p.y + so.labels.player.balance.style.fontsize)
+                so.render();
             }
         }
     };
@@ -94,14 +101,7 @@ class Table {
             return false;
         }
 
-        this.seats.set(seatindex, new SeatObject(seatindex, 32, 'black'));
-        // this.seats.set(seatindex, {
-        //     seat: new Seat(seatindex, 32, 'black'),
-        //     labels: {
-        //         playername: new Label('serif', 18, ' red'),
-        //         playerbalance: new Label('serif', 18, 'red')
-        //     }
-        // });
+        this.seats.set(seatindex, new SeatObject(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
 
         return true;
     };
@@ -164,6 +164,7 @@ class Table {
                 y = oy - r;
                 break;
             default:
+                console.log('err: invalid table position');
                 break;
         }
 

@@ -77,10 +77,15 @@ $(document).ready(() => {
 
     while (seatindex < table.maxseats) {
         table.emptySeat(seatindex);
+        table.seats.get(seatindex).drawOnNextUpdate = true;
         seatindex += 1;
     }
 
     table.drawOnNextUpdate = true;
+
+    // for (const [si, so] of table.seats) {
+    //     so.drawOnNextUpdate = true;
+    // };
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -123,5 +128,8 @@ $(document).ready(() => {
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
         table.drawOnNextUpdate = true;
+        for (const [si, so] of table.seats) {
+            so.drawOnNextUpdate = true;
+        };
     });
 });

@@ -1,5 +1,7 @@
 class SeatObject {
-    constructor(index, radius, color) {
+    constructor(table, index, radius, color, parentcanvas, textcanvas) {
+        this.table = table;
+
         this.index = index;
         this.id = `canvas-seat-${index}`;
 
@@ -7,6 +9,9 @@ class SeatObject {
 
         this.vacant = true;
         this.player = Player.nullPlayerInstance();
+
+        this.parentcanvas = parentcanvas;
+        this.textcanvas = textcanvas;
 
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', this.id);
@@ -19,7 +24,7 @@ class SeatObject {
         };
 
         this.dimensions = {
-            w: 0, h: 0, r: 0, off: 0
+            w: 0, h: 0, r: radius
         };
 
         this.labels = {
@@ -28,5 +33,46 @@ class SeatObject {
                 balance: new Label('serif', 18, 'red')
             }
         };
+
+        this.drawOnNextUpdate = false;
+    };
+
+    render() {
+        if (this.drawOnNextUpdate) {
+            console.log('drawing seat');
+
+            this.drawOnNextUpdate = false;
+
+            this.resize();
+            this.draw();
+
+            const p = this.table.pointOnTable(this.index);
+
+            this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y);
+            this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize);
+        }
+    };
+
+    resize() {
+        this.dimensions.w = this.canvas.width;
+        this.dimensions.h = this.canvas.height;
+
+        const p = this.table.pointOnTable(this.index);
+
+        this.position.x = Math.floor(p.x - this.dimensions.w / 2);
+        this.position.y = Math.floor(p.y - this.dimensions.h / 2);
+    };
+
+    draw() {
+        this.canvas.width = this.dimensions.w;
+        this.canvas.height = this.dimensions.h;
+
+        const ctx = this.canvas.getContext('2d');
+
+        ctx.arc(this.canvas.width / 2, this.canvas.height / 2, this.dimensions.r, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+
+        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.position.x, this.position.y);
     };
 }
