@@ -51,13 +51,13 @@ class Seat {
 
             if (Player.isEmpty(this.player)) {
                 this.labels.player.name.draw('...', this.textcanvas, p.x, p.y);
+                return;
             } else {
-                
                 this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
                 this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize * 1.25);
             }
         }
-        
+
         this.player.render();
     };
 

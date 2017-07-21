@@ -16,7 +16,10 @@ function Sprite(src, row, col, w, h) {
 };
 
 Sprite.prototype.draw = function (ctx, img, dx, dy, sx, sy) {
+    console.log('drawing');
     img.onload = () => {
+        console.log('onloaded')
+        console.log(dx, dy);
         ctx.drawImage(
             img,
             this.row.offset,

@@ -10,6 +10,8 @@ const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
 const cardbackpixelheight = 188;
 
+const scalefactor = 1;
+
 let spriteCache = null;
 
 $(document).ready(() => {
@@ -17,21 +19,32 @@ $(document).ready(() => {
 });
 
 class Card {
-    constructor(value, suite) {
+    constructor(value, suite, parentcanvas) {
         this.value = value;
         this.suite = suite;
+
+        this.parentcanvas = parentcanvas;
 
         this.key = `${this.value}::${this.suite}`;
         this.pretty = `${Card.valueStr(this.value)} of ${Card.suiteStr(this.suite)}`;
 
         this.sprite = null;
 
-        this.drawOnNextTick = false;
+        this.drawOnNextUpdate = false;
     };
 
-    renderAt(x, y, ctx) {
-        if (this.drawOnNextTick) {
-            spriteCache.draw(this.sprite, ctx, x, y, scalefactor, scalefactor)
+    renderAt(x, y, secondcard) {
+        if (this.drawOnNextUpdate) {
+            console.log('drawing card');
+
+            this.drawOnNextUpdate = false;
+            this.loadFromCache();
+
+            if (secondcard) {
+                x += cardpixelwidth;
+            }
+
+            spriteCache.draw(this.sprite, this.parentcanvas.getContext('2d'), x, y, scalefactor, scalefactor);
         }
     };
 

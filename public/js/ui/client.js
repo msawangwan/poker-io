@@ -5,6 +5,7 @@ const flags = {
 
 const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     const parentEle = document.getElementById(parentCanvasId);
+
     const w = parentEle.offsetWidth;
     const h = parentEle.offsetHeight;
 
@@ -28,7 +29,7 @@ const testdata = {
         a: { value: 5, suite: 0 },
         b: { value: 8, suite: 2 }
     }
-}
+};
 
 const table = {
     state: null
@@ -37,11 +38,6 @@ const table = {
 const player = {
     state: null
 };
-
-// const state = {
-//     player: null,
-//     table: null
-// };
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
@@ -59,25 +55,6 @@ $(document).ready(() => {
     const staticCtx = staticCanvas.getContext('2d');
     const dynamicCtx = dynamicCanvas.getContext('2d');
     const labelCtx = labelCanvas.getContext('2d');
-
-    // const table = new Table(9, staticCanvas, labelCanvas);
-
-    // const player = new Player(
-    //     Player.assignGuestName(),
-    //     socket ? socket.id : -1,
-    //     500,
-    //     dynamicCanvas
-    // );
-
-    // let seatindex = 0;
-
-    // while (seatindex < table.maxseats) {
-    //     table.emptySeat(seatindex);
-    //     table.seat(seatindex).drawOnNextUpdate = true;
-    //     seatindex += 1;
-    // }
-
-    // table.drawOnNextUpdate = true;
 
     const $containerbetting = $('#container-betting');
     const $containerturnactions = $('#container-turn-actions');
@@ -146,10 +123,8 @@ $(document).ready(() => {
 
     setTimeout(() => { // start
         console.log('debug: entered start ...');
-
         setTimeout(() => { // update
             console.log('debug: ... started update ...');
-
             setTimeout(() => { // debug
                 console.log('debug ... starting debug check...');
 
@@ -165,14 +140,11 @@ $(document).ready(() => {
 
                 console.log('debug ... exit debug check ...');
             }, startupt);
-
             renderLoop = setInterval(() => {
                 table.state.render();
             }, tickrate, table.state, staticCanvas);
-
             console.log('debug: ... updating running ...');
         }, startupt);
-
         console.log('debug: ... exited start ...');
     }, startupt);
 
