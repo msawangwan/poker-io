@@ -115,21 +115,26 @@ $(document).ready(() => {
         if (table.state.seatCount(false) === data.seatCount) {
             console.log('seat count has not changed')
         } else {
-            console.log('server seat count doesnt match, updating');
+            if (data.seatedPlayer.id === player.state.id) {
+                console.log('skipping as this is me');
+            } else {
+                console.log('server seat count doesnt match, updating');
 
-            const otherplayer = new Player(
-                data.seatedPlayer.name,
-                data.seatedPlayer.id,
-                data.seatedPlayer.balance,
-                dynamicCanvas
-            );
+                const otherplayer = new Player(
+                    data.seatedPlayer.name,
+                    data.seatedPlayer.id,
+                    data.seatedPlayer.balance,
+                    dynamicCanvas
+                );
 
-            const seated = table.state.sit(data.seatedPlayer.seatIndex, otherplayer);
+                const seated = table.state.sit(data.seatedPlayer.seatIndex, otherplayer);
 
-            if (seated) {
-                console.log('other player seated');
-                otherplayer.takeSeatAt(table.state, data.seatedPlayer.seatIndex);
+                if (seated) {
+                    console.log('other player seated');
+                    otherplayer.takeSeatAt(table.state, data.seatedPlayer.seatIndex);
+                }
             }
+
         }
     };
 
@@ -149,19 +154,19 @@ $(document).ready(() => {
         setTimeout(() => { // update
             console.log('debug: ... started update ...');
             setTimeout(() => { // debug
-                console.log('debug ... starting debug check...');
+                // console.log('debug ... starting debug check...');
 
-                flags.NOCONN = !socket.connected;
+                // flags.NOCONN = !socket.connected;
 
-                if (flags.DEBUG && flags.NOCONN) {
-                    console.log('player sits at table');
-                    onsit(testdata.gamedata);
+                // if (flags.DEBUG && flags.NOCONN) {
+                //     console.log('player sits at table');
+                //     onsit(testdata.gamedata);
 
-                    console.log('call the oncardsdealt callback');
-                    oncardsdealt({ cards: testdata.cards });
-                }
+                //     console.log('call the oncardsdealt callback');
+                //     oncardsdealt({ cards: testdata.cards });
+                // }
 
-                console.log('debug ... exit debug check ...');
+                // console.log('debug ... exit debug check ...');
             }, startupt);
             renderLoop = setInterval(() => {
                 table.state.render();

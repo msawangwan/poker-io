@@ -84,10 +84,11 @@ class Table {
     };
 
     draw() {
+        const ctx = this.canvas.getContext('2d');
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
         this.canvas.width = this.dimensions.w;
         this.canvas.height = this.dimensions.h;
-
-        const ctx = this.canvas.getContext('2d');
 
         ctx.beginPath();
         ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
@@ -127,7 +128,6 @@ class Table {
 
         this.redrawHandlers.set(seatindex, () => {
             this.seats.get(seatindex).redraw(); // attach handler to seat
-            // this.seats.get(seatindex).drawOnNextUpdate = rerender;
         });
 
         return true;
@@ -143,7 +143,6 @@ class Table {
 
         s.occupy(player);
         this.redraw();
-        // s.player = player;
 
         return true;
     };

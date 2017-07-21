@@ -34,7 +34,7 @@ class Player {
 
     render() {
         if (this.drawOnNextUpdate) {
-            console.log('drawing player');
+            console.log(`drawing player: ${this.name ? this.name : 'null'}`);
 
             this.drawOnNextUpdate = false;
         }
