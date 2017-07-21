@@ -3,6 +3,7 @@ const validValues = ['two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'n
 
 const cardbackpair = './asset/cards-hand-card-back.png';
 const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+
 const cardpixelwidth = 72.15;
 const cardpixelheight = 83.25;
 const cardbackpixelwidth = 269;
@@ -14,7 +15,8 @@ class Card {
         this.suite = suite;
 
         this.key = `${this.value}::${this.suite}`;
-        this.pretty = `${validValues[this.value]} of ${validSuites[this.suite]}`;
+        this.pretty = `${Card.valueStr(this.value)} of ${Card.suiteStr(this.suite)}`;
+        // this.pretty = `${validValues[this.value]} of ${validSuites[this.suite]}`;
 
         this.sprite = null;
 
@@ -34,6 +36,14 @@ class Card {
             width: cardpixelwidth,
             height: cardpixelheight
         });
+    };
+
+    static valueStr(v) {
+        return `${validValues[v]}`
+    };
+
+    static suiteStr(s) {
+        return `${validSuites[s]}`
     };
 }
 

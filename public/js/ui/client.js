@@ -69,15 +69,13 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
-    socket.emit('joined-table', { name: player.name, balance: player.balance });
-
-    socket.on('player-seated', (data) => {
+    const onsit = (data) => {
         player.gameid = data.gameId;
 
         const result = table.sit(data.seatIndex, player);
 
         if (result) {
-            player.sitAt(table, data.seatIndex);
+            player.takeSeatAt(table, data.seatIndex);
 
             Promise.resolve().then(() => {
                 table.messageHistory.push('waiting for players ...');
@@ -86,7 +84,16 @@ $(document).ready(() => {
         }
 
         socket.emit('player-ready', { seated: result });
-    });
+    };
+
+    const oncardsdealt = (data) => {
+        player.gotHand(data.cards.a, data.cards.b);
+    };
+
+    socket.emit('joined-table', { name: player.name, balance: player.balance });
+
+    socket.on('player-seated', onsit);
+    socket.on('cards-dealt', oncardsdealt);
 
     let renderLoop = null;
 
@@ -104,6 +111,21 @@ $(document).ready(() => {
 
         console.log('debug: ... updating running ...');
     }, 3000);
+
+    setTimeout(() => { // debug
+        console.log('debug ... executing statements with debug data ...');
+
+        console.log('call the oncardsdealt callback');
+
+        oncardsdealt({
+            cards: {
+                a: { value: 5, suite: 0 },
+                b: { value: 8, suite: 2 }
+            }
+        });
+
+        console.log('debug ... finished executing statements with debug data ...');
+    }, 3500);
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);

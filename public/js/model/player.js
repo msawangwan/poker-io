@@ -26,29 +26,36 @@ class Player {
             this.holecards.a.render();
             this.holecards.b.render();
         }
-    }
+    };
 
-    sitAt(table, pos) {
+    takeSeatAt(table, pos) {
         this.seat.position = pos;
 
         setTimeout(() => {
-            this.updateSeatCoordinates(table, pos);
+            const { px, py } = table.pointOnTable(pos);
+
+            this.seat.x = px;
+            this.seat.y = py;
         }, 1500);
     };
 
-    updateSeatCoordinates(table, pos) {
-        const { px, py } = table.pointOnTable(pos);
-        this.seat.x = px;
-        this.seat.y = py;
+    gotHand(a, b) {
+        console.log(a);
+        console.log(b);
+        this.holecards.a = new Card(a.value, a.suite);
+        this.holecards.b = new Card(b.value, b.suite);
+
+        console.log(this.holecards.a.pretty);
+        console.log(this.holecards.b.pretty);
     };
 
     static nullPlayerInstance() {
         return nullInstance;
-    }
+    };
 
     static generateGuestName() {
         return `player ${Math.floor(Math.random() * 100)}`;
-    }
+    };
 
     static assignGuestName() {
         let name = Player.generateGuestName();
