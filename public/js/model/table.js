@@ -16,12 +16,9 @@ class Table {
         this.canvas.setAttribute('id', 'canvas-table');
 
         this.seats = new Map();
+
         this.onseatCoordsChangeHandlers = new Map();
-
-        // this.players 
-
-        // this.viewingPlayer = null;
-        // this.otherPlayers = [];
+        this.onrenderChangedHandlers = new Map();
 
         this.postion = {
             x: 0, y: 0
@@ -29,7 +26,7 @@ class Table {
 
         this.canvasorigin = {
             x: 0, y: 0
-        }
+        };
 
         this.dimensions = {
             w: 0, h: 0, r: 0, off: 0
@@ -101,6 +98,14 @@ class Table {
         this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     };
 
+    notifyRedrawRequired(rerender) {
+        this.drawOnNextUpdate = rerender;
+
+        for (const [k, h] of this.onrenderChangedHandlers) {
+            h(rerender);
+        }
+    };
+
     seat(seatindex) {
         return this.seats.get(seatindex);
     };
@@ -120,6 +125,10 @@ class Table {
 
         this.seats.set(seatindex, new Seat(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
 
+        this.onrenderChangedHandlers.set(seatindex, (rerender) => {
+            this.seats.get(seatindex).drawOnNextUpdate = rerender; // attach handler to seat
+        });
+
         return true;
     };
 
@@ -131,10 +140,12 @@ class Table {
             return false;
         }
 
-        Promise.resolve().then(() => {
-            this.drawOnNextUpdate = true;
-            s.drawOnNextUpdate = true;
-        });
+        this.notifyRedrawRequired(true);
+
+        // Promise.resolve().then(() => {
+        // this.drawOnNextUpdate = true;
+        // s.drawOnNextUpdate = true;
+        // });
 
         s.player = player;
 
@@ -144,9 +155,10 @@ class Table {
     setCenterLabelText(t) {
         this.messageHistory.push(t);
 
-        Promise.resolve().then(() => {
-            this.drawOnNextUpdate = true;
-        });
+        this.notifyRedrawRequired(true);
+        // Promise.resolve().then(() => {
+        //     this.drawOnNextUpdate = true;
+        // });
     };
 
     pointOnTable(position, onchangeHandle) {
