@@ -113,50 +113,32 @@ $(document).ready(() => {
 
     const onsitother = (data) => {
         if (table.state.seatCount(false) === data.seatCount) {
-            console.log('seat count has not changed')
+            console.log('seat count has not changed');
         } else {
-            if (data.seatedPlayer.id === player.state.id) {
-                console.log('skipping as this is me');
-            } else {
-                console.log('server seat count doesnt match, updating');
+            console.log('server seat count doesnt match, updating');
 
-                for (const other of data.seatedPlayers) {
-                    if (other.id === socket.id) {
-                        console.log('skipping self');
-                        continue;
-                    }
-
-                    const p = new Player(
-                        other[1].name,
-                        other[1].id,
-                        other[1].balance,
-                        dynamicCanvas
-                    );
-
-                    const seated = table.state.sit(other[0], p);
-
-                    if (seated) {
-                        console.log(`seated player ${p.name}`);
-                        p.takeSeatAt(table.state, other[0]);
-                    }
+            for (const other of data.seatedPlayers) {
+                if (other.id === socket.id) {
+                    console.log('skipping self');
+                    continue;
                 }
 
-                // const otherplayer = new Player(
-                //     data.seatedPlayer.name,
-                //     data.seatedPlayer.id,
-                //     data.seatedPlayer.balance,
-                //     dynamicCanvas
-                // );
+                const p = new Player(
+                    other[1].name,
+                    other[1].id,
+                    other[1].balance,
+                    dynamicCanvas
+                );
 
-                // const seated = table.state.sit(data.seatedPlayer.seatIndex, otherplayer);
+                const seated = table.state.sit(other[0], p);
 
-                // if (seated) {
-                //     console.log('other player seated');
-                //     otherplayer.takeSeatAt(table.state, data.seatedPlayer.seatIndex);
-                // }
-
-                console.log(data.seatedPlayers);
+                if (seated) {
+                    console.log(`seated player ${p.name}`);
+                    p.takeSeatAt(table.state, other[0]);
+                }
             }
+
+            console.log(data.seatedPlayers);
         }
 
         table.state.redraw();
