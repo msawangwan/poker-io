@@ -15,10 +15,11 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     }
 };
 
-const tickrate = 1000 / 2;
-const startupt = 1500;
 const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
 const containerCanvasId = 'container-canvas';
+
+const tickrate = 1000 / 2;
+const startupt = 1500;
 
 const testdata = {
     gamedata: {
@@ -31,66 +32,53 @@ const testdata = {
     }
 };
 
-{
-// const layer = {
-//     table: {
-//         id: 'static-canvas',
-//         canvas: null,
-//         ctx: null
-//     },
-//     cards: {
-//         id: 'dynamic-canvas',
-//         canvas: null,
-//         ctx: null
-//     },
-//     label: {
-//         id: 'label-canvas',
-//         canvas: null,
-//         ctx: null
-//     }
-// };
-}
-
 const current = {
     player: null, table: null
-}
+};
 
 $(document).ready(() => {
-    const socket = io.connect(window.location.origin, {
-        'reconnection': false
-    });
-
     const staticCanvas = document.getElementById(canvasLayerIds[0]);
     const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
     const labelCanvas = document.getElementById(canvasLayerIds[2]);
-
-    const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
-
-    resizeCanvases(containerCanvasId, canvasGroup);
 
     const staticCtx = staticCanvas.getContext('2d');
     const dynamicCtx = dynamicCanvas.getContext('2d');
     const labelCtx = labelCanvas.getContext('2d');
 
-    const $containerbetting = $('#container-betting');
-    const $containerturnactions = $('#container-turn-actions');
-    const $bettextfield = $('#bet-amount-text-field');
-    const $betrangeslider = $('#bet-range-slider');
-    const $betsubmitbutton = $('#bet-submit-bet-btn');
+    const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
 
-    $betrangeslider.on('change', () => {
-        const slidervalue = $betrangeslider.val();
-        $bettextfield.val(slidervalue);
+    const socket = io.connect(window.location.origin, {
+        'reconnection': false
     });
 
+    resizeCanvases(containerCanvasId, canvasGroup);
+
+    {
+        const $containerbetting = $('#container-betting');
+        const $containerturnactions = $('#container-turn-actions');
+        const $bettextfield = $('#bet-amount-text-field');
+        const $betrangeslider = $('#bet-range-slider');
+        const $betsubmitbutton = $('#bet-submit-bet-btn');
+
+        $betrangeslider.on('change', () => {
+            const slidervalue = $betrangeslider.val();
+            $bettextfield.val(slidervalue);
+        });
+    }
+
     const onconnect = (data) => {
-        console.log('client connected');
+        {
+            console.log(`===`);
+            console.log('connected to server');
+            console.log(`creating a table`);
+            console.log(`===`);
+        }
 
         current.table = new Table(9, staticCanvas, labelCanvas);
 
-        const guestname = Player.assignGuestName();
-        const id = socket.id;
-        const balance = 500;
+        // const guestname = Player.assignGuestName();
+        // const id = socket.id;
+        // const balance = 500;
 
         let seatindex = 0;
 
@@ -101,7 +89,11 @@ $(document).ready(() => {
 
         current.table.redraw();
 
-        socket.emit('joined-table', { name: guestname, balance: balance });
+        // socket.emit('joined-table', { name: guestname, balance: balance });
+    };
+
+    const ontableassigned = (data) => {
+        console.log('ontableassigned');
     };
 
     const onsit = (data) => {
@@ -115,18 +107,19 @@ $(document).ready(() => {
 
         if (seatedPlayer) {
             current.player = seatedPlayer;
-            socket.emit('player-ready', { player: seatedPlayer });
+            // socket.emit('player-ready', { player: seatedPlayer });
 
-            if (flags.DEBUG) {
-                Promise.resolve().then(() => {
-                    console.log('debug: deal fake hand on sit');
-                    oncardsdealt({ cards: testdata.cards });
-                });
-            }
+            // if (flags.DEBUG) {
+            //     Promise.resolve().then(() => {
+            //         console.log('debug: deal fake hand on sit');
+            //         oncardsdealt({ cards: testdata.cards });
+            //     });
+            // }
         }
     };
 
     const onsitother = (data) => {
+        console.log(data.occupiedSeats);
         const gameState = data.tableGameState;
         const occupiedSeats = data.occupiedSeats;
 
@@ -140,16 +133,15 @@ $(document).ready(() => {
                 console.log('=== === ===');
             }
 
-            // TODO: LEFT OFF HERE WITH REWRITE
-            for (const other of data.seatedPlayers) {
-                const pos = other[0];
-                const player = other[1];
+            for (const seat of occupiedSeats) {
+                const pos = seat[0];
+                const player = seat[1];
 
                 if (player.id === socket.id) {
                     console.log('skipping self');
                     continue;
                 }
-                
+
                 {
                     console.log('=== === ===');
                     console.log('creating new player:');
@@ -170,46 +162,46 @@ $(document).ready(() => {
             }
         }
 
-        if (current.table.seatCount(false) === data.seatCount) {
-            console.log('seat count has not changed');
-        } else {
-            // console.log('server seat count doesnt match, updating');
+        // if (current.table.seatCount(false) === data.seatCount) {
+        //     console.log('seat count has not changed');
+        // } else {
+        //     // console.log('server seat count doesnt match, updating');
 
-            // {
-            //     console.log('=== === ===');
-            //     console.log('all players (not including self):');
-            //     console.log(data.seatedPlayers);
-            //     console.log('=== === ===');
-            // }
+        //     // {
+        //     //     console.log('=== === ===');
+        //     //     console.log('all players (not including self):');
+        //     //     console.log(data.seatedPlayers);
+        //     //     console.log('=== === ===');
+        //     // }
 
-            // for (const other of data.seatedPlayers) {
-            //     const pos = other[0];
-            //     const player = other[1];
+        //     // for (const other of data.seatedPlayers) {
+        //     //     const pos = other[0];
+        //     //     const player = other[1];
 
-            //     if (player.id === socket.id) {
-            //         console.log('skipping self');
-            //         continue;
-            //     }
-                
-            //     {
-            //         console.log('=== === ===');
-            //         console.log('creating new player:');
-            //         console.log(`position: ${pos}`);
-            //         console.log(`name: ${player.name}`);
-            //         console.log(`id: ${player.id}`);
-            //         console.log(`balance: ${player.balance}`);
-            //         console.log('=== === ===');
-            //     }
+        //     //     if (player.id === socket.id) {
+        //     //         console.log('skipping self');
+        //     //         continue;
+        //     //     }
 
-            //     const seatedOther = current.table.sit(
-            //         pos,
-            //         player.name,
-            //         player.id,
-            //         player.balance,
-            //         dynamicCanvas
-            //     );
-            // }
-        }
+        //     //     {
+        //     //         console.log('=== === ===');
+        //     //         console.log('creating new player:');
+        //     //         console.log(`position: ${pos}`);
+        //     //         console.log(`name: ${player.name}`);
+        //     //         console.log(`id: ${player.id}`);
+        //     //         console.log(`balance: ${player.balance}`);
+        //     //         console.log('=== === ===');
+        //     //     }
+
+        //     //     const seatedOther = current.table.sit(
+        //     //         pos,
+        //     //         player.name,
+        //     //         player.id,
+        //     //         player.balance,
+        //     //         dynamicCanvas
+        //     //     );
+        //     // }
+        // }
 
         current.table.redraw();
     };
@@ -219,19 +211,12 @@ $(document).ready(() => {
     };
 
     socket.on('connect', onconnect);
+    socket.on('assigned-table', ontableassigned);
     socket.on('player-seated', onsit);
     socket.on('a-player-was-seated', onsitother);
     socket.on('cards-dealt', oncardsdealt);
 
     let renderLoop = null;
-    
-    if (flags.DEBUG) {
-        onconnect();
-        onsitother({
-            seatedPlayers: {},
-            seatCount: 2
-        });
-    }
 
     setTimeout(() => { // start
         console.log('debug: entered start ...');
