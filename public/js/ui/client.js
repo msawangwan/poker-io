@@ -120,22 +120,46 @@ $(document).ready(() => {
             } else {
                 console.log('server seat count doesnt match, updating');
 
-                const otherplayer = new Player(
-                    data.seatedPlayer.name,
-                    data.seatedPlayer.id,
-                    data.seatedPlayer.balance,
-                    dynamicCanvas
-                );
+                for (const other of data.seatedPlayers) {
+                    if (other.id === socket.id) {
+                        console.log('skipping self');
+                        continue;
+                    }
 
-                const seated = table.state.sit(data.seatedPlayer.seatIndex, otherplayer);
+                    const p = new Player(
+                        other[1].name,
+                        other[1].id,
+                        other[1].balance,
+                        dynamicCanvas
+                    );
 
-                if (seated) {
-                    console.log('other player seated');
-                    otherplayer.takeSeatAt(table.state, data.seatedPlayer.seatIndex);
+                    const seated = table.state.sit(other[0], p);
+
+                    if (seated) {
+                        console.log(`seated player ${p.name}`);
+                        p.takeSeatAt(table.state, other[0]);
+                    }
                 }
-            }
 
+                // const otherplayer = new Player(
+                //     data.seatedPlayer.name,
+                //     data.seatedPlayer.id,
+                //     data.seatedPlayer.balance,
+                //     dynamicCanvas
+                // );
+
+                // const seated = table.state.sit(data.seatedPlayer.seatIndex, otherplayer);
+
+                // if (seated) {
+                //     console.log('other player seated');
+                //     otherplayer.takeSeatAt(table.state, data.seatedPlayer.seatIndex);
+                // }
+
+                console.log(data.seatedPlayers);
+            }
         }
+
+        table.state.redraw();
     };
 
     const oncardsdealt = (data) => {

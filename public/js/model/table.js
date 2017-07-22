@@ -60,8 +60,8 @@ class Table {
             );
         }
 
-        for (const [si, so] of this.seats) {
-            so.render();
+        for (const [si, s] of this.seats) {
+            s.render();
         }
     };
 

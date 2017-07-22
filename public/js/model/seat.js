@@ -94,6 +94,8 @@ class Seat {
     }
 
     occupy(player) {
+        console.log(`player occupying seat: ${player.name}`);
+
         if (!this.vacant) {
             return false;
         }
