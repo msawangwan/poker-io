@@ -125,24 +125,21 @@ $(document).ready(() => {
             console.log('server seat count doesnt match, updating');
 
             for (const other of data.seatedPlayers) {
-                if (other.id === socket.id) {
+                const pos = other[0];
+                const player = other[1];
+
+                if (player.id === socket.id) {
                     console.log('skipping self');
                     continue;
                 }
 
-                const p = new Player(
-                    other[1].name,
-                    other[1].id,
-                    other[1].balance,
+                const seatedOther = table.state.sit(
+                    pos,
+                    player.name,
+                    player.id,
+                    player.balance,
                     dynamicCanvas
                 );
-
-                const seated = table.state.sit(other[0], p);
-
-                if (seated) {
-                    console.log(`seated player ${p.name}`);
-                    p.takeSeatAt(table.state, other[0]);
-                }
             }
 
             console.log(data.seatedPlayers);
