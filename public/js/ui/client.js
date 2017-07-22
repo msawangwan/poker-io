@@ -69,16 +69,15 @@ $(document).ready(() => {
     const onconnect = (data) => {
         {
             console.log(`===`);
-            console.log('connected to server');
-            console.log(`creating a table`);
+            console.log('established socket conn');
+            console.log(`client id: ${socket.id}`);
+            console.log(`running settup ...`);
+            console.log(`... creating a table ...`);
+            console.log(`... done.`);
             console.log(`===`);
         }
 
         current.table = new Table(9, staticCanvas, labelCanvas);
-
-        // const guestname = Player.assignGuestName();
-        // const id = socket.id;
-        // const balance = 500;
 
         let seatindex = 0;
 
@@ -88,12 +87,18 @@ $(document).ready(() => {
         }
 
         current.table.redraw();
-
-        // socket.emit('joined-table', { name: guestname, balance: balance });
     };
 
     const ontableassigned = (data) => {
-        console.log('ontableassigned');
+        {
+            console.log(`===`);
+            console.log(`player assigned to table and got seating:`);
+            console.log(`assigned name: ${data.guestname}`);
+            console.log(`assigned seat: ${data.table.assignedSeat}`);
+            console.log(`table id: ${data.table.id}`);
+            console.log(data);
+            console.log(`===`);
+        }
     };
 
     const onsit = (data) => {
