@@ -72,12 +72,16 @@ $(document).ready(() => {
 
         table.state = new Table(9, staticCanvas, labelCanvas);
 
-        player.state = new Player(
-            Player.assignGuestName(),
-            socket ? socket.id : -1,
-            500,
-            dynamicCanvas
-        );
+        const guestname = Player.assignGuestName();
+        const id = socket.id;
+        const balance = 500;
+
+        // player.state = new Player(
+        //     Player.assignGuestName(),
+        //     socket ? socket.id : -1,
+        //     500,
+        //     dynamicCanvas
+        // );
 
         let seatindex = 0;
 
@@ -88,26 +92,29 @@ $(document).ready(() => {
 
         table.state.redraw();
 
-        socket.emit('joined-table', { name: player.state.name, balance: player.state.balance });
+        // socket.emit('joined-table', { name: player.state.name, balance: player.state.balance });
+        socket.emit('joined-table', { name: guestname, balance: balance });
     };
 
     const onsit = (data) => {
-        player.state.gameid = data.gameId;
+        const seatedPlayer = table.state.sit(
+            data.seatedPlayer.seatIndex,
+            data.seatedPlayer.name,
+            socket.id,
+            data.seatedPlayer.balance,
+            dynamicCanvas
+        );
 
-        const seated = table.state.sit(data.seatIndex, player.state);
+        if (seatedPlayer) {
+            player.state = seatedPlayer;
+            socket.emit('player-ready', { player: seatedPlayer });
 
-        if (seated) {
-            player.state.takeSeatAt(table.state, data.seatIndex);
-            table.state.setCenterLabelText('waiting for players ...');
-        }
-
-        socket.emit('player-ready', { seated: seated });
-
-        if (flags.DEBUG) {
-            Promise.resolve().then(() => {
-                console.log('debug: deal fake hand on sit');
-                oncardsdealt({ cards: testdata.cards });
-            });
+            if (flags.DEBUG) {
+                Promise.resolve().then(() => {
+                    console.log('debug: deal fake hand on sit');
+                    oncardsdealt({ cards: testdata.cards });
+                });
+            }
         }
     };
 

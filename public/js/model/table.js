@@ -133,19 +133,37 @@ class Table {
         return true;
     };
 
-    sit(seatindex, player) {
-        const s = this.seats.get(seatindex);
+    sit(seatindex, name, id, balance, canvas) {
+        const seat = this.seats.get(seatindex);
 
-        if (!s) {
+        if (!seat) {
             console.log('table: couldnt not find seat at index: ' + seatindex);
             return false;
         }
 
-        s.occupy(player);
+        const player = new Player(name, id, balance, canvas);
+        player.joinTable(this, seatindex);
+        seat.occupy(player);
+
+        this.setCenterLabelText('waiting for players ...'); // TODO: add a switch statement with different phrases depending on table state
+
         this.redraw();
 
-        return true;
+        return player;
     };
+    // sit(seatindex, player) {
+    //     const s = this.seats.get(seatindex);
+
+    //     if (!s) {
+    //         console.log('table: couldnt not find seat at index: ' + seatindex);
+    //         return false;
+    //     }
+
+    //     s.occupy(player);
+    //     this.redraw();
+
+    //     return true;
+    // };
 
     setCenterLabelText(t) {
         this.messageHistory.push(t);

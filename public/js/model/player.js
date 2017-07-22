@@ -53,7 +53,7 @@ class Player {
         }
     };
 
-    takeSeatAt(table, pos) {
+    joinTable(table, pos) {
         this.seat.position = pos;
 
         const onSeatCoordsChangedHandler = (x, y) => {
