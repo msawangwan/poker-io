@@ -19,7 +19,7 @@ const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
 const containerCanvasId = 'container-canvas';
 
 const tickrate = 1000 / 2;
-const startupt = 1500;
+const startupt = 800;
 
 const testdata = {
     gamedata: {
@@ -99,6 +99,8 @@ $(document).ready(() => {
             console.log(data);
             console.log(`===`);
         }
+
+        current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
     };
 
     const onsit = (data) => {
@@ -215,25 +217,33 @@ $(document).ready(() => {
         current.player.gotHand(data.cards.a, data.cards.b);
     };
 
-    socket.on('connect', onconnect);
-    socket.on('assigned-table', ontableassigned);
-    socket.on('player-seated', onsit);
-    socket.on('a-player-was-seated', onsitother);
-    socket.on('cards-dealt', oncardsdealt);
+    {
+        socket.on('connect', onconnect);
+        socket.on('assigned-table', ontableassigned);
+        socket.on('player-seated', onsit);
+        socket.on('a-player-was-seated', onsitother);
+        socket.on('cards-dealt', oncardsdealt);
+    }
 
     let renderLoop = null;
 
-    setTimeout(() => { // start
-        console.log('debug: entered start ...');
-        setTimeout(() => { // update
-            console.log('debug: ... started update ...');
-            renderLoop = setInterval(() => {
-                current.table.render();
-            }, tickrate, current.table, staticCanvas);
-            console.log('debug: ... updating running ...');
+    {
+        setTimeout(() => { // start
+            console.log(`===`);
+            console.log('entered start ...');
+            setTimeout(() => { // update
+                console.log(`===`);
+                console.log('... started update ...');
+                renderLoop = setInterval(() => {
+                    current.table.render();
+                }, tickrate, current.table, staticCanvas);
+                console.log('... updating running ...');
+                console.log(`===`);
+            }, startupt);
+            console.log('... exited start.');
+            console.log(`===`);
         }, startupt);
-        console.log('debug: ... exited start.');
-    }, startupt);
+    }
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);

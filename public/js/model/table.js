@@ -41,28 +41,61 @@ class Table {
         this.drawOnNextUpdate = false;
     };
 
+    get center() {
+        return [
+            this.parentcanvas.width * 0.5,
+            this.parentcanvas.height * 0.5
+        ];
+    };
+
+    get centerLabelText() {
+        return this.messageHistory.length > 0 ?
+            this.messageHistory[this.messageHistory.length - 1] : '...';
+    };
+
+    set centerLabelText(t) {
+        this.messageHistory.push(t);
+        this.redraw();
+    };
+
     render() {
         if (this.drawOnNextUpdate) {
             console.log('drawing table');
 
-            this.drawOnNextUpdate = false;
-
             this.resize();
             this.draw();
 
-            const msg = this.messageHistory[this.messageHistory.length - 1];
-
             this.labels.center.draw(
-                this.messageHistory[this.messageHistory.length - 1],
+                this.centerLabelText,
                 this.textcanvas,
-                this.parentcanvas.width / 2,
-                this.parentcanvas.height / 2
+                this.center[0],
+                this.center[1]
+                // this.parentcanvas.width / 2,
+                // this.parentcanvas.height / 2
             );
+
+            this.drawOnNextUpdate = false;
         }
 
         for (const [si, s] of this.seats) {
             s.render();
         }
+    };
+
+    draw() {
+        const ctx = this.canvas.getContext('2d');
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.canvas.width = this.dimensions.w;
+        this.canvas.height = this.dimensions.h;
+
+        ctx.beginPath();
+        ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+        ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+        ctx.fillStyle = 'green';
+        ctx.fill();
+
+        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     };
 
     resize() {
@@ -83,22 +116,6 @@ class Table {
         this.dimensions.off = Math.floor(this.dimensions.w * long.small);
     };
 
-    draw() {
-        const ctx = this.canvas.getContext('2d');
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        this.canvas.width = this.dimensions.w;
-        this.canvas.height = this.dimensions.h;
-
-        ctx.beginPath();
-        ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-        ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-        ctx.fillStyle = 'green';
-        ctx.fill();
-
-        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
-    };
-
     redraw() {
         this.drawOnNextUpdate = true;
 
@@ -107,16 +124,16 @@ class Table {
         }
     };
 
-    seat(seatindex) {
-        return this.seats.get(seatindex);
-    };
-
     seatsVacant(vacant) {
         return [...this.seats].filter(([i, s]) => s.vacant === vacant);
     };
 
     seatCount(vacant) {
         return this.seatsVacant(vacant).length;
+    };
+
+    seatByIndex(seatindex) {
+        return this.seats.get(seatindex);
     };
 
     emptySeat(seatindex) {
@@ -151,28 +168,9 @@ class Table {
 
         return player;
     };
-    // sit(seatindex, player) {
-    //     const s = this.seats.get(seatindex);
-
-    //     if (!s) {
-    //         console.log('table: couldnt not find seat at index: ' + seatindex);
-    //         return false;
-    //     }
-
-    //     s.occupy(player);
-    //     this.redraw();
-
-    //     return true;
-    // };
-
-    setCenterLabelText(t) {
-        this.messageHistory.push(t);
-        this.redraw();
-    };
 
     pointOnTable(position, onchangeHandle) {
         if (onchangeHandle) {
-            console.log('registering seat coord change handler');
             this.pointCalcHandlers.set(position, onchangeHandle);
         }
 

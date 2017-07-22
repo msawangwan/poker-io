@@ -8,7 +8,7 @@ class Seat {
         this.color = color;
 
         this.vacant = true;
-        this.player = Player.nullPlayerInstance();
+        this.player = Player.none();
 
         this.parentcanvas = parentcanvas;
         this.textcanvas = textcanvas;
@@ -43,20 +43,22 @@ class Seat {
         if (this.drawOnNextUpdate) {
             console.log(`drawing seat for player: ${this.player ? this.player.name : 'none'}`);
 
-            this.drawOnNextUpdate = false;
-
             this.resize();
             this.draw();
 
             const p = this.table.pointOnTable(this.index);
 
-            if (Player.isEmpty(this.player)) {
-                this.labels.player.name.draw('...', this.textcanvas, p.x, p.y);
-                return;
-            } else {
-                this.labels.player.name.draw(this.player.name, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
+            let pname = this.player.name;
+
+            if (this.player.isValid) {
                 this.labels.player.balance.draw(this.player.balance, this.textcanvas, p.x, p.y + this.labels.player.balance.style.fontsize * 1.25);
+            } else {
+                pname = '...';
             }
+
+            this.labels.player.name.draw(pname, this.textcanvas, p.x, p.y - this.labels.player.name.style.fontsize * 0.25);
+
+            this.drawOnNextUpdate = false;
         }
 
         this.player.render();
