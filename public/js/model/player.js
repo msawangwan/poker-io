@@ -1,25 +1,17 @@
 class Player {
     constructor(name, id, balance, cardcanvas) {
-        if (name === emptyPlayer.name && id === emptyPlayer.id) {
-            console.log('empty player created');
-        } else if (!name || !id) {
-            console.log('defaulting to auto character')
-        } else {
-            console.log('created a new player: ' + name)
-        }
-
+        this.name = name;
+        this.id = id;
+        this.balance = balance;
         this.cardcanvas = cardcanvas;
-
-        this.name = name || Player.assignGuestName();
-        this.id = id || -1;
-        this.balance = balance || 0;
-        this.gameid = null;
 
         this.seat = {
             position: undefined,
             x: 0,
             y: 0
         }
+        
+        this.gameid = null;
 
         this.holecards = {
             a: null, b: null
@@ -27,7 +19,7 @@ class Player {
 
         this.hasHolecards = () => this.holecards.a !== null && this.holecards.b !== null;
 
-        this.redrawHandlers = new Map();
+        this.renderHandlers = new Map();
 
         this.drawOnNextUpdate = false;
     };
@@ -35,20 +27,20 @@ class Player {
     render() {
         if (this.drawOnNextUpdate) {
             console.log(`drawing player: ${this.name ? this.name : 'null'}`);
-
+            
             this.drawOnNextUpdate = false;
-        }
-
-        if (this.hasHolecards()) {
-            this.holecards.a.renderAt(this.seat.x, this.seat.y);
-            this.holecards.b.renderAt(this.seat.x, this.seat.y, true);
+    
+            if (this.hasHolecards()) {
+                this.holecards.a.renderAt(this.seat.x, this.seat.y);
+                this.holecards.b.renderAt(this.seat.x, this.seat.y, true);
+            }
         }
     };
 
     redraw() {
         this.drawOnNextUpdate = true;
 
-        for (const [k, h] of this.redrawHandlers) {
+        for (const [k, h] of this.renderHandlers) {
             h();
         }
     };
@@ -70,7 +62,7 @@ class Player {
         this.holecards.a = new Card(a.value, a.suite, this.cardcanvas); // TODO: cache these card instances
         this.holecards.b = new Card(b.value, b.suite, this.cardcanvas); // TODO: cache these card instances
 
-        this.redrawHandlers.set('holecards', () => {
+        this.renderHandlers.set('holecards', () => {
             this.holecards.a.drawOnNextUpdate = true;
             this.holecards.b.drawOnNextUpdate = true;
         });

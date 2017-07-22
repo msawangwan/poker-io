@@ -31,13 +31,29 @@ const testdata = {
     }
 };
 
-const table = {
-    state: null
-};
+{
+// const layer = {
+//     table: {
+//         id: 'static-canvas',
+//         canvas: null,
+//         ctx: null
+//     },
+//     cards: {
+//         id: 'dynamic-canvas',
+//         canvas: null,
+//         ctx: null
+//     },
+//     label: {
+//         id: 'label-canvas',
+//         canvas: null,
+//         ctx: null
+//     }
+// };
+}
 
-const player = {
-    state: null
-};
+const current = {
+    player: null, table: null
+}
 
 $(document).ready(() => {
     const socket = io.connect(window.location.origin, {
@@ -70,34 +86,26 @@ $(document).ready(() => {
     const onconnect = (data) => {
         console.log('client connected');
 
-        table.state = new Table(9, staticCanvas, labelCanvas);
+        current.table = new Table(9, staticCanvas, labelCanvas);
 
         const guestname = Player.assignGuestName();
         const id = socket.id;
         const balance = 500;
 
-        // player.state = new Player(
-        //     Player.assignGuestName(),
-        //     socket ? socket.id : -1,
-        //     500,
-        //     dynamicCanvas
-        // );
-
         let seatindex = 0;
 
-        while (seatindex < table.state.maxseats) {
-            table.state.emptySeat(seatindex);
+        while (seatindex < current.table.maxseats) {
+            current.table.emptySeat(seatindex);
             seatindex += 1;
         }
 
-        table.state.redraw();
+        current.table.redraw();
 
-        // socket.emit('joined-table', { name: player.state.name, balance: player.state.balance });
         socket.emit('joined-table', { name: guestname, balance: balance });
     };
 
     const onsit = (data) => {
-        const seatedPlayer = table.state.sit(
+        const seatedPlayer = current.table.sit(
             data.seatedPlayer.seatIndex,
             data.seatedPlayer.name,
             socket.id,
@@ -106,7 +114,7 @@ $(document).ready(() => {
         );
 
         if (seatedPlayer) {
-            player.state = seatedPlayer;
+            current.player = seatedPlayer;
             socket.emit('player-ready', { player: seatedPlayer });
 
             if (flags.DEBUG) {
@@ -119,10 +127,24 @@ $(document).ready(() => {
     };
 
     const onsitother = (data) => {
-        if (table.state.seatCount(false) === data.seatCount) {
+        const gameState = data.tableGameState;
+        const occupiedSeats = data.occupiedSeats;
+
+        if (occupiedSeats.length !== current.table.seatCount(false)) {
+            
+        }
+
+        if (current.table.seatCount(false) === data.seatCount) {
             console.log('seat count has not changed');
         } else {
             console.log('server seat count doesnt match, updating');
+
+            {
+                console.log('=== === ===');
+                console.log('all players (not including self):');
+                console.log(data.seatedPlayers);
+                console.log('=== === ===');
+            }
 
             for (const other of data.seatedPlayers) {
                 const pos = other[0];
@@ -132,8 +154,18 @@ $(document).ready(() => {
                     console.log('skipping self');
                     continue;
                 }
+                
+                {
+                    console.log('=== === ===');
+                    console.log('creating new player:');
+                    console.log(`position: ${pos}`);
+                    console.log(`name: ${player.name}`);
+                    console.log(`id: ${player.id}`);
+                    console.log(`balance: ${player.balance}`);
+                    console.log('=== === ===');
+                }
 
-                const seatedOther = table.state.sit(
+                const seatedOther = current.table.sit(
                     pos,
                     player.name,
                     player.id,
@@ -141,15 +173,13 @@ $(document).ready(() => {
                     dynamicCanvas
                 );
             }
-
-            console.log(data.seatedPlayers);
         }
 
-        table.state.redraw();
+        current.table.redraw();
     };
 
     const oncardsdealt = (data) => {
-        player.state.gotHand(data.cards.a, data.cards.b);
+        current.player.gotHand(data.cards.a, data.cards.b);
     };
 
     socket.on('connect', onconnect);
@@ -158,36 +188,29 @@ $(document).ready(() => {
     socket.on('cards-dealt', oncardsdealt);
 
     let renderLoop = null;
+    
+    if (flags.DEBUG) {
+        onconnect();
+        onsitother({
+            seatedPlayers: {},
+            seatCount: 2
+        });
+    }
 
     setTimeout(() => { // start
         console.log('debug: entered start ...');
         setTimeout(() => { // update
             console.log('debug: ... started update ...');
-            setTimeout(() => { // debug
-                // console.log('debug ... starting debug check...');
-
-                // flags.NOCONN = !socket.connected;
-
-                // if (flags.DEBUG && flags.NOCONN) {
-                //     console.log('player sits at table');
-                //     onsit(testdata.gamedata);
-
-                //     console.log('call the oncardsdealt callback');
-                //     oncardsdealt({ cards: testdata.cards });
-                // }
-
-                // console.log('debug ... exit debug check ...');
-            }, startupt);
             renderLoop = setInterval(() => {
-                table.state.render();
-            }, tickrate, table.state, staticCanvas);
+                current.table.render();
+            }, tickrate, current.table, staticCanvas);
             console.log('debug: ... updating running ...');
         }, startupt);
-        console.log('debug: ... exited start ...');
+        console.log('debug: ... exited start.');
     }, startupt);
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);
-        table.state.redraw();
+        current.table.redraw();
     });
 });
