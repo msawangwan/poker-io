@@ -7,6 +7,8 @@ const scalingvalue = 0.65;
 
 class Table {
     constructor(maxseats, parentcanvas, textcanvas) {
+        this.id = null;
+
         this.maxseats = maxseats;
 
         this.parentcanvas = parentcanvas;
@@ -56,6 +58,10 @@ class Table {
     set centerLabelText(t) {
         this.messageHistory.push(t);
         this.redraw();
+    };
+
+    set assignedId(id) {
+        this.id = id;
     };
 
     render() {
@@ -146,6 +152,16 @@ class Table {
         this.redrawHandlers.set(seatindex, () => {
             this.seats.get(seatindex).redraw(); // attach handler to seat
         });
+
+        return true;
+    };
+
+    sitIn(index, player) {
+        if (!this.seats.get(seatindex).vacant) {
+            return false;
+        }
+
+
 
         return true;
     };

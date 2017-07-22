@@ -5,11 +5,19 @@ class Player {
         this.balance = balance;
         this.cardcanvas = cardcanvas;
 
+        this.canvas = {
+            layer: cardcanvas,
+            position: {
+                x: 0,
+                y: 0,
+            }
+        };
+
         this.seat = {
             position: undefined,
             x: 0,
             y: 0
-        }
+        };
 
         this.gameid = null;
 
@@ -27,6 +35,15 @@ class Player {
     get isValid() {
         return this.id !== undefined;
     };
+
+    get canvasCoordinates() {
+        return [this.canvas.position.x, this.canvas.position.y];
+    };
+
+    set canvasCoordinates(c) {
+        this.canvas.position.x = c[0];
+        this.canvas.position.y = c[1];
+    }
 
     render() {
         if (this.drawOnNextUpdate) {

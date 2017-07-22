@@ -101,6 +101,11 @@ $(document).ready(() => {
         }
 
         current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
+
+        current.table.assignedId = data.table.id;
+        current.table.sitIn(data.assignedSeat, player);
+
+        // TODO: redraw table
     };
 
     const onsit = (data) => {
