@@ -79,13 +79,6 @@ $(document).ready(() => {
 
         current.table = new Table(9, staticCanvas, labelCanvas);
 
-        // let seatindex = 0;
-
-        // while (seatindex < current.table.maxseats) {
-        //     current.table.emptySeat(seatindex);
-        //     seatindex += 1;
-        // }
-
         current.table.init();
         current.table.redraw();
     };
@@ -102,11 +95,26 @@ $(document).ready(() => {
         }
 
         current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
-
         current.table.assignedId = data.table.id;
-        current.table.sitIn(data.table.assignedSeat, current.player);
 
-        // TODO: redraw table
+        current.table.seatPlayer(data.table.assignedSeat, current.player);
+
+        for (const seat of data.table.seatingState) {
+            if ((seat[1].vacant) || (seat[1].player.id === socket.id)) { // or: current.player.id
+                continue;
+            }
+
+            const opponent = new Player(
+                seat[1].player.name,
+                seat[1].player.id,
+                seat[1].player.balance,
+                dynamicCanvas
+            );
+
+            current.table.seatPlayer(seat[0], opponent);
+        }
+
+        current.table.redraw();
     };
 
     const onsit = (data) => {

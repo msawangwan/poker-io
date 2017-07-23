@@ -139,18 +139,6 @@ class Table {
         }
     };
 
-    seatsVacant(vacant) {
-        return [...this.seats].filter(([i, s]) => s.vacant === vacant);
-    };
-
-    seatCount(vacant) {
-        return this.seatsVacant(vacant).length;
-    };
-
-    seatByIndex(seatindex) {
-        return this.seats.get(seatindex);
-    };
-
     // TODO: rename
     emptySeat(seatindex) {
         if (this.seats.size > this.maxseats) {
@@ -166,34 +154,36 @@ class Table {
         return true;
     };
 
-    // TODO: rename
-    sitIn(index, player) {
-
-        if (!this.seats.get(index).vacant) {
+    seatPlayer(index, player) {
+        if (!this.seatByIndex(index).vacant) {
             return false;
         }
+
+        const seat = this.seatByIndex(index);
+
+        seat.vacant = false;
+        seat.player = player;
+
+        this.setSeatByIndex(index, seat);
 
         return true;
     };
 
-    // sit(seatindex, name, id, balance, canvas) {
-    //     const seat = this.seats.get(seatindex);
+    seatsVacant(vacant) {
+        return [...this.seats].filter(([i, s]) => s.vacant === vacant);
+    };
 
-    //     if (!seat) {
-    //         console.log('table: couldnt not find seat at index: ' + seatindex);
-    //         return false;
-    //     }
+    seatCount(vacant) {
+        return this.seatsVacant(vacant).length;
+    };
 
-    //     const player = new Player(name, id, balance, canvas);
-    //     player.joinTable(this, seatindex);
-    //     seat.occupy(player);
+    seatByIndex(seatindex) {
+        return this.seats.get(seatindex);
+    };
 
-    //     this.setCenterLabelText('waiting for players ...'); // TODO: add a switch statement with different phrases depending on table state
-
-    //     this.redraw();
-
-    //     return player;
-    // };
+    setSeatByIndex(seatindex, seat) {
+        this.seats.set(seatindex, seat);
+    }
 
     pointOnTable(position, onchangeHandle) {
         if (onchangeHandle) {
