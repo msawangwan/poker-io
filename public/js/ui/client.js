@@ -100,9 +100,16 @@ $(document).ready(() => {
         current.table.seatPlayer(data.table.assignedSeat, current.player);
         current.table.seatOpponents(data.table.seatingState, socket.id);
 
+        current.table.centerLabelText = 'waiting for players ...';
+
         resizeCanvases(containerCanvasId, canvasGroup);
 
-        socket.emit('table-state-requested');
+        // socket.emit('table-state-requested', {
+        //     tableid: current.table.id
+        // });
+        // const subscribeGameStart = () => {
+        //     current.table.game.start(current.player);
+        // }
     };
 
     const onotherplayerjoined = (data) => {
@@ -110,11 +117,13 @@ $(document).ready(() => {
 
         resizeCanvases(containerCanvasId, canvasGroup);
 
-        socket.emit('table-state-requested');
+        // socket.emit('table-state-requested', {
+        //     tableid: current.table.id
+        // });
     };
 
     const onupdatetablestate = (data) => {
-        console.log(data.tablestate);
+        // if (data.table)
     };
 
     // const oncardsdealt = (data) => {

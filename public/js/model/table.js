@@ -19,6 +19,8 @@ class Table {
 
         this.seats = new Map();
 
+        this.game = null;
+
         this.pointCalcHandlers = new Map();
         this.redrawHandlers = new Map();
 
