@@ -117,112 +117,21 @@ $(document).ready(() => {
         current.table.redraw();
     };
 
-    const onsit = (data) => {
-        const seatedPlayer = current.table.sit(
-            data.seatedPlayer.seatIndex,
-            data.seatedPlayer.name,
-            socket.id,
-            data.seatedPlayer.balance,
-            dynamicCanvas
-        );
-
-        if (seatedPlayer) {
-            current.player = seatedPlayer;
-            // socket.emit('player-ready', { player: seatedPlayer });
-
-            // if (flags.DEBUG) {
-            //     Promise.resolve().then(() => {
-            //         console.log('debug: deal fake hand on sit');
-            //         oncardsdealt({ cards: testdata.cards });
-            //     });
-            // }
-        }
-    };
-
-    const onsitother = (data) => {
-        console.log(data.occupiedSeats);
-        const gameState = data.tableGameState;
-        const occupiedSeats = data.occupiedSeats;
-
-        if (occupiedSeats.length !== current.table.seatCount(false)) {
-            console.log('server seat count doesnt match, updating');
-
-            {
-                console.log('=== === ===');
-                console.log('all players (not including self):');
-                console.log(data.occupiedSeats);
-                console.log('=== === ===');
+    const onotherplayerjoined = (data) => {
+        for (const seat of data.table.seatingState) {
+            if ((seat[1].vacant) || (seat[1].player.id === socket.id)) { // or: current.player.id
+                continue;
             }
 
-            for (const seat of occupiedSeats) {
-                const pos = seat[0];
-                const player = seat[1];
+            const opponent = new Player(
+                seat[1].player.name,
+                seat[1].player.id,
+                seat[1].player.balance,
+                dynamicCanvas
+            );
 
-                if (player.id === socket.id) {
-                    console.log('skipping self');
-                    continue;
-                }
-
-                {
-                    console.log('=== === ===');
-                    console.log('creating new player:');
-                    console.log(`position: ${pos}`);
-                    console.log(`name: ${player.name}`);
-                    console.log(`id: ${player.id}`);
-                    console.log(`balance: ${player.balance}`);
-                    console.log('=== === ===');
-                }
-
-                const seatedOther = current.table.sit(
-                    pos,
-                    player.name,
-                    player.id,
-                    player.balance,
-                    dynamicCanvas
-                );
-            }
+            current.table.seatPlayer(seat[0], opponent);
         }
-
-        // if (current.table.seatCount(false) === data.seatCount) {
-        //     console.log('seat count has not changed');
-        // } else {
-        //     // console.log('server seat count doesnt match, updating');
-
-        //     // {
-        //     //     console.log('=== === ===');
-        //     //     console.log('all players (not including self):');
-        //     //     console.log(data.seatedPlayers);
-        //     //     console.log('=== === ===');
-        //     // }
-
-        //     // for (const other of data.seatedPlayers) {
-        //     //     const pos = other[0];
-        //     //     const player = other[1];
-
-        //     //     if (player.id === socket.id) {
-        //     //         console.log('skipping self');
-        //     //         continue;
-        //     //     }
-
-        //     //     {
-        //     //         console.log('=== === ===');
-        //     //         console.log('creating new player:');
-        //     //         console.log(`position: ${pos}`);
-        //     //         console.log(`name: ${player.name}`);
-        //     //         console.log(`id: ${player.id}`);
-        //     //         console.log(`balance: ${player.balance}`);
-        //     //         console.log('=== === ===');
-        //     //     }
-
-        //     //     const seatedOther = current.table.sit(
-        //     //         pos,
-        //     //         player.name,
-        //     //         player.id,
-        //     //         player.balance,
-        //     //         dynamicCanvas
-        //     //     );
-        //     // }
-        // }
 
         current.table.redraw();
     };
@@ -234,8 +143,7 @@ $(document).ready(() => {
     {
         socket.on('connect', onconnect);
         socket.on('assigned-table', ontableassigned);
-        socket.on('player-seated', onsit);
-        socket.on('a-player-was-seated', onsitother);
+        socket.on('a-player-has-joined', onotherplayerjoined);
         socket.on('cards-dealt', oncardsdealt);
     }
 
