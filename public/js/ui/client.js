@@ -133,6 +133,7 @@ $(document).ready(() => {
             current.table.seatPlayer(seat[0], opponent);
         }
 
+        resizeCanvases(containerCanvasId, canvasGroup);
         current.table.redraw();
     };
 
