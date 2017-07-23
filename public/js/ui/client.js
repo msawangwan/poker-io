@@ -66,75 +66,67 @@ $(document).ready(() => {
         });
     }
 
-    const onconnect = (data) => {
-        {
-            console.log(`===`);
-            console.log('established socket conn');
-            console.log(`client id: ${socket.id}`);
-            console.log(`running settup ...`);
-            console.log(`... creating a table ...`);
-            console.log(`... done.`);
-            console.log(`===`);
-        }
-
-        current.table = new Table(9, staticCanvas, labelCanvas);
-
-        current.table.init();
-        current.table.redraw();
-    };
-
-    const ontableassigned = (data) => {
-        {
-            console.log(`===`);
-            console.log(`player assigned to table and got seating:`);
-            console.log(`assigned name: ${data.guestname}`);
-            console.log(`assigned seat: ${data.table.assignedSeat}`);
-            console.log(`table id: ${data.table.id}`);
-            console.log(data);
-            console.log(`===`);
-        }
-
-        current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
-        current.table.assignedId = data.table.id;
-
-        current.table.seatPlayer(data.table.assignedSeat, current.player);
-        current.table.seatOpponents(data.table.seatingState, socket.id);
-
-        current.table.centerLabelText = 'waiting for players ...';
-
-        resizeCanvases(containerCanvasId, canvasGroup);
-
-        // socket.emit('table-state-requested', {
-        //     tableid: current.table.id
-        // });
-        // const subscribeGameStart = () => {
-        //     current.table.game.start(current.player);
-        // }
-    };
-
-    const onotherplayerjoined = (data) => {
-        current.table.seatOpponents(data.table.seatingState, socket.id);
-
-        resizeCanvases(containerCanvasId, canvasGroup);
-
-        // socket.emit('table-state-requested', {
-        //     tableid: current.table.id
-        // });
-    };
-
-    const onupdatetablestate = (data) => {
-        // if (data.table)
-    };
-
-    // const oncardsdealt = (data) => {
-    //     current.player.gotHand(data.cards.a, data.cards.b);
-    // };
-
     {
-        socket.on('connect', onconnect);
-        socket.on('assigned-table', ontableassigned);
-        socket.on('a-player-has-joined', onotherplayerjoined);
-        socket.on('server-sent-table-state', onupdatetablestate);
+        socket.on('connect', (data) => {
+            {
+                console.log(`===`);
+                console.log('established socket conn');
+                console.log(`client id: ${socket.id}`);
+                console.log(`running settup ...`);
+                console.log(`... creating a table ...`);
+                console.log(`... done.`);
+                console.log(`===`);
+            }
+
+            current.table = new Table(9, staticCanvas, labelCanvas);
+
+            current.table.init();
+            current.table.redraw();
+        });
+
+        socket.on('assigned-table', (data) => {
+            {
+                console.log(`===`);
+                console.log(`player assigned to table and got seating:`);
+                console.log(`assigned name: ${data.guestname}`);
+                console.log(`assigned seat: ${data.table.assignedSeat}`);
+                console.log(`table id: ${data.table.id}`);
+                console.log(data);
+                console.log(`===`);
+            }
+
+            current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
+            current.table.assignedId = data.table.id;
+
+            current.table.seatPlayer(data.table.assignedSeat, current.player);
+            current.table.seatOpponents(data.table.seatingState, socket.id);
+
+            current.table.centerLabelText = 'waiting for players ...';
+
+            resizeCanvases(containerCanvasId, canvasGroup);
+
+            // socket.emit('table-state-requested', {
+            //     tableid: current.table.id
+            // });
+            // const subscribeGameStart = () => {
+            //     current.table.game.start(current.player);
+            // }
+        });
+
+        socket.on('a-player-has-joined', (data) => {
+            current.table.seatOpponents(data.table.seatingState, socket.id);
+
+            resizeCanvases(containerCanvasId, canvasGroup);
+
+            // socket.emit('table-state-requested', {
+            //     tableid: current.table.id
+            // });
+        });
+
+        socket.on('server-sent-table-state', (data) => {
+            // if (data.table)
+        });
+
         // socket.on('cards-dealt', oncardsdealt);
     }
 
