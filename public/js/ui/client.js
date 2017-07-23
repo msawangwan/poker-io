@@ -98,54 +98,35 @@ $(document).ready(() => {
         current.table.assignedId = data.table.id;
 
         current.table.seatPlayer(data.table.assignedSeat, current.player);
+        current.table.seatOpponents(data.table.seatingState, socket.id);
 
-        for (const seat of data.table.seatingState) {
-            if ((seat[1].vacant) || (seat[1].player.id === socket.id)) { // or: current.player.id
-                continue;
-            }
+        resizeCanvases(containerCanvasId, canvasGroup);
 
-            const opponent = new Player(
-                seat[1].player.name,
-                seat[1].player.id,
-                seat[1].player.balance,
-                dynamicCanvas
-            );
-
-            current.table.seatPlayer(seat[0], opponent);
-        }
-
-        current.table.redraw();
+        socket.emit('table-state-requested');
     };
 
     const onotherplayerjoined = (data) => {
-        for (const seat of data.table.seatingState) {
-            if ((seat[1].vacant) || (seat[1].player.id === socket.id)) { // or: current.player.id
-                continue;
-            }
-
-            const opponent = new Player(
-                seat[1].player.name,
-                seat[1].player.id,
-                seat[1].player.balance,
-                dynamicCanvas
-            );
-
-            current.table.seatPlayer(seat[0], opponent);
-        }
+        current.table.seatOpponents(data.table.seatingState, socket.id);
 
         resizeCanvases(containerCanvasId, canvasGroup);
-        current.table.redraw();
+
+        socket.emit('table-state-requested');
     };
 
-    const oncardsdealt = (data) => {
-        current.player.gotHand(data.cards.a, data.cards.b);
+    const onupdatetablestate = (data) => {
+        console.log(data.tablestate);
     };
+
+    // const oncardsdealt = (data) => {
+    //     current.player.gotHand(data.cards.a, data.cards.b);
+    // };
 
     {
         socket.on('connect', onconnect);
         socket.on('assigned-table', ontableassigned);
         socket.on('a-player-has-joined', onotherplayerjoined);
-        socket.on('cards-dealt', oncardsdealt);
+        socket.on('server-sent-table-state', onupdatetablestate);
+        // socket.on('cards-dealt', oncardsdealt);
     }
 
     let renderLoop = null;

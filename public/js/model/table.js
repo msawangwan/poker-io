@@ -134,13 +134,12 @@ class Table {
         let seatindex = 0;
 
         while (seatindex < this.maxseats) {
-            this.emptySeat(seatindex);
+            this.clearSeat(seatindex);
             seatindex += 1;
         }
     };
 
-    // TODO: rename
-    emptySeat(seatindex) {
+    clearSeat(seatindex) {
         if (this.seats.size > this.maxseats) {
             return false;
         }
@@ -168,6 +167,28 @@ class Table {
 
         return true;
     };
+
+    seatOpponents(seatingState, currentPlayerId) {
+        for (const seat of seatingState) {
+            if (seat[1].vacant) {
+                continue;
+            } else if (seat[1].player.id === currentPlayerId) {
+                this.seats.get(seat[0]).player.balance = seat[1].player.balance;
+                continue;
+            }
+
+            const opponent = new Player(
+                seat[1].player.name,
+                seat[1].player.id,
+                seat[1].player.balance,
+                null
+            );
+
+            this.seatPlayer(seat[0], opponent);
+        }
+
+        this.redraw();
+    }
 
     seatsVacant(vacant) {
         return [...this.seats].filter(([i, s]) => s.vacant === vacant);
