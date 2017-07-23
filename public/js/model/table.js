@@ -130,6 +130,15 @@ class Table {
         }
     };
 
+    init() {
+        let seatindex = 0;
+
+        while (seatindex < this.maxseats) {
+            this.emptySeat(seatindex);
+            seatindex += 1;
+        }
+    };
+
     seatsVacant(vacant) {
         return [...this.seats].filter(([i, s]) => s.vacant === vacant);
     };
@@ -142,6 +151,7 @@ class Table {
         return this.seats.get(seatindex);
     };
 
+    // TODO: rename
     emptySeat(seatindex) {
         if (this.seats.size > this.maxseats) {
             return false;
@@ -156,34 +166,34 @@ class Table {
         return true;
     };
 
+    // TODO: rename
     sitIn(index, player) {
-        if (!this.seats.get(seatindex).vacant) {
+
+        if (!this.seats.get(index).vacant) {
             return false;
         }
-
-
 
         return true;
     };
 
-    sit(seatindex, name, id, balance, canvas) {
-        const seat = this.seats.get(seatindex);
+    // sit(seatindex, name, id, balance, canvas) {
+    //     const seat = this.seats.get(seatindex);
 
-        if (!seat) {
-            console.log('table: couldnt not find seat at index: ' + seatindex);
-            return false;
-        }
+    //     if (!seat) {
+    //         console.log('table: couldnt not find seat at index: ' + seatindex);
+    //         return false;
+    //     }
 
-        const player = new Player(name, id, balance, canvas);
-        player.joinTable(this, seatindex);
-        seat.occupy(player);
+    //     const player = new Player(name, id, balance, canvas);
+    //     player.joinTable(this, seatindex);
+    //     seat.occupy(player);
 
-        this.setCenterLabelText('waiting for players ...'); // TODO: add a switch statement with different phrases depending on table state
+    //     this.setCenterLabelText('waiting for players ...'); // TODO: add a switch statement with different phrases depending on table state
 
-        this.redraw();
+    //     this.redraw();
 
-        return player;
-    };
+    //     return player;
+    // };
 
     pointOnTable(position, onchangeHandle) {
         if (onchangeHandle) {

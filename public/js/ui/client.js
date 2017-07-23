@@ -79,13 +79,14 @@ $(document).ready(() => {
 
         current.table = new Table(9, staticCanvas, labelCanvas);
 
-        let seatindex = 0;
+        // let seatindex = 0;
 
-        while (seatindex < current.table.maxseats) {
-            current.table.emptySeat(seatindex);
-            seatindex += 1;
-        }
+        // while (seatindex < current.table.maxseats) {
+        //     current.table.emptySeat(seatindex);
+        //     seatindex += 1;
+        // }
 
+        current.table.init();
         current.table.redraw();
     };
 
@@ -103,7 +104,7 @@ $(document).ready(() => {
         current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
 
         current.table.assignedId = data.table.id;
-        current.table.sitIn(data.assignedSeat, player);
+        current.table.sitIn(data.table.assignedSeat, current.player);
 
         // TODO: redraw table
     };
