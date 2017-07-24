@@ -41,8 +41,6 @@ class Seat {
 
     render() {
         if (this.drawOnNextUpdate) {
-            console.log(`drawing seat for player: ${this.player ? this.player.name : 'none'}`);
-
             this.resize();
             this.draw();
 

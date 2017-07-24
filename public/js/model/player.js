@@ -15,29 +15,29 @@ class Player {
 
         });
 
-        this.canvas = {
-            layer: cardcanvas,
-            position: {
-                x: 0,
-                y: 0,
-            }
-        };
+        // this.canvas = {
+        //     layer: cardcanvas,
+        //     position: {
+        //         x: 0,
+        //         y: 0,
+        //     }
+        // };
 
-        this.seat = {
-            position: undefined,
-            x: 0,
-            y: 0
-        };
+        // this.seat = {
+        //     position: undefined,
+        //     x: 0,
+        //     y: 0
+        // };
 
         this.gameid = null;
 
-        this.holecards = {
-            a: null, b: null
-        };
+        // this.holecards = {
+        //     a: null, b: null
+        // };
 
-        this.hasHolecards = () => this.holecards.a !== null && this.holecards.b !== null;
+        // this.hasHolecards = () => this.holecards.a !== null && this.holecards.b !== null;
 
-        this.renderHandlers = new Map();
+        // this.renderHandlers = new Map();
 
         this.drawOnNextUpdate = false;
     };
@@ -46,18 +46,18 @@ class Player {
         return this.id !== undefined;
     };
 
-    get canvasCoordinates() {
-        return [this.canvas.position.x, this.canvas.position.y];
-    };
+    // get canvasCoordinates() {
+    //     return [this.canvas.position.x, this.canvas.position.y];
+    // };
 
     get seatPositionIndex() {
         return this.seatPosition;
     }
 
-    set canvasCoordinates(c) {
-        this.canvas.position.x = c[0];
-        this.canvas.position.y = c[1];
-    }
+    // set canvasCoordinates(c) {
+    //     this.canvas.position.x = c[0];
+    //     this.canvas.position.y = c[1];
+    // }
 
     set seatPositionIndex(i) {
         this.seatPosition = i
@@ -97,17 +97,17 @@ class Player {
         }, 1500);
     };
 
-    gotHand(a, b) {
-        this.holecards.a = new Card(a.value, a.suite, this.cardcanvas); // TODO: cache these card instances
-        this.holecards.b = new Card(b.value, b.suite, this.cardcanvas); // TODO: cache these card instances
+    // gotHand(a, b) {
+    //     this.holecards.a = new Card(a.value, a.suite, this.cardcanvas); // TODO: cache these card instances
+    //     this.holecards.b = new Card(b.value, b.suite, this.cardcanvas); // TODO: cache these card instances
 
-        this.renderHandlers.set('holecards', () => {
-            this.holecards.a.drawOnNextUpdate = true;
-            this.holecards.b.drawOnNextUpdate = true;
-        });
+    //     this.renderHandlers.set('holecards', () => {
+    //         this.holecards.a.drawOnNextUpdate = true;
+    //         this.holecards.b.drawOnNextUpdate = true;
+    //     });
 
-        this.redraw();
-    };
+    //     this.redraw();
+    // };
 
     static exists(player) {
         return player.id !== undefined;

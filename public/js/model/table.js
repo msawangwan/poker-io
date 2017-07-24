@@ -84,8 +84,6 @@ class Table {
 
     render() {
         if (this.drawOnNextUpdate) {
-            console.log('drawing table');
-
             this.resize();
             this.draw();
 
@@ -305,14 +303,14 @@ class Table {
             x: x, y: y
         };
     };
-    
+
     static seat(vacant, fixedpos, relpos, player) {
         return {
             vacant: vacant,
             player: player,
             position: {
                 fixed: fixedpos,
-                relative:relpos
+                relative: relpos
             }
         }
     }

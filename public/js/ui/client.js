@@ -93,6 +93,12 @@ $(document).ready(() => {
                 console.log('===');
             }
 
+            // switch (current.player)
+
+            // if (data.button === current.player.position) {
+
+            // }
+
             socket.emit('player-ready-up', {
                 tableid: current.table.id,
                 gameid: current.table.game.id
