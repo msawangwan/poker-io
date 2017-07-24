@@ -169,6 +169,8 @@ class Table {
         seat.vacant = false;
         seat.player = player;
 
+        player.seatPositionIndex = index;
+
         this.setSeatByIndex(index, seat);
 
         return true;
@@ -189,6 +191,8 @@ class Table {
                 seat[1].player.balance,
                 null
             );
+
+            opponent.seatPositionIndex = seat[0];
 
             this.seatPlayer(seat[0], opponent);
         }

@@ -5,6 +5,16 @@ class Player {
         this.balance = balance;
         this.cardcanvas = cardcanvas;
 
+        this.handlers = new Map();
+
+        this.handlers.set('gameposition', (pos) => {
+
+        });
+
+        this.handlers.set('onthebutton', (button) => {
+
+        });
+
         this.canvas = {
             layer: cardcanvas,
             position: {
@@ -40,10 +50,18 @@ class Player {
         return [this.canvas.position.x, this.canvas.position.y];
     };
 
+    get seatPositionIndex() {
+        return this.seatPosition;
+    }
+
     set canvasCoordinates(c) {
         this.canvas.position.x = c[0];
         this.canvas.position.y = c[1];
     }
+
+    set seatPositionIndex(i) {
+        this.seatPosition = i
+    };
 
     render() {
         if (this.drawOnNextUpdate) {
