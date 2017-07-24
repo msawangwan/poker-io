@@ -70,6 +70,18 @@ class Table {
         this.id = id;
     };
 
+    set dealerbutton(db) {
+        this.db = db;
+    };
+
+    set smallblind(sb) {
+        this.sb = sb;
+    };
+
+    set bigblind(bb) {
+        this.bb = bb;
+    };
+
     render() {
         if (this.drawOnNextUpdate) {
             console.log('drawing table');

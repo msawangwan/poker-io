@@ -85,16 +85,18 @@ $(document).ready(() => {
             });
         });
 
-        socket.on('assign-positions', (data) => {
+        socket.on('game-positions', (data) => {
             {
                 console.log('===');
-                console.log('position data sent');
+                console.log('got game positions for round');
+                console.log(data);
                 console.log('===');
             }
 
-            current.table.game.assignButton(data.button);
-
-            console.log(data);
+            socket.emit('player-ready-up', {
+                tableid: current.table.id,
+                gameid: current.table.game.id
+            });
         });
     }
 
