@@ -104,27 +104,33 @@ $(document).ready(() => {
             current.table.centerLabelText = 'waiting for players ...';
 
             resizeCanvases(containerCanvasId, canvasGroup);
-
-            // socket.emit('table-state-requested', {
-            //     tableid: current.table.id
-            // });
-            // const subscribeGameStart = () => {
-            //     current.table.game.start(current.player);
-            // }
         });
 
         socket.on('a-player-has-joined', (data) => {
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
             resizeCanvases(containerCanvasId, canvasGroup);
-
-            // socket.emit('table-state-requested', {
-            //     tableid: current.table.id
-            // });
         });
 
-        socket.on('server-sent-table-state', (data) => {
-            // if (data.table)
+        socket.on('game-started', (data) => {
+            current.table.game = new Game(data.gameId, current.table.players);
+
+            socket.emit('get-position', {
+                tableid: current.table.id,
+                gameid: current.table.game.id
+            });
+        });
+
+        socket.on('on-the-button', (data) => {
+            {
+                console.log('===');
+                console.log('position data sent');
+                console.log('===');
+            }
+
+            current.table.game.onTheButton = data.button;
+
+            console.log(data);
         });
 
         // socket.on('cards-dealt', oncardsdealt);

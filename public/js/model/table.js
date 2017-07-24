@@ -45,6 +45,10 @@ class Table {
         this.drawOnNextUpdate = false;
     };
 
+    get players() {
+        return this.seatsVacant(false).map(s => s[1].player);
+    }
+
     get center() {
         return [
             this.parentcanvas.width * 0.5,
