@@ -94,8 +94,6 @@ class Table {
                 this.textcanvas,
                 this.center[0],
                 this.center[1]
-                // this.parentcanvas.width / 2,
-                // this.parentcanvas.height / 2
             );
 
             this.drawOnNextUpdate = false;
@@ -307,4 +305,15 @@ class Table {
             x: x, y: y
         };
     };
+    
+    static seat(vacant, fixedpos, relpos, player) {
+        return {
+            vacant: vacant,
+            player: player,
+            position: {
+                fixed: fixedpos,
+                relative:relpos
+            }
+        }
+    }
 }
