@@ -102,20 +102,6 @@ $(document).ready(() => {
             current.table.buttonIndex = data.buttonIndex;
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
-
-            {
-                console.log('===');
-                console.log('player id');
-                console.log(current.player.id);
-                console.log('seat index');
-                console.log(current.player.seatPositionIndex);
-                console.log('turn position index:');
-                console.log(current.player.turnPositionIndex);
-                console.log('button index');
-                console.log(current.table.buttonIndex);
-                console.log(data);
-                console.log('===');
-            }
         });
 
         socket.on('action', (data) => {
@@ -127,30 +113,66 @@ $(document).ready(() => {
                 console.log('===');
             }
 
+            let action = null;
+
             switch (data.type) {
                 case 'post-small-blind':
-                    console.log(data.type);
-                    $btnsendblind.toggle($hidebtn);
+                    action = () => {
+                        $btnsendblind.toggle($hidebtn);
+                        $btnsendblind.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'smallblind',
+                                betAmount: 50,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
+
+                            $btnsendblind.toggle($hidebtn);
+                        });
+                    };
                     break;
                 case 'post-big-blind':
-                    console.log(data.type);
-                    $btnsendblind.toggle($hidebtn);
+                    action = () => {
+                        $btnsendblind.toggle($hidebtn);
+                        $btnsendblind.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'bigblind',
+                                betAmount: 100,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
+
+                            $btnsendblind.toggle($hidebtn);
+                        });
+                    };
                     break;
                 case 'call':
-                    console.log(data.type);
                     break;
                 case 'raise':
-                    console.log(data.type);
                     break;
                 case 'bet':
-                    console.log(data.type);
                     break;
                 case 'check':
-                    console.log(data.type);
                     break;
                 default:
-                    console.log('no matching action');
+                    action = () => console.log('no matching action');
+                    break;
             }
+
+            action();
+        });
+
+
+        socket.on('action-result', (data) => {
+
+        });
+
+        socket.on('player-posted-blinds', (data) => {
+            console.log('player posted blinds');
+            console.log(data);
+            resizeCanvases(containerCanvasId, canvasGroup);
+            current.table.drawChips(data.playerSeat);
+            current.table.redraw();
         });
     }
 

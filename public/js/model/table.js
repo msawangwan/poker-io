@@ -316,6 +316,35 @@ class Table {
 
     setSeatByIndex(seatindex, seat) {
         this.seats.set(seatindex, seat);
+    };
+
+    drawChips(seatindex) {
+        this.drawHandlers.set('drawchips' + seatindex, () => {
+            const offsetAmount = 38;
+
+            let offsetx = 0;
+            let offsety = 0;
+
+            if (seatindex === 0 || seatindex === 1) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount;
+            } else if (seatindex === 2 || seatindex === 3) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount * -1;
+            } else if (seatindex === 4) {
+                offsety = offsetAmount * -1;
+            } else if (seatindex === 5 || seatindex === 6) {
+                offsetx = offsetAmount;
+                offsety = offsetAmount;
+            } else {
+                offsetx = offsetAmount;
+                offsety = offsetAmount * -1;
+            }
+
+            const p = this.pointOnTable(seatindex);
+
+            this.chip.render(p.x + offsetx, p.y + offsety)
+        });
     }
 
     pointOnTable(position, onchangeHandle) {
