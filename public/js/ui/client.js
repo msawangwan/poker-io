@@ -1,8 +1,3 @@
-const flags = {
-    DEBUG: true,
-    NOCONN: true
-};
-
 const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     const parentEle = document.getElementById(parentCanvasId);
 
@@ -20,17 +15,6 @@ const containerCanvasId = 'container-canvas';
 
 const tickrate = 1000 / 2;
 const startupt = 800;
-
-const testdata = {
-    gamedata: {
-        gameid: 0,
-        seatIndex: 3
-    },
-    cards: {
-        a: { value: 5, suite: 0 },
-        b: { value: 8, suite: 2 }
-    }
-};
 
 const current = {
     player: null, table: null
@@ -95,7 +79,7 @@ $(document).ready(() => {
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
 
-            socket.emit('get-position', {
+            socket.emit('get-dealer', {
                 tableid: current.table.id,
                 gameid: current.table.game.id
             });
@@ -112,27 +96,17 @@ $(document).ready(() => {
 
             console.log(data);
         });
-
-        // socket.on('cards-dealt', oncardsdealt);
     }
 
     let renderLoop = null;
 
     {
         setTimeout(() => { // start
-            console.log(`===`);
-            console.log('entered start ...');
             setTimeout(() => { // update
-                console.log(`===`);
-                console.log('... started update ...');
                 renderLoop = setInterval(() => {
                     current.table.render();
                 }, tickrate, current.table, staticCanvas);
-                console.log('... updating running ...');
-                console.log(`===`);
             }, startupt);
-            console.log('... exited start.');
-            console.log(`===`);
         }, startupt);
     }
 
