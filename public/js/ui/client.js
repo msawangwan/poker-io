@@ -107,15 +107,18 @@ $(document).ready(() => {
             }
         });
 
-        // socket.on('post-blinds', (data) => {
-        //     let blindtype = data.type;
-
-        //     socket.emit('player-posted-blind', { type: blindtype, tableid: current.table.id });
-        // });
-
         socket.on('action', (data) => {
-            console.log('GOT AN ACTION');
-            console.log(data);
+            {
+                console.log('===');
+                console.log('player got an action');
+                console.log(current.player);
+                console.log(data);
+                console.log('===');
+            }
+
+            switch (data.type) {
+
+            }
         });
     }
 
