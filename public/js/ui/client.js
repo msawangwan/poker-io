@@ -78,6 +78,7 @@ $(document).ready(() => {
 
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
+            current.table.centerLabelText = 'pot size: 0'
 
             socket.emit('get-turn-order', {
                 tableid: current.table.id,
@@ -88,6 +89,8 @@ $(document).ready(() => {
         socket.on('turn-order-index', (data) => {
             current.player.turnPositionIndex = data.turnOrderIndex;
             current.table.buttonIndex = data.buttonIndex;
+            current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
+            current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
 
             {
                 console.log('===');
@@ -102,11 +105,17 @@ $(document).ready(() => {
                 console.log(data);
                 console.log('===');
             }
+        });
 
-            socket.emit('player-ready-up', {
-                tableid: current.table.id,
-                gameid: current.table.game.id
-            });
+        // socket.on('post-blinds', (data) => {
+        //     let blindtype = data.type;
+
+        //     socket.emit('player-posted-blind', { type: blindtype, tableid: current.table.id });
+        // });
+
+        socket.on('action', (data) => {
+            console.log('GOT AN ACTION');
+            console.log(data);
         });
     }
 

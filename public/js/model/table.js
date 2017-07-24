@@ -43,7 +43,9 @@ class Table {
 
         this.messageHistory = ['... seating ...'];
 
-        this.dealerButton = new DealerButton(this.textcanvas);
+        this.dealerbtn = new Button(this.textcanvas, './asset/btn-dealer.png');
+        this.sbbtn = new Button(this.textcanvas, './asset/btn-sb.png');
+        this.bbbtn = new Button(this.textcanvas, './asset/btn-bb.png');
 
         this.drawOnNextUpdate = false;
     };
@@ -81,6 +83,64 @@ class Table {
         this.id = id;
     };
 
+    set bbIndex(bb) {
+        this.bb = bb;
+        this.drawHandlers.set('draw-bigblind-button', () => {
+            const offsetAmount = 64;
+
+            let offsetx = 0;
+            let offsety = 0;
+
+            if (bb === 0 || bb === 1) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount
+            } else if (bb === 2 || bb === 3) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount * -1;
+            } else if (bb === 4) {
+                offsety = offsetAmount * -1;
+            } else if (bb === 5 || bb === 6) {
+                offsetx = offsetAmount;
+                offsety = offsetAmount;
+            } else {
+                offsetx = offsetAmount;
+                offsety = offsetAmount * -1;
+            }
+
+            const p = this.pointOnTable(bb);
+            this.bbbtn.render(p.x + offsetx, p.y + offsety);
+        });
+    }
+
+    set sbIndex(sb) {
+        this.sb = sb;
+        this.drawHandlers.set('draw-smallblind-button', () => {
+            const offsetAmount = 64;
+
+            let offsetx = 0;
+            let offsety = 0;
+
+            if (sb === 0 || sb === 1) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount
+            } else if (sb === 2 || sb === 3) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount * -1;
+            } else if (sb === 4) {
+                offsety = offsetAmount * -1;
+            } else if (sb === 5 || sb === 6) {
+                offsetx = offsetAmount;
+                offsety = offsetAmount;
+            } else {
+                offsetx = offsetAmount;
+                offsety = offsetAmount * -1;
+            }
+
+            const p = this.pointOnTable(sb);
+            this.sbbtn.render(p.x + offsetx, p.y + offsety);
+        });
+    }
+
     set buttonIndex(db) {
         this.db = db;
         this.drawHandlers.set('draw-dealer-button', () => {
@@ -106,7 +166,7 @@ class Table {
             }
 
             const p = this.pointOnTable(db);
-            this.dealerButton.draw(p.x + offsetx, p.y + offsety, 32, 32, 18);
+            this.dealerbtn.render(p.x + offsetx, p.y + offsety);
         });
     };
 
