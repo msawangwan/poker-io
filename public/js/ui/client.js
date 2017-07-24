@@ -79,25 +79,27 @@ $(document).ready(() => {
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
 
-            socket.emit('get-dealer', {
+            socket.emit('get-turn-order', {
                 tableid: current.table.id,
                 gameid: current.table.game.id
             });
         });
 
-        socket.on('game-positions', (data) => {
+        socket.on('turn-order-index', (data) => {
+            // current.player.turnPositionIndex = (data.button + current.player.seatPositionIndex % current.table.playerCount) % current.table.playerCount;
+            current.player.turnPositionIndex = data.turnOrderIndex;
+
             {
                 console.log('===');
-                console.log('got game positions for round');
+                console.log('player id');
+                console.log(current.player.id);
+                console.log('seat index');
+                console.log(current.player.seatPositionIndex);
+                console.log('turn position index:');
+                console.log(current.player.turnPositionIndex);
                 console.log(data);
                 console.log('===');
             }
-
-            // switch (current.player)
-
-            // if (data.button === current.player.position) {
-
-            // }
 
             socket.emit('player-ready-up', {
                 tableid: current.table.id,

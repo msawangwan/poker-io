@@ -47,7 +47,11 @@ class Table {
 
     get players() {
         return this.seatsVacant(false).map(s => s[1].player);
-    }
+    };
+
+    get playerCount() {
+        return this.seatsVacant(false).length;
+    };
 
     get center() {
         return [
@@ -304,14 +308,14 @@ class Table {
         };
     };
 
-    static seat(vacant, fixedpos, relpos, player) {
-        return {
-            vacant: vacant,
-            player: player,
-            position: {
-                fixed: fixedpos,
-                relative: relpos
-            }
-        }
-    }
+    // static seat(vacant, fixedpos, relpos, player) {
+    //     return {
+    //         vacant: vacant,
+    //         player: player,
+    //         position: {
+    //             fixed: fixedpos,
+    //             relative: relpos
+    //         }
+    //     }
+    // }
 }

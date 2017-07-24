@@ -8,6 +8,7 @@ class Seat {
         this.color = color;
 
         this.vacant = true;
+        this.turnOrder = 0;
         this.player = Player.none();
 
         this.parentcanvas = parentcanvas;
@@ -58,8 +59,6 @@ class Seat {
 
             this.drawOnNextUpdate = false;
         }
-
-        this.player.render();
     };
 
     resize() {
