@@ -37,18 +37,29 @@ $(document).ready(() => {
 
     resizeCanvases(containerCanvasId, canvasGroup);
 
-    {
-        const $containerbetting = $('#container-betting');
-        const $containerturnactions = $('#container-turn-actions');
-        const $bettextfield = $('#bet-amount-text-field');
-        const $betrangeslider = $('#bet-range-slider');
-        const $betsubmitbutton = $('#bet-submit-bet-btn');
+    const $betrangeslider = $('#bet-range-slider');
+    const $bettextfield = $('#bet-amount-text-field');
 
-        $betrangeslider.on('change', () => {
-            const slidervalue = $betrangeslider.val();
-            $bettextfield.val(slidervalue);
-        });
+    $betrangeslider.on('change', () => {
+        const slidervalue = $betrangeslider.val();
+        $bettextfield.val(slidervalue);
+    });
+
+    const $btnsendblind = $('#btn-send-blind');
+    const $btnsendfold = $('#btn-send-fold');
+    const $btnsendcall = $('#btn-send-call');
+    const $btnsendraise = $('#btn-send-raise');
+
+    const $allbtns = [
+        $btnsendblind, $btnsendfold, $btnsendcall, $btnsendraise
+    ];
+
+    const $hidebtn = '#hide-button';
+
+    for (const $b of $allbtns) {
+        $b.toggle($hidebtn);
     }
+
 
     {
         socket.on('connect', (data) => {
@@ -117,7 +128,28 @@ $(document).ready(() => {
             }
 
             switch (data.type) {
-
+                case 'post-small-blind':
+                    console.log(data.type);
+                    $btnsendblind.toggle($hidebtn);
+                    break;
+                case 'post-big-blind':
+                    console.log(data.type);
+                    $btnsendblind.toggle($hidebtn);
+                    break;
+                case 'call':
+                    console.log(data.type);
+                    break;
+                case 'raise':
+                    console.log(data.type);
+                    break;
+                case 'bet':
+                    console.log(data.type);
+                    break;
+                case 'check':
+                    console.log(data.type);
+                    break;
+                default:
+                    console.log('no matching action');
             }
         });
     }

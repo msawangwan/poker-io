@@ -47,6 +47,8 @@ class Table {
         this.sbbtn = new Button(this.textcanvas, './asset/btn-sb.png');
         this.bbbtn = new Button(this.textcanvas, './asset/btn-bb.png');
 
+        this.chip = new Chip(this.textcanvas, './asset/chip.png');
+
         this.drawOnNextUpdate = false;
     };
 

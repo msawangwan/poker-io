@@ -116,7 +116,7 @@ body {
     background: #a4a4a4;
 
     width: 100%;
-    z-index: -10;
+    z-index: 10;
 }
 
 .main-content-subsection:nth-child(3) {
@@ -124,7 +124,7 @@ body {
 
     background: #e6e6e6;
 
-    z-index: -10;
+    z-index: 10;
 }
 
 .canvas-layer {
@@ -175,6 +175,10 @@ body {
     justify-content: space-around;
 }
 
+#action-blinds:nth-child(1) {
+    display: hidden;
+}
+
 .container-bet-action {
     flex: 0 1 auto;
 }
@@ -193,4 +197,8 @@ body {
 
 #bet-amount-text-field {
     width: 75px;
+}
+
+.hide-button {
+    display: hidden;
 }
