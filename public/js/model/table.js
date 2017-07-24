@@ -22,6 +22,7 @@ class Table {
         this.game = null;
 
         this.pointCalcHandlers = new Map();
+        this.drawHandlers = new Map();
         this.redrawHandlers = new Map();
 
         this.postion = {
@@ -41,6 +42,8 @@ class Table {
         };
 
         this.messageHistory = ['... seating ...'];
+
+        this.dealerButton = new DealerButton(this.textcanvas);
 
         this.drawOnNextUpdate = false;
     };
@@ -65,6 +68,10 @@ class Table {
             this.messageHistory[this.messageHistory.length - 1] : '...';
     };
 
+    get buttonIndex() {
+        return this.db;
+    }
+
     set centerLabelText(t) {
         this.messageHistory.push(t);
         this.redraw();
@@ -74,16 +81,33 @@ class Table {
         this.id = id;
     };
 
-    set dealerbutton(db) {
+    set buttonIndex(db) {
         this.db = db;
-    };
+        this.drawHandlers.set('draw-dealer-button', () => {
+            const offsetAmount = 64;
 
-    set smallblind(sb) {
-        this.sb = sb;
-    };
+            let offsetx = 0;
+            let offsety = 0;
 
-    set bigblind(bb) {
-        this.bb = bb;
+            if (db === 0 || db === 1) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount
+            } else if (db === 2 || db === 3) {
+                offsetx = offsetAmount * -1;
+                offsety = offsetAmount * -1;
+            } else if (db === 4) {
+                offsety = offsetAmount * -1;
+            } else if (db === 5 || db === 6) {
+                offsetx = offsetAmount;
+                offsety = offsetAmount;
+            } else {
+                offsetx = offsetAmount;
+                offsety = offsetAmount * -1;
+            }
+
+            const p = this.pointOnTable(db);
+            this.dealerButton.draw(p.x + offsetx, p.y + offsety, 32, 32, 18);
+        });
     };
 
     render() {
@@ -99,10 +123,14 @@ class Table {
             );
 
             this.drawOnNextUpdate = false;
-        }
 
-        for (const [si, s] of this.seats) {
-            s.render();
+            for (const [si, s] of this.seats) {
+                s.render();
+            }
+
+            for (const [di, dh] of this.drawHandlers) {
+                dh();
+            }
         }
     };
 
@@ -307,15 +335,4 @@ class Table {
             x: x, y: y
         };
     };
-
-    // static seat(vacant, fixedpos, relpos, player) {
-    //     return {
-    //         vacant: vacant,
-    //         player: player,
-    //         position: {
-    //             fixed: fixedpos,
-    //             relative: relpos
-    //         }
-    //     }
-    // }
 }

@@ -86,8 +86,8 @@ $(document).ready(() => {
         });
 
         socket.on('turn-order-index', (data) => {
-            // current.player.turnPositionIndex = (data.button + current.player.seatPositionIndex % current.table.playerCount) % current.table.playerCount;
             current.player.turnPositionIndex = data.turnOrderIndex;
+            current.table.buttonIndex = data.buttonIndex;
 
             {
                 console.log('===');
@@ -97,6 +97,8 @@ $(document).ready(() => {
                 console.log(current.player.seatPositionIndex);
                 console.log('turn position index:');
                 console.log(current.player.turnPositionIndex);
+                console.log('button index');
+                console.log(current.table.buttonIndex);
                 console.log(data);
                 console.log('===');
             }
