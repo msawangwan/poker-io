@@ -362,7 +362,7 @@ class Table {
 
             const p = this.pointOnTable(seatindex);
 
-            this.chip.render(p.x + offsetx, p.y + offsety, 1, 1)
+            this.chip.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
         });
     }
 

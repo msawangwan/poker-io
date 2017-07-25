@@ -1,30 +1,30 @@
-class Button {
-    constructor(parentcanvas, src) {
-        this.parentcanvas = parentcanvas;
+// class Button {
+//     constructor(parentcanvas, src) {
+//         this.parentcanvas = parentcanvas;
 
-        this.canvas = document.createElement('canvas');
-        this.canvas.setAttribute('id', `canvas-button-${src}`);
+//         this.canvas = document.createElement('canvas');
+//         this.canvas.setAttribute('id', `canvas-button-${src}`);
 
-        this.src = src;
-    };
+//         this.src = src;
+//     };
 
-    render(x, y) {
-        const img = new Image();
+//     render(x, y) {
+//         const img = new Image();
 
-        img.onload = () => {
-            this.parentcanvas.getContext('2d').drawImage(
-                img,
-                1,
-                1,
-                64,
-                64,
-                x,
-                y,
-                64,
-                64
-            );
-        };
+//         img.onload = () => {
+//             this.parentcanvas.getContext('2d').drawImage(
+//                 img,
+//                 1,
+//                 1,
+//                 64,
+//                 64,
+//                 x,
+//                 y,
+//                 64,
+//                 64
+//             );
+//         };
 
-        img.src = this.src;
-    }
-}
+//         img.src = this.src;
+//     }
+// }
