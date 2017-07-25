@@ -23,7 +23,7 @@ const tickrate = 1000 / 2;
 const startupt = 800;
 
 const current = {
-    player: null, table: null
+    player: null, table: null, betPhase: null
 };
 
 $(document).ready(() => {
@@ -122,7 +122,26 @@ $(document).ready(() => {
                 console.log('===');
             }
 
+            {
+                debug.log('====');
+                debug.log('current betting phase:');
+                debug.log('phase: ' + data.betPhase);
+                debug.log('====');
+            }
+
+            current.betPhase = data.betPhase;
+
             let action = null;
+
+            const ondoaction = (t, p, b) => {
+                socket.emit('bet-action', {
+                    betType: t,
+                    betPhase: p,
+                    betAmount: b,
+                    tableid: current.table.id,
+                    gameid: current.table.game.id
+                });
+            };
 
             switch (data.type) {
                 case 'smallblind':
@@ -130,12 +149,14 @@ $(document).ready(() => {
                         $btnsendblind.toggle($hidebtn);
                         $btnsendblind.val('post small blind');
                         $btnsendblind.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'smallblind',
-                                betAmount: data.minbet / 2,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'smallblind',
+                            //     betPhase: current.betPhase,
+                            //     betAmount: data.minbet / 2,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+                            ondoaction('smallblind', data.betPhase, data.minbet / 2);
 
                             $btnsendblind.toggle($hidebtn);
                         });
@@ -146,12 +167,14 @@ $(document).ready(() => {
                         $btnsendblind.toggle($hidebtn);
                         $btnsendblind.val('post big blind');
                         $btnsendblind.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'bigblind',
-                                betAmount: data.minbet,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'bigblind',
+                            //     betAmount: data.minbet,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+                            ondoaction('bigblind', data.betPhase, data.minbet);
 
                             $btnsendblind.toggle($hidebtn);
                         });
@@ -162,12 +185,15 @@ $(document).ready(() => {
                         $btnsendcall.toggle($hidebtn);
                         $btnsendcall.val(`call ${data.minbet}`);
                         $btnsendcall.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'anteup',
-                                betAmount: data.minbet,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'anteup',
+                            //     betAmount: data.minbet,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+
+                            ondoaction('anteup', data.betPhase, data.minbet);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -177,12 +203,14 @@ $(document).ready(() => {
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'raiseante',
-                                betAmount: data.minbet,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'raiseante',
+                            //     betAmount: data.minbet,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+                            ondoaction('raise', data.betPhase, data.minbet);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -191,12 +219,15 @@ $(document).ready(() => {
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'foldante',
-                                betAmount: 0,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'foldante',
+                            //     betAmount: 0,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+
+                            ondoaction('fold', data.betPhase, 0);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -209,12 +240,15 @@ $(document).ready(() => {
                         $btnsendcheck.toggle($hidebtn);
                         $btnsendcheck.val(`check`);
                         $btnsendcheck.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'check',
-                                betAmount: data.minbet,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'check',
+                            //     betPhase: current.betPhase,
+                            //     betAmount: data.minbet,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+                            ondoaction('check', data.betPhase, 0);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -224,12 +258,16 @@ $(document).ready(() => {
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'raise',
-                                betAmount: data.minbet,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'raise',
+                            //     betPhase: current.betPhase,
+                            //     betAmount: data.minbet,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+
+                            ondoaction('raise', data.betPhase, data.minbet);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -238,12 +276,15 @@ $(document).ready(() => {
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
-                            socket.emit('bet-action', {
-                                betType: 'fold',
-                                betAmount: 0,
-                                tableid: current.table.id,
-                                gameid: current.table.game.id
-                            });
+                            // socket.emit('bet-action', {
+                            //     betType: 'fold',
+                            //     betPhase: current.betPhase,
+                            //     betAmount: 0,
+                            //     tableid: current.table.id,
+                            //     gameid: current.table.game.id
+                            // });
+
+                            ondoaction('fold', data.betPhase, 0);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -276,6 +317,7 @@ $(document).ready(() => {
             debug.log('player name: ' + data.playerName);
             debug.log('player id: ' + data.playerId);
             debug.log('bet type: ' + data.betType);
+            debug.log('bet phase: ' + data.betPhase);
             debug.log('bet amount: ' + data.betAmount);
             debug.log('new balance: ' + data.updatedBalance);
             debug.log('updated pot size:' + data.potsize);
