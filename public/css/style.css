@@ -202,3 +202,14 @@ body {
 .hide-button {
     display: hidden;
 }
+
+#table-log-output {
+    color: black;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+}
+
+/* #table-log-output > small {
+    flex-
+} */
