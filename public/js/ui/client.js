@@ -160,20 +160,47 @@ $(document).ready(() => {
                         $btnsendcall.toggle($hidebtn);
                         $btnsendcall.val(`call ${data.minbet}`);
                         $btnsendcall.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'anteup',
+                                betAmount: data.minbet,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
 
+                            $btnsendcall.toggle($hidebtn);
+                            $btnsendraise.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
                         });
 
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'raiseante',
+                                betAmount: data.minbet,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
 
+                            $btnsendcall.toggle($hidebtn);
+                            $btnsendraise.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
                         });
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'foldante',
+                                betAmount: 0,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
 
+                            $btnsendcall.toggle($hidebtn);
+                            $btnsendraise.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
                         });
-                    }
+                    };
                 case 'call':
                     break;
                 case 'raise':
