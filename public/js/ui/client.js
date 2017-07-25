@@ -204,13 +204,13 @@ $(document).ready(() => {
                         });
                     };
                     break;
-                case 'checkorraise':
+                case 'check':
                     action = () => {
                         $btnsendcheck.toggle($hidebtn);
                         $btnsendcheck.val(`check`);
                         $btnsendcheck.on('click', () => {
                             socket.emit('bet-action', {
-                                betType: 'checkante',
+                                betType: 'check',
                                 betAmount: data.minbet,
                                 tableid: current.table.id,
                                 gameid: current.table.game.id
@@ -225,7 +225,7 @@ $(document).ready(() => {
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
                             socket.emit('bet-action', {
-                                betType: 'raiseante',
+                                betType: 'raise',
                                 betAmount: data.minbet,
                                 tableid: current.table.id,
                                 gameid: current.table.game.id
@@ -239,7 +239,7 @@ $(document).ready(() => {
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
                             socket.emit('bet-action', {
-                                betType: 'foldante',
+                                betType: 'fold',
                                 betAmount: 0,
                                 tableid: current.table.id,
                                 gameid: current.table.game.id
