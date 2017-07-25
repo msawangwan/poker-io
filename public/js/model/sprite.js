@@ -1,74 +1,21 @@
 class Sprite {
-    constructor(parentcanvas, src, row, col, w, h) {
+    constructor(parentcanvas, src) {
         this.parentcanvas = parentcanvas;
-        this.src =src;
-        
-        this.width = w;
-        this.height = h;
-        
-        this.row = {
-            offset: row * w,
-            index: row
-        };
-        
-        this.col = {
-            offset: col * h,
-            index: col
-        };
+        this.src = src;
     };
-    
-    draw(dx, dy, sx, sy) {
+
+    render(x, y, row, col, w, h) {
         const img = new Image();
-        
+
         img.onload = () => {
-            this.parentcanvas.getContext('2d').drawImage(
-                img,
-                this.row.offset,
-                this.col.offset,
-                this.width,
-                this.height,
-                dx,
-                dy,
-                this.width * sx,
-                this.height * sy
-            );
+            const ctx = this.parentcanvas.getContext('2d');
+            ctx.drawImage(img, row * w, col * h, w, h, x, y, w, h);
         };
-        
+
         img.src = this.src;
     };
+
+    renderScaled(x, y, row, col, w, h, sx, sy) {
+        this.render(x, y, row, col, w * sx, h * sx);
+    };
 }
-
-// function Sprite(src, row, col, w, h) {
-//     this.src = src;
-
-//     this.width = w;
-//     this.height = h;
-
-//     this.row = {
-//         offset: row * w, index: row
-//     };
-
-//     this.col = {
-//         offset: col * h, index: col
-//     };
-
-//     this.cacheKey = `${this.row.index}::${this.col.index}`;
-// };
-
-// Sprite.prototype.draw = function (ctx, img, dx, dy, sx, sy) {
-//     img.onload = () => {
-//         ctx.drawImage(
-//             img,
-//             this.row.offset,
-//             this.col.offset,
-//             this.width,
-//             this.height,
-//             dx,
-//             dy,
-//             this.width * sx,
-//             this.height * sy
-//         );
-//     };
-
-//     img.src = this.src;
-// };
