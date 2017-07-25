@@ -203,10 +203,15 @@ body {
     display: hidden;
 }
 
+#container-output {
+    overflow-y: scroll;
+}
+
 #table-log-output {
     display: flex;
     flex-direction: column;
     font-weight: bold;
     color: black;
-    overflow: auto;
+    height: 100%;
+    /* overflow-y: scroll; */
 }
