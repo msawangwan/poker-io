@@ -208,4 +208,5 @@ body {
     flex-direction: column;
     font-weight: bold;
     color: black;
+    overflow: auto;
 }
