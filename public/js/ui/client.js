@@ -130,7 +130,7 @@ $(document).ready(() => {
             let action = null;
 
             switch (data.type) {
-                case 'post-small-blind':
+                case 'smallblind':
                     action = () => {
                         $btnsendblind.toggle($hidebtn);
                         $btnsendblind.val('post small blind');
@@ -146,7 +146,7 @@ $(document).ready(() => {
                         });
                     };
                     break;
-                case 'post-big-blind':
+                case 'bigblind':
                     action = () => {
                         $btnsendblind.toggle($hidebtn);
                         $btnsendblind.val('post big blind');
@@ -162,7 +162,7 @@ $(document).ready(() => {
                         });
                     };
                     break;
-                case 'post-ante-up':
+                case 'anteup':
                     action = () => {
                         $btnsendcall.toggle($hidebtn);
                         $btnsendcall.val(`call ${data.minbet}`);
