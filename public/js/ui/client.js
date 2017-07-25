@@ -96,11 +96,10 @@ $(document).ready(() => {
             resizeCanvases(containerCanvasId, canvasGroup);
         });
 
-        socket.on('update-potsize', (data) => {
-            current.table.centerLabelText = `pot size: ${data.potsize}`;
-            console.log('set potsize: ' + data.potsize);
-            // current.table.redraw();
-        });
+        // socket.on('update-potsize', (data) => {
+        //     current.table.centerLabelText = `pot size: ${data.potsize}`;
+        //     console.log('set potsize: ' + data.potsize);
+        // });
 
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
@@ -230,23 +229,29 @@ $(document).ready(() => {
             console.log(data);
         });
 
-        socket.on('player-posted-blinds', (data) => {
-            console.log('player posted blinds');
-            console.log(data);
+        // socket.on('player-posted-blinds', (data) => {
+        //     console.log('player posted blinds');
+        //     console.log(data);
 
-            resizeCanvases(containerCanvasId, canvasGroup);
-            drawChips(current.table, data.playerSeat, data.updatedBalance);
-        });
+        //     resizeCanvases(containerCanvasId, canvasGroup);
+        //     drawChips(current.table, data.playerSeat, data.updatedBalance);
+        // });
 
-        // TODO: replace above with this
         socket.on('player-posted-bet', (data) => {
-            debug.log('player posted bet:')
+            debug.log('**')
+            debug.log('player posted bet')
+            debug.log('player name: ' + current.player.name);
+            debug.log('player id: ' + current.player.id);
             debug.log('bet type: ' + data.betType);
             debug.log('bet amount: ' + data.betAmount);
             debug.log('new balance: ' + data.updatedBalance);
             debug.log('updated pot size:' + data.potsize);
+            debug.log('**')
+
+            current.table.centerLabelText = `pot size: ${data.potsize}`;
 
             resizeCanvases(containerCanvasId, canvasGroup);
+
             drawChips(current.table, data.playerSeat, data.updatedBalance);
         });
     }
