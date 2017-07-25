@@ -88,6 +88,12 @@ $(document).ready(() => {
             resizeCanvases(containerCanvasId, canvasGroup);
         });
 
+        socket.on('update-potsize', (data) => {
+            current.table.centerLabelText = `pot size: ${data.potsize}`;
+            console.log('set potsize: ' + data.potsize);
+            // current.table.redraw();
+        });
+
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
             current.table.centerLabelText = 'pot size: 0'
@@ -124,7 +130,7 @@ $(document).ready(() => {
                         $btnsendblind.on('click', () => {
                             socket.emit('bet-action', {
                                 betType: 'smallblind',
-                                betAmount: 50,
+                                betAmount: data.minbet / 2,
                                 tableid: current.table.id,
                                 gameid: current.table.game.id
                             });
@@ -140,7 +146,7 @@ $(document).ready(() => {
                         $btnsendblind.on('click', () => {
                             socket.emit('bet-action', {
                                 betType: 'bigblind',
-                                betAmount: 100,
+                                betAmount: data.minbet,
                                 tableid: current.table.id,
                                 gameid: current.table.game.id
                             });
@@ -152,11 +158,13 @@ $(document).ready(() => {
                 case 'post-ante-up':
                     action = () => {
                         $btnsendcall.toggle($hidebtn);
+                        $btnsendcall.val(`call ${data.minbet}`);
                         $btnsendcall.on('click', () => {
 
                         });
 
                         $btnsendraise.toggle($hidebtn);
+                        $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
 
                         });
