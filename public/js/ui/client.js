@@ -10,6 +10,12 @@ const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
     }
 };
 
+const drawChips = (t, i, b) => {
+    t.seats.get(i).player.balance = b;
+    t.drawChips(i);
+    t.redraw();
+};
+
 const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
 const containerCanvasId = 'container-canvas';
 
@@ -227,10 +233,23 @@ $(document).ready(() => {
             console.log(data);
 
             resizeCanvases(containerCanvasId, canvasGroup);
+            drawChips(current.table, data.playerSeat, data.updatedBalance);
 
-            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
-            current.table.drawChips(data.playerSeat);
-            current.table.redraw();
+            // current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
+            // current.table.drawChips(data.playerSeat);
+            // current.table.redraw();
+        });
+        
+        // TODO: replace above with this
+        socket.on('player-posted-bet', (data) => {
+            console.log('player posted bet:')
+            console.log('bet type: ' +data.betType);
+            console.log('bet amount: ' +data.betAmount);
+            console.log('new balance: ' +data.updatedBalance);
+            console.log('updated pot size:' +data.potsize);
+            
+            resizeCanvases();
+            drawChips(current.table, data.playerSeat, data.updatedBalance);
         });
     }
 

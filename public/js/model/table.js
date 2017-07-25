@@ -43,11 +43,25 @@ class Table {
 
         this.messageHistory = ['... seating ...'];
 
-        this.dealerbtn = new Button(this.textcanvas, './asset/btn-dealer.png');
-        this.sbbtn = new Button(this.textcanvas, './asset/btn-sb.png');
-        this.bbbtn = new Button(this.textcanvas, './asset/btn-bb.png');
+        // this.dealerbtn = new Button(this.textcanvas, './asset/btn-dealer.png');
+        // this.sbbtn = new Button(this.textcanvas, './asset/btn-sb.png');
+        // this.bbbtn = new Button(this.textcanvas, './asset/btn-bb.png');
 
-        this.chip = new Chip(this.textcanvas, './asset/chip.png');
+        // this.chip = new Chip(this.textcanvas, './asset/chip.png');
+        
+        this.dealerbtn = new Sprite(this.textcanvas, './asset/btn-dealer.png', 1, 1, 64, 64);
+        this.sbbtn = new Sprite(this.textcanvas, './asset/btn-sb.png',1 ,1 ,64,64);
+        this.bbbtn = new Sprite(this.textcanvas, './asset/btn-bb.png',1,1,64,64);
+
+        this.chip = new Sprite(this.textcanvas, './asset/chip.png',1,1,64,64);
+        
+        this.cards = new Map();
+        
+        for (let i = 0; i < 4; i++){
+            for (let j = 0; j < 13; j++) {
+                this.cards.set(`${i}::${j}`, new Sprite('./asset/cardsheet', i, j, cardpixelwith, cardpixelheight));
+            }
+        }
 
         this.drawOnNextUpdate = false;
     };
@@ -110,7 +124,7 @@ class Table {
             }
 
             const p = this.pointOnTable(bb);
-            this.bbbtn.render(p.x + offsetx, p.y + offsety);
+            this.bbbtn.render(p.x + offsetx, p.y + offsety,1,1);
         });
     }
 
@@ -139,7 +153,7 @@ class Table {
             }
 
             const p = this.pointOnTable(sb);
-            this.sbbtn.render(p.x + offsetx, p.y + offsety);
+            this.sbbtn.render(p.x + offsetx, p.y + offsety,1,1);
         });
     }
 
@@ -168,7 +182,7 @@ class Table {
             }
 
             const p = this.pointOnTable(db);
-            this.dealerbtn.render(p.x + offsetx, p.y + offsety);
+            this.dealerbtn.render(p.x + offsetx, p.y + offsety,1,1);
         });
     };
 
@@ -343,7 +357,7 @@ class Table {
 
             const p = this.pointOnTable(seatindex);
 
-            this.chip.render(p.x + offsetx, p.y + offsety)
+            this.chip.render(p.x + offsetx, p.y + offsety,1,1)
         });
     }
 
