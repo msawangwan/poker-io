@@ -188,7 +188,7 @@ body {
 }
 
 .container-bet-action:nth-child(1) > input {
-    width: 75px;
+    width: 200px;
 }
 
 .container-bet-action:nth-child(2) {

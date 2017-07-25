@@ -151,18 +151,18 @@ $(document).ready(() => {
                     break;
                 case 'post-ante-up':
                     action = () => {
-                        $btnsendcheck.toggle($hidebtn);
-                        $btnsendcheck.on('click', () => {
-
-                        });
-
-                        $btnsendfold.toggle($hidebtn);
-                        $btnsendfold.on('click', () => {
+                        $btnsendcall.toggle($hidebtn);
+                        $btnsendcall.on('click', () => {
 
                         });
 
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.on('click', () => {
+
+                        });
+
+                        $btnsendfold.toggle($hidebtn);
+                        $btnsendfold.on('click', () => {
 
                         });
                     }
@@ -193,6 +193,7 @@ $(document).ready(() => {
 
             resizeCanvases(containerCanvasId, canvasGroup);
 
+            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
             current.table.drawChips(data.playerSeat);
             current.table.redraw();
         });
