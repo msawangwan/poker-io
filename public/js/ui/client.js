@@ -96,11 +96,6 @@ $(document).ready(() => {
             resizeCanvases(containerCanvasId, canvasGroup);
         });
 
-        // socket.on('update-potsize', (data) => {
-        //     current.table.centerLabelText = `pot size: ${data.potsize}`;
-        //     console.log('set potsize: ' + data.potsize);
-        // });
-
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
             current.table.centerLabelText = 'pot size: 0'
@@ -208,7 +203,53 @@ $(document).ready(() => {
                             $btnsendfold.toggle($hidebtn);
                         });
                     };
-                case 'call':
+                    break;
+                case 'checkorraise':
+                    action = () => {
+                        $btnsendcheck.toggle($hidebtn);
+                        $btnsendcheck.val(`check`);
+                        $btnsendcheck.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'checkante',
+                                betAmount: data.minbet,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
+
+                            $btnsendcheck.toggle($hidebtn);
+                            $btnsendraise.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
+                        });
+
+                        $btnsendraise.toggle($hidebtn);
+                        $btnsendraise.val(`raise ${data.minbet}`);
+                        $btnsendraise.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'raiseante',
+                                betAmount: data.minbet,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
+
+                            $btnsendcheck.toggle($hidebtn);
+                            $btnsendraise.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
+                        });
+
+                        $btnsendfold.toggle($hidebtn);
+                        $btnsendfold.on('click', () => {
+                            socket.emit('bet-action', {
+                                betType: 'foldante',
+                                betAmount: 0,
+                                tableid: current.table.id,
+                                gameid: current.table.game.id
+                            });
+
+                            $btnsendcheck.toggle($hidebtn);
+                            $btnsendraise.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
+                        });
+                    };
                     break;
                 case 'raise':
                     break;
@@ -229,19 +270,11 @@ $(document).ready(() => {
             console.log(data);
         });
 
-        // socket.on('player-posted-blinds', (data) => {
-        //     console.log('player posted blinds');
-        //     console.log(data);
-
-        //     resizeCanvases(containerCanvasId, canvasGroup);
-        //     drawChips(current.table, data.playerSeat, data.updatedBalance);
-        // });
-
         socket.on('player-posted-bet', (data) => {
             debug.log('**')
             debug.log('player posted bet')
-            debug.log('player name: ' + current.player.name);
-            debug.log('player id: ' + current.player.id);
+            debug.log('player name: ' + data.playerName);
+            debug.log('player id: ' + data.playerId);
             debug.log('bet type: ' + data.betType);
             debug.log('bet amount: ' + data.betAmount);
             debug.log('new balance: ' + data.updatedBalance);
