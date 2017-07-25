@@ -320,7 +320,7 @@ class Table {
 
     drawChips(seatindex) {
         this.drawHandlers.set('drawchips' + seatindex, () => {
-            const offsetAmount = 38;
+            const offsetAmount = 96;
 
             let offsetx = 0;
             let offsety = 0;

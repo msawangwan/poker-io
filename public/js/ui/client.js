@@ -46,12 +46,13 @@ $(document).ready(() => {
     });
 
     const $btnsendblind = $('#btn-send-blind');
+    const $btnsendcheck = $('#btn-send-check');
     const $btnsendfold = $('#btn-send-fold');
     const $btnsendcall = $('#btn-send-call');
     const $btnsendraise = $('#btn-send-raise');
 
     const $allbtns = [
-        $btnsendblind, $btnsendfold, $btnsendcall, $btnsendraise
+        $btnsendblind, $btnsendcheck, $btnsendfold, $btnsendcall, $btnsendraise
     ];
 
     const $hidebtn = '#hide-button';
@@ -119,6 +120,7 @@ $(document).ready(() => {
                 case 'post-small-blind':
                     action = () => {
                         $btnsendblind.toggle($hidebtn);
+                        $btnsendblind.val('post small blind');
                         $btnsendblind.on('click', () => {
                             socket.emit('bet-action', {
                                 betType: 'smallblind',
@@ -134,6 +136,7 @@ $(document).ready(() => {
                 case 'post-big-blind':
                     action = () => {
                         $btnsendblind.toggle($hidebtn);
+                        $btnsendblind.val('post big blind');
                         $btnsendblind.on('click', () => {
                             socket.emit('bet-action', {
                                 betType: 'bigblind',
@@ -146,6 +149,23 @@ $(document).ready(() => {
                         });
                     };
                     break;
+                case 'post-ante-up':
+                    action = () => {
+                        $btnsendcheck.toggle($hidebtn);
+                        $btnsendcheck.on('click', () => {
+
+                        });
+
+                        $btnsendfold.toggle($hidebtn);
+                        $btnsendfold.on('click', () => {
+
+                        });
+
+                        $btnsendraise.toggle($hidebtn);
+                        $btnsendraise.on('click', () => {
+
+                        });
+                    }
                 case 'call':
                     break;
                 case 'raise':
@@ -163,14 +183,16 @@ $(document).ready(() => {
         });
 
 
-        socket.on('action-result', (data) => {
-
+        socket.on('player-dealt-cards', (data) => {
+            console.log(data);
         });
 
         socket.on('player-posted-blinds', (data) => {
             console.log('player posted blinds');
             console.log(data);
+
             resizeCanvases(containerCanvasId, canvasGroup);
+
             current.table.drawChips(data.playerSeat);
             current.table.redraw();
         });
