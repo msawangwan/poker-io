@@ -204,12 +204,8 @@ body {
 }
 
 #table-log-output {
-    color: black;
-    font-weight: bold;
     display: flex;
     flex-direction: column;
+    font-weight: bold;
+    color: black;
 }
-
-/* #table-log-output > small {
-    flex-
-} */
