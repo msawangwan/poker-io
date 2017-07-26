@@ -127,8 +127,6 @@ $(document).ready(() => {
             const submitAction = (t, nt, p, b) => {
                 socket.emit('player-submit-action', {
                     betType: t,
-                    nextBetType: nt,
-                    betPhase: p,
                     betAmount: b,
                     tableid: current.table.id,
                     gameid: current.table.game.id
@@ -148,11 +146,11 @@ $(document).ready(() => {
                                 $btnsendblind.toggle($hidebtn);
                                 $btnsendblind.val('post small blind');
                                 $btnsendblind.on('click', () => {
-                                    submitAction('smallblind', 'bigblind', data.betPhase, data.minbet / 2);
+                                    submitAction('ante', data.minbet / 2);
                                     $btnsendblind.toggle($hidebtn);
                                 });
                             } else {
-                                if ('check' in data.allowedactions || 'raise' in data.allowedactions) {
+                                if (data.allowedactions.includes('check') || data.allowedactions.includes('raise')) {
 
                                 }
                             }
