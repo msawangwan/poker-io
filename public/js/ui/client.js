@@ -124,7 +124,7 @@ $(document).ready(() => {
 
             let action = null;
 
-            const onactioncompleted = (t, nt, p, b) => {
+            const submitAction = (t, nt, p, b) => {
                 socket.emit('player-submit-action', {
                     betType: t,
                     nextBetType: nt,
@@ -138,13 +138,26 @@ $(document).ready(() => {
             switch (data.gamePhase) {
                 case 'predeal':
                     switch (data.turnOrder) {
-                        case 0:
+                        case 0: // note: dealer
                             debug.delimit('u da button');
                             break;
-                        case 1:
-                            debug.delimit('u da small blind');
+                        case 1: // note: smallblind
+                            debug.delimit('action to: smallblind');
+
+                            if (data.allowedactions.includes('ante')) {
+                                $btnsendblind.toggle($hidebtn);
+                                $btnsendblind.val('post small blind');
+                                $btnsendblind.on('click', () => {
+                                    submitAction('smallblind', 'bigblind', data.betPhase, data.minbet / 2);
+                                    $btnsendblind.toggle($hidebtn);
+                                });
+                            } else {
+                                if ('check' in data.allowedactions || 'raise' in data.allowedactions) {
+
+                                }
+                            }
                             break;
-                        case 2:
+                        case 2: // note: bigblind
                             debug.delimit('u da big blind');
                             break;
                         default:
@@ -163,8 +176,8 @@ $(document).ready(() => {
                 default:
                     break;
             }
-
-            switch (data.betType) {
+            const bettype = 's';
+            switch (bettype) {
                 case 'ante':
                     if (data.gamePhase === 'predeal') {
 
@@ -175,7 +188,7 @@ $(document).ready(() => {
                         $btnsendblind.toggle($hidebtn);
                         $btnsendblind.val('post small blind');
                         $btnsendblind.on('click', () => {
-                            onactioncompleted('smallblind', 'bigblind', data.betPhase, data.minbet / 2);
+                            submitAction('smallblind', 'bigblind', data.betPhase, data.minbet / 2);
 
                             $btnsendblind.toggle($hidebtn);
                         });
@@ -186,7 +199,7 @@ $(document).ready(() => {
                         $btnsendblind.toggle($hidebtn);
                         $btnsendblind.val('post big blind');
                         $btnsendblind.on('click', () => {
-                            onactioncompleted('bigblind', 'anteup', data.betPhase, data.minbet);
+                            submitAction('bigblind', 'anteup', data.betPhase, data.minbet);
 
                             $btnsendblind.toggle($hidebtn);
                         });
@@ -197,7 +210,7 @@ $(document).ready(() => {
                         $btnsendcall.toggle($hidebtn);
                         $btnsendcall.val(`call ${data.minbet}`);
                         $btnsendcall.on('click', () => {
-                            onactioncompleted('anteup', 'anteup', data.betPhase, data.minbet);
+                            submitAction('anteup', 'anteup', data.betPhase, data.minbet);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -207,7 +220,7 @@ $(document).ready(() => {
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
-                            onactioncompleted('raise', 'bet', data.betPhase, data.minbet);
+                            submitAction('raise', 'bet', data.betPhase, data.minbet);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -216,7 +229,7 @@ $(document).ready(() => {
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
-                            onactioncompleted('fold', 'anteup', data.betPhase, 0);
+                            submitAction('fold', 'anteup', data.betPhase, 0);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -229,7 +242,7 @@ $(document).ready(() => {
                         $btnsendcheck.toggle($hidebtn);
                         $btnsendcheck.val(`check`);
                         $btnsendcheck.on('click', () => {
-                            onactioncompleted('check', 'check', data.betPhase, 0);
+                            submitAction('check', 'check', data.betPhase, 0);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -239,7 +252,7 @@ $(document).ready(() => {
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
-                            onactioncompleted('raise', 'bet', data.betPhase, data.minbet);
+                            submitAction('raise', 'bet', data.betPhase, data.minbet);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -248,7 +261,7 @@ $(document).ready(() => {
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
-                            onactioncompleted('fold', 'check', data.betPhase, 0);
+                            submitAction('fold', 'check', data.betPhase, 0);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -261,7 +274,7 @@ $(document).ready(() => {
                         $btnsendcall.toggle($hidebtn);
                         $btnsendcall.val(`call ${data.minbet}`);
                         $btnsendcall.on('click', () => {
-                            onactioncompleted('call', 'bet', data.betPhase, data.minbet);
+                            submitAction('call', 'bet', data.betPhase, data.minbet);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -271,7 +284,7 @@ $(document).ready(() => {
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
-                            onactioncompleted('raise', 'raise', data.betPhase, data.minbet);
+                            submitAction('raise', 'raise', data.betPhase, data.minbet);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -280,7 +293,7 @@ $(document).ready(() => {
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
-                            onactioncompleted('fold', 'bet', data.betPhase, 0);
+                            submitAction('fold', 'bet', data.betPhase, 0);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -293,7 +306,7 @@ $(document).ready(() => {
                         $btnsendcall.toggle($hidebtn);
                         $btnsendcall.val(`call ${data.minbet}`);
                         $btnsendcall.on('click', () => {
-                            onactioncompleted('call', 'bet', data.betPhase, data.minbet);
+                            submitAction('call', 'bet', data.betPhase, data.minbet);
 
                             $btnsendcall.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -303,7 +316,7 @@ $(document).ready(() => {
                         $btnsendraise.toggle($hidebtn);
                         $btnsendraise.val(`raise ${data.minbet}`);
                         $btnsendraise.on('click', () => {
-                            onactioncompleted('raise', 'raise', data.betPhase, data.minbet);
+                            submitAction('raise', 'raise', data.betPhase, data.minbet);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -312,7 +325,7 @@ $(document).ready(() => {
 
                         $btnsendfold.toggle($hidebtn);
                         $btnsendfold.on('click', () => {
-                            onactioncompleted('fold', 'check', data.betPhase, 0);
+                            submitAction('fold', 'check', data.betPhase, 0);
 
                             $btnsendcheck.toggle($hidebtn);
                             $btnsendraise.toggle($hidebtn);
@@ -323,7 +336,7 @@ $(document).ready(() => {
                 case 'fold':
                     alert('fold??');
                 default:
-                    action = () => console.log('no matching action');
+                    // action = () => console.log('no matching action');
                     break;
             }
 
