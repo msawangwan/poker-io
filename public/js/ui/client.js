@@ -124,7 +124,7 @@ $(document).ready(() => {
 
             let action = null;
 
-            const submitAction = (t, nt, p, b) => {
+            const submitAction = (t, b) => {
                 socket.emit('player-submit-action', {
                     betType: t,
                     betAmount: b,
@@ -353,6 +353,7 @@ $(document).ready(() => {
             debug.logobject(data);
 
             current.table.centerLabelText = `pot size: ${data.potsize}`;
+            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
             resizeCanvases(containerCanvasId, canvasGroup);
 
