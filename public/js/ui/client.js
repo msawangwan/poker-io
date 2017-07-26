@@ -97,25 +97,16 @@ $(document).ready(() => {
         });
 
         socket.on('game-started', (data) => {
+            current.player.turnPositionIndex = data.turnOrderIndex;
             current.table.game = new Game(data.gameId, current.table.players);
             current.table.centerLabelText = 'pot size: 0'
-
-            // socket.emit('get-turn-order', {
-            //     tableid: current.table.id,
-            //     gameid: current.table.game.id
-            // });
-            current.player.turnPositionIndex = data.turnOrderIndex;
             current.table.buttonIndex = data.buttonIndex;
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
-        });
 
-        // socket.on('turn-order-index', (data) => {
-        //     current.player.turnPositionIndex = data.turnOrderIndex;
-        //     current.table.buttonIndex = data.buttonIndex;
-        //     current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
-        //     current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
-        // });
+            debug.logobject(data);
+            debug.delimit('game is starting', 'button index: ' + data.buttonIndex, 'sb index: ' + current.table.sbIndex, 'bb index: ' + current.table.bbIndex);
+        });
 
         socket.on('action', (data) => {
             {
