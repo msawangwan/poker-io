@@ -114,19 +114,24 @@ $(document).ready(() => {
             );
         });
 
-        socket.on('action', (data) => {
+        socket.on('action-to-player', (data) => {
             {
-                debug.log('==== * ====');
-                debug.log('your turn!');
-                debug.log('current betting phase:');
-                debug.log('phase: ' + data.betPhase);
-                debug.log('==== * ====');
+                debug.delimit(
+                    `${current.player.name} it's your turn!`,
+                );
+                debug.logobject(data);
+                // debug.log('==== * ====');
+
+                // debug.log('your turn!');
+                // debug.log('current betting phase:');
+                // debug.log('phase: ' + data.betPhase);
+                // debug.log('==== * ====');
             }
 
             let action = null;
 
             const onactioncompleted = (t, nt, p, b) => {
-                socket.emit('bet-action', {
+                socket.emit('player-submit-action', {
                     betType: t,
                     nextBetType: nt,
                     betPhase: p,
@@ -302,17 +307,7 @@ $(document).ready(() => {
             console.log(data);
         });
 
-        socket.on('player-posted-bet', (data) => {
-            // debug.log('**')
-            // debug.log('player posted bet')
-            // debug.log('player name: ' + data.playerName);
-            // debug.log('player id: ' + data.playerId);
-            // debug.log('bet type: ' + data.betType);
-            // debug.log('bet phase: ' + data.betPhase);
-            // debug.log('bet amount: ' + data.betAmount);
-            // debug.log('new balance: ' + data.updatedBalance);
-            // debug.log('updated pot size:' + data.potsize);
-            // debug.log('**')
+        socket.on('update-table-state', (data) => {
             debug.delimit('player posted bet')
             debug.logobject(data);
 

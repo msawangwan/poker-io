@@ -18,7 +18,7 @@ class HTMLLogger {
         }
 
         this.delimit(
-            `${o.constructor.name !== 'Object' ? o.constructor.name : 'data:'}`,
+            `${o.constructor.name !== 'Object' ? o.constructor.name : '* * *:'}`,
             ...props
         );
     };
