@@ -137,10 +137,10 @@ $(document).ready(() => {
                 case 'predeal':
                     switch (data.turnOrder) {
                         case 0: // note: dealer
-                            debug.delimit('u da button');
+                            debug.delimit('*ACTION*: button');
                             break;
                         case 1: // note: smallblind
-                            debug.delimit('action to: smallblind');
+                            debug.delimit('*ACTION*: small blind');
 
                             if (data.allowedactions.includes('ante')) {
                                 $btnsendblind.toggle($hidebtn);
@@ -156,10 +156,24 @@ $(document).ready(() => {
                             }
                             break;
                         case 2: // note: bigblind
-                            debug.delimit('u da big blind');
+                            debug.delimit('*ACTION*: big blind');
+
+                            if (data.allowedactions.includes('ante')) {
+                                $btnsendblind.toggle($hidebtn);
+                                $btnsendblind.val('post big blind');
+                                $btnsendblind.on('click', () => {
+                                    submitAction('ante', data.minbet);
+
+                                    $btnsendblind.toggle($hidebtn);
+                                });
+                            } else {
+                                if (data.allowedactions.includes('check') || data.allowedactions.includes('raise')) {
+
+                                }
+                            }
                             break;
                         default:
-                            debug.delimit('u nothn');
+                            debug.delimit('*ACTION*: nothing');
                             break;
                     }
                     break;
@@ -334,7 +348,6 @@ $(document).ready(() => {
                 case 'fold':
                     alert('fold??');
                 default:
-                    // action = () => console.log('no matching action');
                     break;
             }
 
