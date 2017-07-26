@@ -18,13 +18,13 @@ class HTMLLogger {
         }
 
         this.delimit(
-            `${o.constructor.name !== 'Object' ? o.constructor.name : '* * *:'}`,
+            `${o.constructor.name !== 'Object' ? o.constructor.name : '* * *'}`,
             ...props
         );
     };
 
     delimit(...lines) {
-        this.log('=-- * * * =--')
+        this.log('*')
         this.log(...lines);
     };
 

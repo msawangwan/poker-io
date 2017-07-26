@@ -120,12 +120,6 @@ $(document).ready(() => {
                     `${current.player.name} it's your turn!`,
                 );
                 debug.logobject(data);
-                // debug.log('==== * ====');
-
-                // debug.log('your turn!');
-                // debug.log('current betting phase:');
-                // debug.log('phase: ' + data.betPhase);
-                // debug.log('==== * ====');
             }
 
             let action = null;
@@ -141,7 +135,41 @@ $(document).ready(() => {
                 });
             };
 
-            switch (data.type) {
+            switch (data.gamePhase) {
+                case 'predeal':
+                    switch (data.turnOrder) {
+                        case 0:
+                            debug.delimit('u da button');
+                            break;
+                        case 1:
+                            debug.delimit('u da small blind');
+                            break;
+                        case 2:
+                            debug.delimit('u da big blind');
+                            break;
+                        default:
+                            debug.delimit('u nothn');
+                            break;
+                    }
+                    break;
+                case 'preflop':
+                    break;
+                case 'postflop':
+                    break;
+                case 'preriver':
+                    break;
+                case 'postriver':
+                    break;
+                default:
+                    break;
+            }
+
+            switch (data.betType) {
+                case 'ante':
+                    if (data.gamePhase === 'predeal') {
+
+                    }
+                    break;
                 case 'smallblind':
                     action = () => {
                         $btnsendblind.toggle($hidebtn);
@@ -299,7 +327,9 @@ $(document).ready(() => {
                     break;
             }
 
-            action();
+            if (action) {
+                action();
+            }
         });
 
 
