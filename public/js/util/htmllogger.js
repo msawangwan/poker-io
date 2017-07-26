@@ -8,13 +8,9 @@ class HTMLLogger {
         lines.map(l => this.toHtml(l));
     };
 
-    delimit(...lines) {
-        this.log('=-- * * * =--')
-        this.log(...lines);
-    }
-
     logobject(o) {
         const props = [];
+
         for (const p in o) {
             if (o.hasOwnProperty(p)) {
                 props.push(`${p}: ${o.p}`);
@@ -22,9 +18,14 @@ class HTMLLogger {
         }
 
         this.delimit(`${o.constructor.name !== 'Object' ? o.constructor.name : 'data:'}`, ...props);
-    }
+    };
+
+    delimit(...lines) {
+        this.log('=-- * * * =--')
+        this.log(...lines);
+    };
 
     toHtml(m) {
-        this.output.insertAdjacentHTML('beforeend', `<small>[${this.timestamp.toLocaleString()}] ${m}</small>`);
+        this.output.insertAdjacentHTML('beforeend', `<small><b>[${this.timestamp.toLocaleString()}]</b> ${m}</small>`);
     };
 }
