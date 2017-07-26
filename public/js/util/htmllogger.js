@@ -13,7 +13,7 @@ class HTMLLogger {
 
         for (const p in o) {
             if (o.hasOwnProperty(p)) {
-                props.push(`${p}: ${o.p}`);
+                props.push(`${p}: ${o[p]}`);
             }
         }
 

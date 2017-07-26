@@ -95,6 +95,14 @@ class Table {
         return this.db;
     }
 
+    get sbIndex() {
+        return this.sb;
+    };
+
+    get bbIndex() {
+        return this.bb;
+    };
+
     set centerLabelText(t) {
         this.messageHistory.push(t);
         this.redraw();
