@@ -99,7 +99,7 @@ $(document).ready(() => {
         socket.on('game-started', (data) => {
             current.player.turnPositionIndex = data.turnOrderIndex;
             current.table.game = new Game(data.gameId, current.table.players);
-            current.table.centerLabelText = 'pot size: 0'
+            current.table.centerLabelText = 'pot size: 0';
             current.table.buttonIndex = data.buttonIndex;
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
@@ -297,16 +297,18 @@ $(document).ready(() => {
         });
 
         socket.on('player-posted-bet', (data) => {
-            debug.log('**')
-            debug.log('player posted bet')
-            debug.log('player name: ' + data.playerName);
-            debug.log('player id: ' + data.playerId);
-            debug.log('bet type: ' + data.betType);
-            debug.log('bet phase: ' + data.betPhase);
-            debug.log('bet amount: ' + data.betAmount);
-            debug.log('new balance: ' + data.updatedBalance);
-            debug.log('updated pot size:' + data.potsize);
-            debug.log('**')
+            // debug.log('**')
+            // debug.log('player posted bet')
+            // debug.log('player name: ' + data.playerName);
+            // debug.log('player id: ' + data.playerId);
+            // debug.log('bet type: ' + data.betType);
+            // debug.log('bet phase: ' + data.betPhase);
+            // debug.log('bet amount: ' + data.betAmount);
+            // debug.log('new balance: ' + data.updatedBalance);
+            // debug.log('updated pot size:' + data.potsize);
+            // debug.log('**')
+            debug.delimit('player posted bet')
+            debug.logobject(data);
 
             current.table.centerLabelText = `pot size: ${data.potsize}`;
 
@@ -328,7 +330,7 @@ $(document).ready(() => {
         }, startupt);
     }
 
-    debug.log('ready ...');
+    debug.delimit('start up complete!', 'ready ...');
 
     $(window).on('resize', () => {
         resizeCanvases(containerCanvasId, canvasGroup);

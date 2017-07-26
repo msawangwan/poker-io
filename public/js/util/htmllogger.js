@@ -17,7 +17,10 @@ class HTMLLogger {
             }
         }
 
-        this.delimit(`${o.constructor.name !== 'Object' ? o.constructor.name : 'data:'}`, ...props);
+        this.delimit(
+            `${o.constructor.name !== 'Object' ? o.constructor.name : 'data:'}`,
+            ...props
+        );
     };
 
     delimit(...lines) {
@@ -26,6 +29,9 @@ class HTMLLogger {
     };
 
     toHtml(m) {
-        this.output.insertAdjacentHTML('beforeend', `<small><b>[${this.timestamp.toLocaleString()}]</b> ${m}</small>`);
+        this.output.insertAdjacentHTML(
+            'beforeend',
+            `<small><b>[${this.timestamp.toLocaleString()}]</b> ${m}</small>`
+        );
     };
 }
