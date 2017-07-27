@@ -23,7 +23,7 @@ const tickrate = 1000 / 2;
 const startupt = 800;
 
 const current = {
-    player: null, table: null
+    player: null, table: null, seat: null
 };
 
 $(document).ready(() => {
@@ -53,6 +53,7 @@ $(document).ready(() => {
         $bettextfield.val(slidervalue);
     });
 
+    const $btnsendbet = $('#btn-send-bet');
     const $btnsendblind = $('#btn-send-blind');
     const $btnsendcheck = $('#btn-send-check');
     const $btnsendfold = $('#btn-send-fold');
@@ -60,7 +61,7 @@ $(document).ready(() => {
     const $btnsendraise = $('#btn-send-raise');
 
     const $allbtns = [
-        $btnsendblind, $btnsendcheck, $btnsendfold, $btnsendcall, $btnsendraise
+        $btnsendbet, $btnsendblind, $btnsendcheck, $btnsendfold, $btnsendcall, $btnsendraise
     ];
 
     const $hidebtn = '#hide-button';
@@ -72,7 +73,7 @@ $(document).ready(() => {
 
     {
         socket.on('connect', (data) => {
-            current.table = new Table(9, staticCanvas, labelCanvas);
+            current.table = new Table(9, staticCanvas, dynamicCanvas, labelCanvas);
 
             current.table.init();
             current.table.redraw();
@@ -80,6 +81,8 @@ $(document).ready(() => {
 
         socket.on('assigned-table', (data) => {
             current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
+
+            current.seat = data.table.assignedSeat;
 
             current.table.assignedId = data.table.id;
             current.table.centerLabelText = 'waiting for players ...';
@@ -121,8 +124,6 @@ $(document).ready(() => {
                 );
                 debug.logobject(data);
             }
-
-            let action = null;
 
             const submitAction = (t, b) => {
                 socket.emit('player-submit-action', {
@@ -178,6 +179,34 @@ $(document).ready(() => {
                     }
                     break;
                 case 'preflop':
+                    if (data.allowedactions.includes('bet')) {
+                        $btnsendbet.toggle($hidebtn);
+                        $btnsendbet.val(`bet ${data.minbet}`);
+                        $btnsendbet.on('click', () => {
+                            submitAction('bet', data.minbet);
+
+                            $btnsendbet.toggle($hidebtn);
+                        });
+
+
+                        $btnsendcheck.toggle($hidebtn);
+                        $btnsendcheck.val(`check`);
+                        $btnsendcheck.on('click', () => {
+                            submitAction('check', data.minbet);
+
+                            $btnsendcheck.toggle($hidebtn);
+                        });
+
+                        $btnsendfold.toggle($hidebtn);
+                        $btnsendfold.on('click', () => {
+                            submitAction('fold', 0);
+
+                            $btnsendbet.toggle($hidebtn);
+                            $btnsendcheck.toggle($hidebtn);
+                            $btnsendfold.toggle($hidebtn);
+                        });
+                    }
+
                     break;
                 case 'postflop':
                     break;
@@ -188,177 +217,19 @@ $(document).ready(() => {
                 default:
                     break;
             }
-            const bettype = 's';
-            switch (bettype) {
-                case 'ante':
-                    if (data.gamePhase === 'predeal') {
-
-                    }
-                    break;
-                case 'smallblind':
-                    action = () => {
-                        $btnsendblind.toggle($hidebtn);
-                        $btnsendblind.val('post small blind');
-                        $btnsendblind.on('click', () => {
-                            submitAction('smallblind', 'bigblind', data.betPhase, data.minbet / 2);
-
-                            $btnsendblind.toggle($hidebtn);
-                        });
-                    };
-                    break;
-                case 'bigblind':
-                    action = () => {
-                        $btnsendblind.toggle($hidebtn);
-                        $btnsendblind.val('post big blind');
-                        $btnsendblind.on('click', () => {
-                            submitAction('bigblind', 'anteup', data.betPhase, data.minbet);
-
-                            $btnsendblind.toggle($hidebtn);
-                        });
-                    };
-                    break;
-                case 'anteup':
-                    action = () => {
-                        $btnsendcall.toggle($hidebtn);
-                        $btnsendcall.val(`call ${data.minbet}`);
-                        $btnsendcall.on('click', () => {
-                            submitAction('anteup', 'anteup', data.betPhase, data.minbet);
-
-                            $btnsendcall.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendraise.toggle($hidebtn);
-                        $btnsendraise.val(`raise ${data.minbet}`);
-                        $btnsendraise.on('click', () => {
-                            submitAction('raise', 'bet', data.betPhase, data.minbet);
-
-                            $btnsendcall.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendfold.toggle($hidebtn);
-                        $btnsendfold.on('click', () => {
-                            submitAction('fold', 'anteup', data.betPhase, 0);
-
-                            $btnsendcall.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-                    };
-                    break;
-                case 'check':
-                    action = () => {
-                        $btnsendcheck.toggle($hidebtn);
-                        $btnsendcheck.val(`check`);
-                        $btnsendcheck.on('click', () => {
-                            submitAction('check', 'check', data.betPhase, 0);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendraise.toggle($hidebtn);
-                        $btnsendraise.val(`raise ${data.minbet}`);
-                        $btnsendraise.on('click', () => {
-                            submitAction('raise', 'bet', data.betPhase, data.minbet);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendfold.toggle($hidebtn);
-                        $btnsendfold.on('click', () => {
-                            submitAction('fold', 'check', data.betPhase, 0);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-                    };
-                    break;
-                case 'bet':
-                    action = () => {
-                        $btnsendcall.toggle($hidebtn);
-                        $btnsendcall.val(`call ${data.minbet}`);
-                        $btnsendcall.on('click', () => {
-                            submitAction('call', 'bet', data.betPhase, data.minbet);
-
-                            $btnsendcall.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendraise.toggle($hidebtn);
-                        $btnsendraise.val(`raise ${data.minbet}`);
-                        $btnsendraise.on('click', () => {
-                            submitAction('raise', 'raise', data.betPhase, data.minbet);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendfold.toggle($hidebtn);
-                        $btnsendfold.on('click', () => {
-                            submitAction('fold', 'bet', data.betPhase, 0);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-                    };
-                    break;
-                case 'raise':
-                    action = () => {
-                        $btnsendcall.toggle($hidebtn);
-                        $btnsendcall.val(`call ${data.minbet}`);
-                        $btnsendcall.on('click', () => {
-                            submitAction('call', 'bet', data.betPhase, data.minbet);
-
-                            $btnsendcall.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendraise.toggle($hidebtn);
-                        $btnsendraise.val(`raise ${data.minbet}`);
-                        $btnsendraise.on('click', () => {
-                            submitAction('raise', 'raise', data.betPhase, data.minbet);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-
-                        $btnsendfold.toggle($hidebtn);
-                        $btnsendfold.on('click', () => {
-                            submitAction('fold', 'check', data.betPhase, 0);
-
-                            $btnsendcheck.toggle($hidebtn);
-                            $btnsendraise.toggle($hidebtn);
-                            $btnsendfold.toggle($hidebtn);
-                        });
-                    };
-                    break;
-                case 'fold':
-                    alert('fold??');
-                default:
-                    break;
-            }
-
-            if (action) {
-                action();
-            }
         });
 
 
         socket.on('player-dealt-cards', (data) => {
             console.log(data);
+
+            debug.delimit('player was dealt hole cards:');
+            debug.logobject(data.a);
+            debug.logobject(data.b);
+
+            resizeCanvases(containerCanvasId, canvasGroup);
+
+            current.table.drawCards(current.seat, data.a, data.b);
         });
 
         socket.on('update-table-state', (data) => {

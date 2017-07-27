@@ -6,12 +6,13 @@ const thetaLower = toradian(325);
 const scalingvalue = 0.65;
 
 class Table {
-    constructor(maxseats, parentcanvas, textcanvas) {
+    constructor(maxseats, parentcanvas, cardcanvas, textcanvas) {
         this.id = null;
 
         this.maxseats = maxseats;
 
         this.parentcanvas = parentcanvas;
+        this.cardcanvas = cardcanvas;
         this.textcanvas = textcanvas;
 
         this.canvas = document.createElement('canvas');
@@ -43,12 +44,6 @@ class Table {
 
         this.messageHistory = ['... seating ...'];
 
-        // this.dealerbtn = new Button(this.textcanvas, './asset/btn-dealer.png');
-        // this.sbbtn = new Button(this.textcanvas, './asset/btn-sb.png');
-        // this.bbbtn = new Button(this.textcanvas, './asset/btn-bb.png');
-
-        // this.chip = new Chip(this.textcanvas, './asset/chip.png');
-
         this.dealerbtn = new Sprite(this.textcanvas, './asset/btn-dealer.png');
         this.sbbtn = new Sprite(this.textcanvas, './asset/btn-sb.png');
         this.bbbtn = new Sprite(this.textcanvas, './asset/btn-bb.png');
@@ -57,14 +52,14 @@ class Table {
 
         const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
 
-        const cardpixelwidth = 72.15;
-        const cardpixelheight = 83.25;
+        this.cardpixelwidth = 72.15;
+        this.cardpixelheight = 83.25;
 
         this.cards = new Map();
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 13; j++) {
-                this.cards.set(`${i}::${j}`, new Sprite(this.textcanvas, './asset/cards_52-card-deck_stylized.png'));
+                this.cards.set(`${i}::${j}`, new Sprite(this.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
             }
         }
 
@@ -208,7 +203,7 @@ class Table {
                 this.centerLabelText,
                 this.textcanvas,
                 this.center[0],
-                this.center[1]
+                this.center[1] - this.cardpixelheight
             );
 
             this.drawOnNextUpdate = false;
@@ -344,6 +339,15 @@ class Table {
     setSeatByIndex(seatindex, seat) {
         this.seats.set(seatindex, seat);
     };
+
+    drawCards(seatindex, a, b) {
+        this.drawHandlers.set('drawcards' + seatindex, () => {
+            const p = this.pointOnTable(seatindex);
+
+            this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, this.cardpixelwidth, this.cardpixelheight);
+            this.cards.get(`${b.suite}::${b.value}`).render(p.x + this.cardpixelwidth, p.y, b.value, b.suite, this.cardpixelwidth, this.cardpixelheight);
+        });
+    }
 
     drawChips(seatindex) {
         this.drawHandlers.set('drawchips' + seatindex, () => {
