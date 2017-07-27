@@ -2,6 +2,9 @@ class HTMLLogger {
     constructor() {
         this.output = document.getElementById('table-log-output');
         this.timestamp = new Date();
+
+        this.$messageContainer = $('#container-output');
+        this.$messages = $('#table-log-output');
     };
 
     log(...lines) {
@@ -33,5 +36,9 @@ class HTMLLogger {
             'beforeend',
             `<small><b>[${this.timestamp.toLocaleString()}]</b> ${m}</small>`
         );
+
+        this.$messageContainer.animate({
+            scrollTop: this.$messages.prop('scrollHeight') // TODO: blink instead of scroll?
+        }, 750);
     };
 }
