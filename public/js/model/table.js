@@ -51,6 +51,7 @@ class Table {
         this.chip = new Sprite(this.textcanvas, './asset/chip.png');
 
         const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+        const cardbacksheet = './asset/cards-hand-card-back.png';
 
         this.cardpixelwidth = 72.15;
         this.cardpixelheight = 83.25;
@@ -62,6 +63,8 @@ class Table {
                 this.cards.set(`${i}::${j}`, new Sprite(this.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
             }
         }
+
+        this.cardbacks = new Map();
 
         this.drawOnNextUpdate = false;
     };
@@ -190,6 +193,7 @@ class Table {
             }
 
             const p = this.pointOnTable(db);
+
             this.dealerbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
         });
     };
@@ -346,6 +350,20 @@ class Table {
 
             this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, this.cardpixelwidth, this.cardpixelheight);
             this.cards.get(`${b.suite}::${b.value}`).render(p.x + this.cardpixelwidth, p.y, b.value, b.suite, this.cardpixelwidth, this.cardpixelheight);
+
+            for (const [s, p] of this.seatsVacant(false)) {
+                if (s === seatindex) {
+                    continue;
+                }
+
+                const p = this.pointOnTable(s);
+
+                if (!this.cardbacks.has(s)) {
+                    this.cardbacks.set(s, new Sprite(this.cardcanvas, './asset/cards-hand-card-back.png'));
+                }
+
+                this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
+            }
         });
     }
 

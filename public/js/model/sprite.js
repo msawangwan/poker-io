@@ -16,6 +16,13 @@ class Sprite {
     };
 
     renderScaled(x, y, row, col, w, h, sx, sy) {
-        this.render(x, y, row, col, w * sx, h * sx);
+        const img = new Image();
+
+        img.onload = () => {
+            const ctx = this.parentcanvas.getContext('2d');
+            ctx.drawImage(img, row * w, col * h, w, h, x, y, w * sx, h * sy);
+        };
+
+        img.src = this.src;
     };
 }
