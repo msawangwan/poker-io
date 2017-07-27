@@ -125,10 +125,11 @@ $(document).ready(() => {
                 debug.logobject(data);
             }
 
-            const submitAction = (t, b) => {
+            const submitAction = (t, b, p) => {
                 socket.emit('player-submit-action', {
                     betType: t,
                     betAmount: b,
+                    turnPhase: p,
                     tableid: current.table.id,
                     gameid: current.table.game.id
                 });
@@ -136,46 +137,22 @@ $(document).ready(() => {
 
             switch (data.gamePhase) {
                 case 'predeal':
-                    switch (data.turnOrder) {
-                        case 0: // note: dealer
-                            debug.delimit('*ACTION*: button');
-                            break;
-                        case 1: // note: smallblind
-                            debug.delimit('*ACTION*: small blind');
+                    if (data.allowedactions.includes('smallblind')) {
+                        $btnsendblind.toggle($hidebtn);
+                        $btnsendblind.val('post small blind');
+                        $btnsendblind.on('click', () => {
+                            submitAction('ante', data.minbet / 2, 'predeal');
+                            $btnsendblind.toggle($hidebtn);
+                        });
+                    }
 
-                            if (data.allowedactions.includes('ante')) {
-                                $btnsendblind.toggle($hidebtn);
-                                $btnsendblind.val('post small blind');
-                                $btnsendblind.on('click', () => {
-                                    submitAction('ante', data.minbet / 2);
-                                    $btnsendblind.toggle($hidebtn);
-                                });
-                            } else {
-                                if (data.allowedactions.includes('check') || data.allowedactions.includes('raise')) {
-
-                                }
-                            }
-                            break;
-                        case 2: // note: bigblind
-                            debug.delimit('*ACTION*: big blind');
-
-                            if (data.allowedactions.includes('ante')) {
-                                $btnsendblind.toggle($hidebtn);
-                                $btnsendblind.val('post big blind');
-                                $btnsendblind.on('click', () => {
-                                    submitAction('ante', data.minbet);
-
-                                    $btnsendblind.toggle($hidebtn);
-                                });
-                            } else {
-                                if (data.allowedactions.includes('check') || data.allowedactions.includes('raise')) {
-
-                                }
-                            }
-                            break;
-                        default:
-                            debug.delimit('*ACTION*: nothing');
-                            break;
+                    if (data.allowedactions.includes('bigblind')) {
+                        $btnsendblind.toggle($hidebtn);
+                        $btnsendblind.val('post big blind');
+                        $btnsendblind.on('click', () => {
+                            submitAction('ante', data.minbet, 'predeal');
+                            $btnsendblind.toggle($hidebtn);
+                        });
                     }
                     break;
                 case 'preflop':
@@ -183,7 +160,7 @@ $(document).ready(() => {
                         $btnsendbet.toggle($hidebtn);
                         $btnsendbet.val(`bet ${data.minbet}`);
                         $btnsendbet.on('click', () => {
-                            submitAction('bet', data.minbet);
+                            submitAction('bet', data.minbet, 'preflop');
 
                             $btnsendbet.toggle($hidebtn);
                         });
@@ -192,7 +169,7 @@ $(document).ready(() => {
                         $btnsendcheck.toggle($hidebtn);
                         $btnsendcheck.val(`check`);
                         $btnsendcheck.on('click', () => {
-                            submitAction('check', data.minbet);
+                            submitAction('check', data.minbet, 'preflop');
 
                             $btnsendcheck.toggle($hidebtn);
                         });
