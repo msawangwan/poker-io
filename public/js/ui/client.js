@@ -111,10 +111,76 @@ $(document).ready(() => {
             debug.logobject(data);
             debug.delimit(
                 'game is starting',
+                `playe id: ${socket.id}`,
+                `seat index: ${current.seat}`,
                 `button index: ${current.table.buttonIndex}`,
                 `small blind index: ${current.table.sbIndex}`,
                 `big blind index: ${current.table.bbIndex}`
             );
+        });
+
+        // socket.on('collect-small-blind', (data) => {
+        //     const sbBet = data.minbet / 2;
+
+        //     $btnsendblind.toggle($hidebtn);
+        //     $btnsendblind.val('post small blind');
+        //     $btnsendblind.on('click', () => {
+        //         socket.emit('post-blind', {
+        //             blindType: 'sb',
+        //             betAmount: sbBet,
+        //             tableid: current.table.id,
+        //             gameid: current.table.game.id
+        //         });
+
+        //         $btnsendblind.toggle($hidebtn);
+        //     });
+
+        //     debug.delimit(
+        //         `*ACTION*: post small blind`,
+        //         `player: ${current.player.name}`,
+        //         `id: ${socket.id}`
+        //     );
+        // });
+
+        socket.on('collect-blind', (data) => {
+            debug.delimit(
+                `*ACTION*: post ${data.blindType === 'sb' ? 'small' : 'big'} blind`,
+                `player: ${current.player.name}`,
+                `id: ${socket.id}`
+            );
+
+            switch (data.blindType) {
+                case 'sb':
+                    $btnsendblind.toggle($hidebtn);
+                    $btnsendblind.val('post small blind');
+                    $btnsendblind.on('click', () => {
+                        socket.emit('post-blind', {
+                            blindType: 'sb',
+                            betAmount: data.blindBetSize / 2,
+                            tableid: current.table.id,
+                            gameid: current.table.game.id
+                        });
+
+                        $btnsendblind.toggle($hidebtn);
+                    });
+                    break;
+                case 'bb':
+                    $btnsendblind.toggle($hidebtn);
+                    $btnsendblind.val('post big blind');
+                    $btnsendblind.on('click', () => {
+                        socket.emit('post-blind', {
+                            blindType: 'bb',
+                            betAmount: data.blindBetSize,
+                            tableid: current.table.id,
+                            gameid: current.table.game.id
+                        });
+
+                        $btnsendblind.toggle($hidebtn);
+                    });
+                    break;
+                default:
+                    break;
+            }
         });
 
         socket.on('action-to-player', (data) => {
