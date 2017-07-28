@@ -156,6 +156,8 @@ $(document).ready(() => {
                     }
                     break;
                 case 'preflop':
+                    debug.delimit("PREEFLOP ENTERED");
+                    debug.delimit(data.allowedactions);
                     if (data.allowedactions.includes('bet')) {
                         $btnsendbet.toggle($hidebtn);
                         $btnsendbet.val(`bet ${data.minbet}`);
