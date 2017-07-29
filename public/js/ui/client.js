@@ -119,29 +119,6 @@ $(document).ready(() => {
             );
         });
 
-        // socket.on('collect-small-blind', (data) => {
-        //     const sbBet = data.minbet / 2;
-
-        //     $btnsendblind.toggle($hidebtn);
-        //     $btnsendblind.val('post small blind');
-        //     $btnsendblind.on('click', () => {
-        //         socket.emit('post-blind', {
-        //             blindType: 'sb',
-        //             betAmount: sbBet,
-        //             tableid: current.table.id,
-        //             gameid: current.table.game.id
-        //         });
-
-        //         $btnsendblind.toggle($hidebtn);
-        //     });
-
-        //     debug.delimit(
-        //         `*ACTION*: post small blind`,
-        //         `player: ${current.player.name}`,
-        //         `id: ${socket.id}`
-        //     );
-        // });
-
         socket.on('collect-blind', (data) => {
             debug.delimit(
                 `*ACTION*: post ${data.blindType === 'sb' ? 'small' : 'big'} blind`,
@@ -177,6 +154,67 @@ $(document).ready(() => {
 
                         $btnsendblind.toggle($hidebtn);
                     });
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        socket.on('yield-action-to-player', (data) => {
+            {
+                debug.delimit(
+                    `${current.player.name} it's your turn!`,
+                );
+
+                debug.logobject(data);
+            }
+
+            switch (data.actionType) {
+                case 'open':
+                    debug.delimit('action is open and on you', 'bet', 'check', 'fold');
+
+                    let action = (type, amount) => {
+                        socket.emit('post-bet', {
+                            round: data.round,
+                            betType: type,
+                            betAmount: amount,
+                            tableid: current.table.id,
+                            gameid: current.table.game.id
+                        });
+                    };
+
+                    $btnsendbet.toggle($hidebtn);
+                    $btnsendcheck.toggle($hidebtn);
+                    $btnsendfold.toggle($hidebtn);
+
+                    $btnsendbet.val(`bet ${data.minBetSize}`);
+                    $btnsendbet.on('click', () => {
+                        $btnsendbet.toggle($hidebtn);
+                        $btnsendcheck.toggle($hidebtn);
+                        $btnsendfold.toggle($hidebtn);
+
+                        action('bet', data.minBetSize);
+                    });
+
+                    $btnsendcheck.val(`check`);
+                    $btnsendcheck.on('click', () => {
+                        $btnsendbet.toggle($hidebtn);
+                        $btnsendcheck.toggle($hidebtn);
+                        $btnsendfold.toggle($hidebtn);
+
+                        action('check', 0);
+                    });
+
+                    $btnsendfold.on('click', () => {
+                        $btnsendbet.toggle($hidebtn);
+                        $btnsendcheck.toggle($hidebtn);
+                        $btnsendfold.toggle($hidebtn);
+
+                        action('fold', 0);
+                    });
+
+                    break;
+                case 'closed':
                     break;
                 default:
                     break;
