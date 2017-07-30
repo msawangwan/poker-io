@@ -1,112 +1,302 @@
-// const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
-//     const parentEle = document.getElementById(parentCanvasId);
+const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
+    const parentEle = document.getElementById(parentCanvasId);
 
-//     const w = parentEle.offsetWidth;
-//     const h = parentEle.offsetHeight;
+    const w = parentEle.offsetWidth;
+    const h = parentEle.offsetHeight;
 
-//     for (const c of canvasEleGroup) {
-//         c.width = w;
-//         c.height = h;
-//     }
-// };
+    for (const c of canvasEleGroup) {
+        c.width = w;
+        c.height = h;
+    }
+};
 
-// const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
-// const containerCanvasId = 'container-canvas';
+const drawChips = (t, i, b) => {
+    t.seats.get(i).player.balance = b;
+    t.drawChips(i);
+    t.redraw();
+};
 
-// const tickrate = 1000 / 2;
-// const startupt = 800;
+const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
+const containerCanvasId = 'container-canvas';
 
-// const current = {
-//     player: null, table: null
-// };
+const tickrate = 1000 / 2;
+const startupt = 800;
 
-// $(document).ready(() => {
-//     const staticCanvas = document.getElementById(canvasLayerIds[0]);
-//     const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
-//     const labelCanvas = document.getElementById(canvasLayerIds[2]);
+const current = {
+    player: null, table: null, seat: null
+};
 
-//     const staticCtx = staticCanvas.getContext('2d');
-//     const dynamicCtx = dynamicCanvas.getContext('2d');
-//     const labelCtx = labelCanvas.getContext('2d');
+$(document).ready(() => {
+    const debug = new HTMLLogger();
 
-//     const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
+    const staticCanvas = document.getElementById(canvasLayerIds[0]);
+    const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
+    const labelCanvas = document.getElementById(canvasLayerIds[2]);
 
-//     const socket = io.connect(window.location.origin, {
-//         'reconnection': false
-//     });
+    const staticCtx = staticCanvas.getContext('2d');
+    const dynamicCtx = dynamicCanvas.getContext('2d');
+    const labelCtx = labelCanvas.getContext('2d');
 
-//     resizeCanvases(containerCanvasId, canvasGroup);
+    const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
 
-//     {
-//         socket.on('connect', (data) => {
-//             current.table = new Table(9, staticCanvas, labelCanvas);
+    const socket = io.connect(window.location.origin, {
+        'reconnection': false
+    });
 
-//             current.table.init();
-//             current.table.redraw();
-//         });
+    resizeCanvases(containerCanvasId, canvasGroup);
 
-//         socket.on('assigned-table', (data) => {
-//             current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
+    const ui = new ClientUI();
 
-//             current.table.assignedId = data.table.id;
-//             current.table.centerLabelText = 'waiting for players ...';
+    ui.hideAllButtons();
 
-//             current.table.seatPlayer(data.table.assignedSeat, current.player);
-//             current.table.seatOpponents(data.table.seatingState, socket.id);
+    ui.$betrangeslider.on('change', () => {
+        const slidervalue = ui.$betrangeslider.val();
+        ui.$bettextfield.val(slidervalue);
+    });
 
-//             resizeCanvases(containerCanvasId, canvasGroup);
-//         });
+    {
+        socket.on('connect', (data) => {
+            current.table = new Table(9, staticCanvas, dynamicCanvas, labelCanvas);
 
-//         socket.on('a-player-has-joined', (data) => {
-//             current.table.seatOpponents(data.table.seatingState, socket.id);
+            current.table.init();
+            current.table.redraw();
+        });
 
-//             resizeCanvases(containerCanvasId, canvasGroup);
-//         });
+        socket.on('assigned-table', (data) => {
+            current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
 
-//         socket.on('game-started', (data) => {
-//             current.table.game = new Game(data.gameId, current.table.players);
+            current.seat = data.table.assignedSeat;
 
-//             socket.emit('get-position', {
-//                 tableid: current.table.id,
-//                 gameid: current.table.game.id
-//             });
-//         });
+            current.table.assignedId = data.table.id;
+            current.table.centerLabelText = 'waiting for players ...';
 
-//         socket.on('assign-positions', (data) => {
-//             {
-//                 console.log('===');
-//                 console.log('position data sent');
-//                 console.log('===');
-//             }
+            current.table.seatPlayer(data.table.assignedSeat, current.player);
+            current.table.seatOpponents(data.table.seatingState, socket.id);
 
-//             current.table.game.assignButton(data.button);
+            resizeCanvases(containerCanvasId, canvasGroup);
+        });
 
-//             console.log(data);
-//         });
-//     }
+        socket.on('a-player-has-joined', (data) => {
+            current.table.seatOpponents(data.table.seatingState, socket.id);
 
-//     let renderLoop = null;
+            resizeCanvases(containerCanvasId, canvasGroup);
+        });
 
-//     {
-//         setTimeout(() => { // start
-//             console.log(`===`);
-//             console.log('entered start ...');
-//             setTimeout(() => { // update
-//                 console.log(`===`);
-//                 console.log('... started update ...');
-//                 renderLoop = setInterval(() => {
-//                     current.table.render();
-//                 }, tickrate, current.table, staticCanvas);
-//                 console.log('... updating running ...');
-//                 console.log(`===`);
-//             }, startupt);
-//             console.log('... exited start.');
-//             console.log(`===`);
-//         }, startupt);
-//     }
+        socket.on('game-started', (data) => {
+            current.table.game = new Game(data.gameId, current.table.players);
 
-//     $(window).on('resize', () => {
-//         resizeCanvases(containerCanvasId, canvasGroup);
-//         current.table.redraw();
-//     });
-// });
+            current.table.buttonIndex = data.buttonIndex;
+            current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
+            current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
+
+            current.table.centerLabelText = 'pot size: 0';
+
+            debug.logobject(data);
+            debug.delimit(
+                'game is starting',
+                `playe id: ${socket.id}`,
+                `seat index: ${current.seat}`,
+                `button index: ${current.table.buttonIndex}`,
+                `small blind index: ${current.table.sbIndex}`,
+                `big blind index: ${current.table.bbIndex}`
+            );
+        });
+
+        socket.on('collect-blind', (data) => {
+            debug.delimit(
+                `*ACTION*: post ${data.blindType === 'sb' ? 'small' : 'big'} blind`,
+                `player: ${current.player.name}`,
+                `id: ${socket.id}`
+            );
+
+            switch (data.blindType) {
+                case 'sb':
+                    ui.$btnsendblind.toggle(ui.$hidebtn);
+                    ui.$btnsendblind.val('post small blind');
+                    ui.$btnsendblind.on('click', () => {
+                        socket.emit('post-blind', {
+                            blindType: 'sb',
+                            betAmount: data.blindBetSize / 2,
+                            tableid: current.table.id,
+                            gameid: current.table.game.id
+                        });
+
+                        ui.$btnsendblind.toggle(ui.$hidebtn);
+                    });
+                    break;
+                case 'bb':
+                    ui.$btnsendblind.toggle(ui.$hidebtn);
+                    ui.$btnsendblind.val('post big blind');
+                    ui.$btnsendblind.on('click', () => {
+                        socket.emit('post-blind', {
+                            blindType: 'bb',
+                            betAmount: data.blindBetSize,
+                            tableid: current.table.id,
+                            gameid: current.table.game.id
+                        });
+
+                        ui.$btnsendblind.toggle(ui.$hidebtn);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        socket.on('collect-ante', (data) => {
+            {
+                debug.delimit(
+                    `${current.player.name} ante up!`,
+                );
+
+                debug.logobject(data);
+            }
+
+            debug.delimit('action is open and on you', 'bet', 'check', 'fold');
+
+            let action = (type, amount) => {
+                socket.emit('post-ante', {
+                    betType: type,
+                    betAmount: amount,
+                    tableid: current.table.id,
+                    gameid: current.table.game.id
+                });
+            };
+
+            ui.$btnsendcall.toggle(ui.$hidebtn);
+            ui.$btnsendraise.toggle(ui.$hidebtn);
+            ui.$btnsendfold.toggle(ui.$hidebtn);
+
+            ui.$btnsendcall.val(`call ${data.minBetSize}`);
+            ui.$btnsendcall.on('click', () => {
+                ui.$btnsendcall.toggle(ui.$hidebtn);
+                ui.$btnsendraise.toggle(ui.$hidebtn);
+                ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                action('call', data.minBetSize);
+            });
+
+            ui.$btnsendraise.val(`raise ${x}`);
+            ui.$btnsendraise.on('click', () => {
+                ui.$btnsendcall.toggle(ui.$hidebtn);
+                ui.$btnsendraise.toggle(ui.$hidebtn);
+                ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                action('raise', data.minBetSize);
+            });
+
+            ui.$btnsendfold.on('click', () => {
+                ui.$btnsendcall.toggle(ui.$hidebtn);
+                ui.$btnsendraise.toggle(ui.$hidebtn);
+                ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                action('fold', 0);
+            });
+
+        });
+
+        socket.on('yield-action-to-player', (data) => {
+            {
+                debug.delimit(
+                    `${current.player.name} it's your turn!`,
+                );
+
+                debug.logobject(data);
+            }
+
+            switch (data.actionType) {
+                case 'open':
+                    debug.delimit('action is open and on you', 'bet', 'check', 'fold');
+
+                    let action = (type, amount) => {
+                        socket.emit('post-bet', {
+                            round: data.round,
+                            betType: type,
+                            betAmount: amount,
+                            tableid: current.table.id,
+                            gameid: current.table.game.id
+                        });
+                    };
+
+                    ui.$btnsendbet.toggle(ui.$hidebtn);
+                    ui.$btnsendcheck.toggle(ui.$hidebtn);
+                    ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                    ui.$btnsendbet.val(`bet ${data.minBetSize}`);
+                    ui.$btnsendbet.on('click', () => {
+                        ui.$btnsendbet.toggle(ui.$hidebtn);
+                        ui.$btnsendcheck.toggle(ui.$hidebtn);
+                        ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                        action('bet', data.minBetSize);
+                    });
+
+                    ui.$btnsendcheck.val(`check`);
+                    ui.$btnsendcheck.on('click', () => {
+                        ui.$btnsendbet.toggle(ui.$hidebtn);
+                        ui.$btnsendcheck.toggle(ui.$hidebtn);
+                        ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                        action('check', 0);
+                    });
+
+                    ui.$btnsendfold.on('click', () => {
+                        ui.$btnsendbet.toggle(ui.$hidebtn);
+                        ui.$btnsendcheck.toggle(ui.$hidebtn);
+                        ui.$btnsendfold.toggle(ui.$hidebtn);
+
+                        action('fold', 0);
+                    });
+
+                    break;
+                case 'closed':
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        socket.on('player-dealt-cards', (data) => {
+            console.log(data);
+
+            debug.delimit('player was dealt hole cards:');
+            debug.logobject(data.a);
+            debug.logobject(data.b);
+
+            resizeCanvases(containerCanvasId, canvasGroup);
+
+            current.table.drawCards(current.seat, data.a, data.b);
+        });
+
+        socket.on('update-table-state', (data) => {
+            debug.delimit('player posted bet')
+            debug.logobject(data);
+
+            current.table.centerLabelText = `pot size: ${data.potsize}`;
+            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
+
+            resizeCanvases(containerCanvasId, canvasGroup);
+
+            drawChips(current.table, data.playerSeat, data.updatedBalance);
+        });
+    }
+
+    let renderLoop = null;
+
+    {
+        setTimeout(() => { // start
+            setTimeout(() => { // update
+                renderLoop = setInterval(() => {
+                    current.table.render();
+                }, tickrate, current.table, staticCanvas);
+            }, startupt);
+        }, startupt);
+    }
+
+    debug.delimit('start up complete!', 'ready ...');
+
+    $(window).on('resize', () => {
+        resizeCanvases(containerCanvasId, canvasGroup);
+        current.table.redraw();
+    });
+});
