@@ -11,9 +11,14 @@
 <body>
     <section class="main-content">
         <section class="main-content-subsection" id="container-canvas">
-            <canvas class="canvas-layer" id="static-canvas"></canvas>
-            <canvas class="canvas-layer" id="dynamic-canvas"></canvas>
-            <canvas class="canvas-layer" id="label-canvas"></canvas>
+            <!-- <canvas class="canvas-layer" id="static-canvas"></canvas>
+            <canvas class="canvas-layer" id="dynamic-canvas"></canvas> -->
+            <canvas class="canvas-layer" id="table-canvas"></canvas>
+            <canvas class="canvas-layer" id="player-canvas"></canvas>
+            <canvas class="canvas-layer" id="card-canvas"></canvas>
+            <canvas class="canvas-layer" id="button-canvas"></canvas>
+            <canvas class="canvas-layer" id="chip-canvas"></canvas>
+            <canvas class="canvas-layer" id="text-canvas"></canvas>
         </section>
         <section class="main-content-subsection" id="container-input">
             <div id="table-input">
@@ -58,7 +63,8 @@
     <script src='./js/util/fmt.js' type='text/javascript'></script>
     <script src='./js/util/htmllogger.js' type='text/javascript'></script>
 
-    <script src='./js/ui/clientui.js' type='text/javascript'></script>
+    <script src='./js/ui/canvasview.js' type='text/javascript'></script>
+    <script src='./js/ui/clientview.js' type='text/javascript'></script>
 
     <script src='./js/model/sprite.js' type='text/javascript'></script>
     <script src='./js/model/spritecache.js' type='text/javascript'></script>

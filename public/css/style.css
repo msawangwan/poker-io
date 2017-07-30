@@ -147,6 +147,18 @@ body {
     z-index: 1;
 }
 
+.canvas-layer:nth-child(4) { /* labels */
+    z-index: 2;
+}
+
+.canvas-layer:nth-child(5) { /* labels */
+    z-index: 3;
+}
+
+.canvas-layer:nth-child(6) { /* labels */
+    z-index: 4;
+}
+
 #container-canvas { }
 
 #table-input {

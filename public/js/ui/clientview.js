@@ -1,4 +1,4 @@
-class ClientUI {
+class ClientView {
     constructor() {
         this.$betrangeslider = $('#bet-range-slider');
         this.$bettextfield = $('#bet-amount-text-field');

@@ -2,7 +2,7 @@ class Sprite {
     constructor(parentcanvas, src) {
         this.parentcanvas = parentcanvas;
         this.src = src;
-    };
+    }
 
     render(x, y, row, col, w, h) {
         const img = new Image();
@@ -13,7 +13,7 @@ class Sprite {
         };
 
         img.src = this.src;
-    };
+    }
 
     renderScaled(x, y, row, col, w, h, sx, sy) {
         const img = new Image();
@@ -24,5 +24,10 @@ class Sprite {
         };
 
         img.src = this.src;
-    };
+    }
+
+    erase(x, y, w, h, sx, sy) {
+        const ctx = this.parentcanvas.getContext('2d');
+        ctx.clearRect(x, y, w * sx, h * sy);
+    }
 }

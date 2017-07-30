@@ -1,23 +1,23 @@
-const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
-    const parentEle = document.getElementById(parentCanvasId);
+// const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
+//     const parentEle = document.getElementById(parentCanvasId);
 
-    const w = parentEle.offsetWidth;
-    const h = parentEle.offsetHeight;
+//     const w = parentEle.offsetWidth;
+//     const h = parentEle.offsetHeight;
 
-    for (const c of canvasEleGroup) {
-        c.width = w;
-        c.height = h;
-    }
-};
+//     for (const c of canvasEleGroup) {
+//         c.width = w;
+//         c.height = h;
+//     }
+// };
 
-const drawChips = (t, i, b) => {
+const drawChips = (t, i, b, e) => {
     t.seats.get(i).player.balance = b;
-    t.drawChips(i);
+    t.drawChips(i, e);
     t.redraw();
 };
 
-const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
-const containerCanvasId = 'container-canvas';
+// const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
+// const containerCanvasId = 'container-canvas';
 
 const tickrate = 1000 / 2;
 const startupt = 800;
@@ -29,41 +29,46 @@ const current = {
 $(document).ready(() => {
     const debug = new HTMLLogger();
 
-    const staticCanvas = document.getElementById(canvasLayerIds[0]);
-    const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
-    const labelCanvas = document.getElementById(canvasLayerIds[2]);
+    const clientView = new ClientView();
+    const canvasView = new CanvasView('container-canvas');
 
-    const staticCtx = staticCanvas.getContext('2d');
-    const dynamicCtx = dynamicCanvas.getContext('2d');
-    const labelCtx = labelCanvas.getContext('2d');
+    // const staticCanvas = document.getElementById(canvasLayerIds[0]);
+    // const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
+    // const labelCanvas = document.getElementById(canvasLayerIds[2]);
 
-    const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
+    // const staticCtx = staticCanvas.getContext('2d');
+    // const dynamicCtx = dynamicCanvas.getContext('2d');
+    // const labelCtx = labelCanvas.getContext('2d');
+
+    // const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
 
-    resizeCanvases(containerCanvasId, canvasGroup);
+    // resizeCanvases(containerCanvasId, canvasGroup);
+    canvasView.clearAndResizeAll();
 
-    const ui = new ClientUI();
 
-    ui.hideAllButtons();
+    clientView.hideAllButtons();
 
-    ui.$betrangeslider.on('change', () => {
-        const slidervalue = ui.$betrangeslider.val();
-        ui.$bettextfield.val(slidervalue);
+    clientView.$betrangeslider.on('change', () => {
+        const slidervalue = clientView.$betrangeslider.val();
+        clientView.$bettextfield.val(slidervalue);
     });
 
     {
         socket.on('connect', (data) => {
-            current.table = new Table(9, staticCanvas, dynamicCanvas, labelCanvas);
+            current.table = new Table(9, canvasView);
+            // current.table = new Table(9, staticCanvas, dynamicCanvas, labelCanvas);
 
             current.table.init();
             current.table.redraw();
         });
 
         socket.on('assigned-table', (data) => {
-            current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas);
+            current.player = new Player(data.guestname, socket.id, 0, canvasView.getCanvas('player-canvas'));
+            // current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas));
 
             current.seat = data.table.assignedSeat;
 
@@ -73,13 +78,15 @@ $(document).ready(() => {
             current.table.seatPlayer(data.table.assignedSeat, current.player);
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
-            resizeCanvases(containerCanvasId, canvasGroup);
+            // resizeCanvases(containerCanvasId, canvasGroup);
+            canvasView.clearAndResizeAll();
         });
 
         socket.on('a-player-has-joined', (data) => {
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
-            resizeCanvases(containerCanvasId, canvasGroup);
+            // resizeCanvases(containerCanvasId, canvasGroup);
+            canvasView.clearAndResizeAll();
         });
 
         socket.on('game-started', (data) => {
@@ -111,9 +118,9 @@ $(document).ready(() => {
 
             switch (data.blindType) {
                 case 'sb':
-                    ui.$btnsendblind.toggle(ui.$hidebtn);
-                    ui.$btnsendblind.val('post small blind');
-                    ui.$btnsendblind.on('click', () => {
+                    clientView.$btnsendblind.toggle(clientView.$hidebtn);
+                    clientView.$btnsendblind.val('post small blind');
+                    clientView.$btnsendblind.on('click', () => {
                         socket.emit('post-blind', {
                             blindType: 'sb',
                             betAmount: data.blindBetSize / 2,
@@ -121,13 +128,13 @@ $(document).ready(() => {
                             gameid: current.table.game.id
                         });
 
-                        ui.$btnsendblind.toggle(ui.$hidebtn);
+                        clientView.$btnsendblind.toggle(clientView.$hidebtn);
                     });
                     break;
                 case 'bb':
-                    ui.$btnsendblind.toggle(ui.$hidebtn);
-                    ui.$btnsendblind.val('post big blind');
-                    ui.$btnsendblind.on('click', () => {
+                    clientView.$btnsendblind.toggle(clientView.$hidebtn);
+                    clientView.$btnsendblind.val('post big blind');
+                    clientView.$btnsendblind.on('click', () => {
                         socket.emit('post-blind', {
                             blindType: 'bb',
                             betAmount: data.blindBetSize,
@@ -135,7 +142,7 @@ $(document).ready(() => {
                             gameid: current.table.game.id
                         });
 
-                        ui.$btnsendblind.toggle(ui.$hidebtn);
+                        clientView.$btnsendblind.toggle(clientView.$hidebtn);
                     });
                     break;
                 default:
@@ -163,32 +170,32 @@ $(document).ready(() => {
                 });
             };
 
-            ui.$btnsendcall.toggle(ui.$hidebtn);
-            ui.$btnsendraise.toggle(ui.$hidebtn);
-            ui.$btnsendfold.toggle(ui.$hidebtn);
+            clientView.$btnsendcall.toggle(clientView.$hidebtn);
+            clientView.$btnsendraise.toggle(clientView.$hidebtn);
+            clientView.$btnsendfold.toggle(clientView.$hidebtn);
 
-            ui.$btnsendcall.val(`call ${data.minBetSize}`);
-            ui.$btnsendcall.on('click', () => {
-                ui.$btnsendcall.toggle(ui.$hidebtn);
-                ui.$btnsendraise.toggle(ui.$hidebtn);
-                ui.$btnsendfold.toggle(ui.$hidebtn);
+            clientView.$btnsendcall.val(`call ${data.minBetSize}`);
+            clientView.$btnsendcall.on('click', () => {
+                clientView.$btnsendcall.toggle(clientView.$hidebtn);
+                clientView.$btnsendraise.toggle(clientView.$hidebtn);
+                clientView.$btnsendfold.toggle(clientView.$hidebtn);
 
                 action('call', data.minBetSize);
             });
 
-            ui.$btnsendraise.val(`raise ${'x'}`);
-            ui.$btnsendraise.on('click', () => {
-                ui.$btnsendcall.toggle(ui.$hidebtn);
-                ui.$btnsendraise.toggle(ui.$hidebtn);
-                ui.$btnsendfold.toggle(ui.$hidebtn);
+            clientView.$btnsendraise.val(`raise ${'x'}`);
+            clientView.$btnsendraise.on('click', () => {
+                clientView.$btnsendcall.toggle(clientView.$hidebtn);
+                clientView.$btnsendraise.toggle(clientView.$hidebtn);
+                clientView.$btnsendfold.toggle(clientView.$hidebtn);
 
                 action('raise', data.minBetSize);
             });
 
-            ui.$btnsendfold.on('click', () => {
-                ui.$btnsendcall.toggle(ui.$hidebtn);
-                ui.$btnsendraise.toggle(ui.$hidebtn);
-                ui.$btnsendfold.toggle(ui.$hidebtn);
+            clientView.$btnsendfold.on('click', () => {
+                clientView.$btnsendcall.toggle(clientView.$hidebtn);
+                clientView.$btnsendraise.toggle(clientView.$hidebtn);
+                clientView.$btnsendfold.toggle(clientView.$hidebtn);
 
                 action('fold', 0);
             });
@@ -200,7 +207,8 @@ $(document).ready(() => {
             debug.logobject(data.a);
             debug.logobject(data.b);
 
-            resizeCanvases(containerCanvasId, canvasGroup);
+            // resizeCanvases(containerCanvasId, canvasGroup);
+            canvasView.clearAndResizeAll();
 
             current.table.drawCards(current.seat, data.a, data.b);
         });
@@ -211,7 +219,8 @@ $(document).ready(() => {
             debug.logobject(data.b);
             debug.logobject(data.c);
 
-            resizeCanvases(containerCanvasId, canvasGroup);
+            // resizeCanvases(containerCanvasId, canvasGroup);
+            canvasView.clearAndResizeAll();
 
             current.table.drawCommunityCards(data.a, data.b, data.c);
         });
@@ -223,9 +232,10 @@ $(document).ready(() => {
             current.table.centerLabelText = `pot size: ${data.potsize}`;
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
-            resizeCanvases(containerCanvasId, canvasGroup);
+            // resizeCanvases(containerCanvasId, canvasGroup);
+            canvasView.clearAndResizeAll();
 
-            drawChips(current.table, data.playerSeat, data.updatedBalance);
+            drawChips(current.table, data.playerSeat, data.updatedBalance, data.clearTable);
         });
     }
 
@@ -236,7 +246,7 @@ $(document).ready(() => {
             setTimeout(() => { // update
                 renderLoop = setInterval(() => {
                     current.table.render();
-                }, tickrate, current.table, staticCanvas);
+                }, tickrate, current.table, canvasView.getCanvas('table-canvas'));
             }, startupt);
         }, startupt);
     }
@@ -244,7 +254,8 @@ $(document).ready(() => {
     debug.delimit('start up complete!', 'ready ...');
 
     $(window).on('resize', () => {
-        resizeCanvases(containerCanvasId, canvasGroup);
+        // resizeCanvases(containerCanvasId, canvasGroup);
+        canvasView.clearAndResizeAll();
         current.table.redraw();
     });
 });

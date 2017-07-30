@@ -6,17 +6,27 @@ const thetaLower = toradian(325);
 const scalingvalue = 0.65;
 
 class Table {
-    constructor(maxseats, parentcanvas, cardcanvas, textcanvas) {
+    // constructor(maxseats, parentcanvas, cardcanvas, textcanvas) {
+    constructor(maxseats, canvasView) {
         this.id = null;
 
         this.maxseats = maxseats;
 
-        this.parentcanvas = parentcanvas;
-        this.cardcanvas = cardcanvas;
-        this.textcanvas = textcanvas;
+        this.canvasView = canvasView;
+
+        this.parentcanvas = this.canvasView.parentCanvas;
+        this.parentcanvas = this.canvasView.getCanvas('table-canvas');
+        this.buttoncanvas = this.canvasView.getCanvas('button-canvas');
+        this.chipcanvas = this.canvasView.getCanvas('chip-canvas');
+        this.cardcanvas = this.canvasView.getCanvas('card-canvas');
+        this.textcanvas = this.canvasView.getCanvas('text-canvas');
+
+        // this.parentcanvas = parentcanvas;
+        // this.cardcanvas = cardcanvas;
+        // this.textcanvas = textcanvas;
 
         this.canvas = document.createElement('canvas');
-        this.canvas.setAttribute('id', 'canvas-table');
+        this.canvas.setAttribute('id', 'table-cvs');
 
         this.seats = new Map();
 
@@ -44,11 +54,11 @@ class Table {
 
         this.messageHistory = ['... seating ...'];
 
-        this.dealerbtn = new Sprite(this.textcanvas, './asset/btn-dealer.png');
-        this.sbbtn = new Sprite(this.textcanvas, './asset/btn-sb.png');
-        this.bbbtn = new Sprite(this.textcanvas, './asset/btn-bb.png');
+        this.dealerbtn = new Sprite(this.buttoncanvas, './asset/btn-dealer.png');
+        this.sbbtn = new Sprite(this.buttoncanvas, './asset/btn-sb.png');
+        this.bbbtn = new Sprite(this.buttoncanvas, './asset/btn-bb.png');
 
-        this.chip = new Sprite(this.textcanvas, './asset/chip.png');
+        this.chip = new Sprite(this.chipcanvas, './asset/chip.png');
 
         const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
         const cardbacksheet = './asset/cards-hand-card-back.png';
@@ -237,7 +247,7 @@ class Table {
         });
     }
 
-    drawChips(seatindex) {
+    drawChips(seatindex, erase) {
         this.drawHandlers.set('drawchips' + seatindex, () => {
             const offsetAmount = 96;
 
@@ -262,7 +272,11 @@ class Table {
 
             const p = this.pointOnTable(seatindex);
 
-            this.chip.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+            if (erase) {
+                this.chip.erase(p.x + offsetx, p.y + offsety, 64, 64, 1, 1);
+            } else {
+                this.chip.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+            }
         });
     }
 
