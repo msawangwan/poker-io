@@ -176,7 +176,7 @@ $(document).ready(() => {
                 action('call', data.minBetSize);
             });
 
-            ui.$btnsendraise.val(`raise ${x}`);
+            ui.$btnsendraise.val(`raise ${'x'}`);
             ui.$btnsendraise.on('click', () => {
                 ui.$btnsendcall.toggle(ui.$hidebtn);
                 ui.$btnsendraise.toggle(ui.$hidebtn);
@@ -195,70 +195,68 @@ $(document).ready(() => {
 
         });
 
-        socket.on('yield-action-to-player', (data) => {
-            {
-                debug.delimit(
-                    `${current.player.name} it's your turn!`,
-                );
+        // socket.on('yield-action-to-player', (data) => {
+        //     {
+        //         debug.delimit(
+        //             `${current.player.name} it's your turn!`,
+        //         );
 
-                debug.logobject(data);
-            }
+        //         debug.logobject(data);
+        //     }
 
-            switch (data.actionType) {
-                case 'open':
-                    debug.delimit('action is open and on you', 'bet', 'check', 'fold');
+        //     switch (data.actionType) {
+        //         case 'open':
+        //             debug.delimit('action is open and on you', 'bet', 'check', 'fold');
 
-                    let action = (type, amount) => {
-                        socket.emit('post-bet', {
-                            round: data.round,
-                            betType: type,
-                            betAmount: amount,
-                            tableid: current.table.id,
-                            gameid: current.table.game.id
-                        });
-                    };
+        //             let action = (type, amount) => {
+        //                 socket.emit('post-bet', {
+        //                     round: data.round,
+        //                     betType: type,
+        //                     betAmount: amount,
+        //                     tableid: current.table.id,
+        //                     gameid: current.table.game.id
+        //                 });
+        //             };
 
-                    ui.$btnsendbet.toggle(ui.$hidebtn);
-                    ui.$btnsendcheck.toggle(ui.$hidebtn);
-                    ui.$btnsendfold.toggle(ui.$hidebtn);
+        //             ui.$btnsendbet.toggle(ui.$hidebtn);
+        //             ui.$btnsendcheck.toggle(ui.$hidebtn);
+        //             ui.$btnsendfold.toggle(ui.$hidebtn);
 
-                    ui.$btnsendbet.val(`bet ${data.minBetSize}`);
-                    ui.$btnsendbet.on('click', () => {
-                        ui.$btnsendbet.toggle(ui.$hidebtn);
-                        ui.$btnsendcheck.toggle(ui.$hidebtn);
-                        ui.$btnsendfold.toggle(ui.$hidebtn);
+        //             ui.$btnsendbet.val(`bet ${data.minBetSize}`);
+        //             ui.$btnsendbet.on('click', () => {
+        //                 ui.$btnsendbet.toggle(ui.$hidebtn);
+        //                 ui.$btnsendcheck.toggle(ui.$hidebtn);
+        //                 ui.$btnsendfold.toggle(ui.$hidebtn);
 
-                        action('bet', data.minBetSize);
-                    });
+        //                 action('bet', data.minBetSize);
+        //             });
 
-                    ui.$btnsendcheck.val(`check`);
-                    ui.$btnsendcheck.on('click', () => {
-                        ui.$btnsendbet.toggle(ui.$hidebtn);
-                        ui.$btnsendcheck.toggle(ui.$hidebtn);
-                        ui.$btnsendfold.toggle(ui.$hidebtn);
+        //             ui.$btnsendcheck.val(`check`);
+        //             ui.$btnsendcheck.on('click', () => {
+        //                 ui.$btnsendbet.toggle(ui.$hidebtn);
+        //                 ui.$btnsendcheck.toggle(ui.$hidebtn);
+        //                 ui.$btnsendfold.toggle(ui.$hidebtn);
 
-                        action('check', 0);
-                    });
+        //                 action('check', 0);
+        //             });
 
-                    ui.$btnsendfold.on('click', () => {
-                        ui.$btnsendbet.toggle(ui.$hidebtn);
-                        ui.$btnsendcheck.toggle(ui.$hidebtn);
-                        ui.$btnsendfold.toggle(ui.$hidebtn);
+        //             ui.$btnsendfold.on('click', () => {
+        //                 ui.$btnsendbet.toggle(ui.$hidebtn);
+        //                 ui.$btnsendcheck.toggle(ui.$hidebtn);
+        //                 ui.$btnsendfold.toggle(ui.$hidebtn);
 
-                        action('fold', 0);
-                    });
+        //                 action('fold', 0);
+        //             });
 
-                    break;
-                case 'closed':
-                    break;
-                default:
-                    break;
-            }
-        });
+        //             break;
+        //         case 'closed':
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // });
 
         socket.on('player-dealt-cards', (data) => {
-            console.log(data);
-
             debug.delimit('player was dealt hole cards:');
             debug.logobject(data.a);
             debug.logobject(data.b);
@@ -266,6 +264,13 @@ $(document).ready(() => {
             resizeCanvases(containerCanvasId, canvasGroup);
 
             current.table.drawCards(current.seat, data.a, data.b);
+        });
+
+        socket.on('flop-dealt', (data) => {
+            debug.delimit('flop dealt');
+            debug.logobject(data.a);
+            debug.logobject(data.b);
+            debug.logobject(data.c);
         });
 
         socket.on('update-table-state', (data) => {
