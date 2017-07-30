@@ -69,8 +69,9 @@ $(document).ready(() => {
             debug.logobject(data);
             debug.delimit(
                 'game is starting',
-                `playe id: ${socket.id}`,
-                `seat index: ${current.seat}`,
+                `id: ${socket.id}`,
+                `name: ${current.player.name}`,
+                `seat: ${current.seat}`,
                 `button index: ${current.table.buttonIndex}`,
                 `small blind index: ${current.table.sbIndex}`,
                 `big blind index: ${current.table.bbIndex}`
