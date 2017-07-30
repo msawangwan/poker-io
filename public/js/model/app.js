@@ -1,23 +1,8 @@
-// const resizeCanvases = (parentCanvasId, canvasEleGroup) => {
-//     const parentEle = document.getElementById(parentCanvasId);
-
-//     const w = parentEle.offsetWidth;
-//     const h = parentEle.offsetHeight;
-
-//     for (const c of canvasEleGroup) {
-//         c.width = w;
-//         c.height = h;
-//     }
-// };
-
 const drawChips = (t, i, b, e) => {
     t.seats.get(i).player.balance = b;
     t.drawChips(i, e);
     t.redraw();
 };
-
-// const canvasLayerIds = ['static-canvas', 'dynamic-canvas', 'label-canvas'];
-// const containerCanvasId = 'container-canvas';
 
 const tickrate = 1000 / 2;
 const startupt = 800;
@@ -32,24 +17,11 @@ $(document).ready(() => {
     const clientView = new ClientView();
     const canvasView = new CanvasView('container-canvas');
 
-    // const staticCanvas = document.getElementById(canvasLayerIds[0]);
-    // const dynamicCanvas = document.getElementById(canvasLayerIds[1]);
-    // const labelCanvas = document.getElementById(canvasLayerIds[2]);
-
-    // const staticCtx = staticCanvas.getContext('2d');
-    // const dynamicCtx = dynamicCanvas.getContext('2d');
-    // const labelCtx = labelCanvas.getContext('2d');
-
-    // const canvasGroup = [staticCanvas, dynamicCanvas, labelCanvas];
-
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
 
-    // resizeCanvases(containerCanvasId, canvasGroup);
     canvasView.clearAndResizeAll();
-
-
     clientView.hideAllButtons();
 
     clientView.$betrangeslider.on('change', () => {
@@ -60,7 +32,6 @@ $(document).ready(() => {
     {
         socket.on('connect', (data) => {
             current.table = new Table(9, canvasView);
-            // current.table = new Table(9, staticCanvas, dynamicCanvas, labelCanvas);
 
             current.table.init();
             current.table.redraw();
@@ -68,7 +39,6 @@ $(document).ready(() => {
 
         socket.on('assigned-table', (data) => {
             current.player = new Player(data.guestname, socket.id, 0, canvasView.getCanvas('player-canvas'));
-            // current.player = new Player(data.guestname, socket.id, 0, dynamicCanvas));
 
             current.seat = data.table.assignedSeat;
 
@@ -78,14 +48,12 @@ $(document).ready(() => {
             current.table.seatPlayer(data.table.assignedSeat, current.player);
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
-            // resizeCanvases(containerCanvasId, canvasGroup);
             canvasView.clearAndResizeAll();
         });
 
         socket.on('a-player-has-joined', (data) => {
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
-            // resizeCanvases(containerCanvasId, canvasGroup);
             canvasView.clearAndResizeAll();
         });
 
@@ -207,7 +175,6 @@ $(document).ready(() => {
             debug.logobject(data.a);
             debug.logobject(data.b);
 
-            // resizeCanvases(containerCanvasId, canvasGroup);
             canvasView.clearAndResizeAll();
 
             current.table.drawCards(current.seat, data.a, data.b);
@@ -219,7 +186,6 @@ $(document).ready(() => {
             debug.logobject(data.b);
             debug.logobject(data.c);
 
-            // resizeCanvases(containerCanvasId, canvasGroup);
             canvasView.clearAndResizeAll();
 
             current.table.drawCommunityCards(data.a, data.b, data.c);
@@ -232,7 +198,6 @@ $(document).ready(() => {
             current.table.centerLabelText = `pot size: ${data.potsize}`;
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
-            // resizeCanvases(containerCanvasId, canvasGroup);
             canvasView.clearAndResizeAll();
 
             drawChips(current.table, data.playerSeat, data.updatedBalance, data.clearTable);
@@ -254,7 +219,6 @@ $(document).ready(() => {
     debug.delimit('start up complete!', 'ready ...');
 
     $(window).on('resize', () => {
-        // resizeCanvases(containerCanvasId, canvasGroup);
         canvasView.clearAndResizeAll();
         current.table.redraw();
     });

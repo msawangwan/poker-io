@@ -6,7 +6,6 @@ const thetaLower = toradian(325);
 const scalingvalue = 0.65;
 
 class Table {
-    // constructor(maxseats, parentcanvas, cardcanvas, textcanvas) {
     constructor(maxseats, canvasView) {
         this.id = null;
 
@@ -20,10 +19,6 @@ class Table {
         this.chipcanvas = this.canvasView.getCanvas('chip-canvas');
         this.cardcanvas = this.canvasView.getCanvas('card-canvas');
         this.textcanvas = this.canvasView.getCanvas('text-canvas');
-
-        // this.parentcanvas = parentcanvas;
-        // this.cardcanvas = cardcanvas;
-        // this.textcanvas = textcanvas;
 
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', 'table-cvs');
