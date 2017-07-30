@@ -57,14 +57,14 @@ class Table {
         this.cardpixelheight = 83.25;
 
         this.cards = new Map();
+        this.cardbacks = new Map();
+        this.communityCards = new Map();
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 13; j++) {
                 this.cards.set(`${i}::${j}`, new Sprite(this.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
             }
         }
-
-        this.cardbacks = new Map();
 
         this.drawOnNextUpdate = false;
     };
@@ -198,152 +198,6 @@ class Table {
         });
     };
 
-    render() {
-        if (this.drawOnNextUpdate) {
-            this.resize();
-            this.draw();
-
-            this.labels.center.draw(
-                this.centerLabelText,
-                this.textcanvas,
-                this.center[0],
-                this.center[1] - this.cardpixelheight
-            );
-
-            this.drawOnNextUpdate = false;
-
-            for (const [si, s] of this.seats) {
-                s.render();
-            }
-
-            for (const [di, dh] of this.drawHandlers) {
-                dh();
-            }
-        }
-    };
-
-    draw() {
-        const ctx = this.canvas.getContext('2d');
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        this.canvas.width = this.dimensions.w;
-        this.canvas.height = this.dimensions.h;
-
-        ctx.beginPath();
-        ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-        ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-        ctx.fillStyle = 'green';
-        ctx.fill();
-
-        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
-    };
-
-    resize() {
-        this.dimensions.w = Math.floor(this.parentcanvas.width * scalingvalue);
-        this.dimensions.h = Math.floor(this.parentcanvas.height * scalingvalue);
-
-        this.canvasorigin.x = Math.floor(this.dimensions.w * 0.5);
-        this.canvasorigin.y = Math.floor(this.dimensions.h * 0.5);
-
-        this.postion.x = Math.floor(this.parentcanvas.width / 2 - this.canvasorigin.x);
-        this.postion.y = Math.floor(this.parentcanvas.height / 2 - this.canvasorigin.y);
-
-        // TODO: these should be defined elsewhere and the canvas also needs to be sized
-        const wide = { small: 0.25, med: 0.35, large: 0.45 };
-        const long = { small: 0.15, med: 0.30, large: 0.50 };
-
-        this.dimensions.r = Math.floor(this.dimensions.h * wide.large);
-        this.dimensions.off = Math.floor(this.dimensions.w * long.small);
-    };
-
-    redraw() {
-        this.drawOnNextUpdate = true;
-
-        for (const [k, h] of this.redrawHandlers) {
-            h();
-        }
-    };
-
-    init() {
-        let seatindex = 0;
-
-        while (seatindex < this.maxseats) {
-            this.clearSeat(seatindex);
-            seatindex += 1;
-        }
-    };
-
-    clearSeat(seatindex) {
-        if (this.seats.size > this.maxseats) {
-            return false;
-        }
-
-        this.seats.set(seatindex, new Seat(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
-
-        this.redrawHandlers.set(seatindex, () => {
-            this.seats.get(seatindex).redraw(); // attach handler to seat
-        });
-
-        return true;
-    };
-
-    seatPlayer(index, player) {
-        if (!this.seatByIndex(index).vacant) {
-            return false;
-        }
-
-        const seat = this.seatByIndex(index);
-
-        seat.vacant = false;
-        seat.player = player;
-
-        player.seatPositionIndex = index;
-
-        this.setSeatByIndex(index, seat);
-
-        return true;
-    };
-
-    seatOpponents(seatingState, currentPlayerId) {
-        for (const seat of seatingState) {
-            if (seat[1].vacant) {
-                continue;
-            } else if (seat[1].player.id === currentPlayerId) {
-                this.seats.get(seat[0]).player.balance = seat[1].player.balance;
-                continue;
-            }
-
-            const opponent = new Player(
-                seat[1].player.name,
-                seat[1].player.id,
-                seat[1].player.balance,
-                null
-            );
-
-            opponent.seatPositionIndex = seat[0];
-
-            this.seatPlayer(seat[0], opponent);
-        }
-
-        this.redraw();
-    }
-
-    seatsVacant(vacant) {
-        return [...this.seats].filter(([i, s]) => s.vacant === vacant);
-    };
-
-    seatCount(vacant) {
-        return this.seatsVacant(vacant).length;
-    };
-
-    seatByIndex(seatindex) {
-        return this.seats.get(seatindex);
-    };
-
-    setSeatByIndex(seatindex, seat) {
-        this.seats.set(seatindex, seat);
-    };
-
     drawCards(seatindex, a, b) {
         this.drawHandlers.set('drawcards' + seatindex, () => {
             const p = this.pointOnTable(seatindex);
@@ -363,6 +217,22 @@ class Table {
                 }
 
                 this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
+            }
+        });
+    }
+
+    drawCommunityCards(...ccCards) {
+        this.drawHandlers.set('drawcommunitycards', () => {
+            const p = this.pointOnTable(-2);
+            const numCards = ccCards.length;
+            const totalWidth = this.cardpixelwidth * 3;
+
+            let start = p.x - (totalWidth / 2); // (this.cardpixelwidth / 2) -
+            let shift = 0;
+
+            for (const c of ccCards) {
+                this.cards.get(this.cardByKey(c)).render(start + shift, p.y, c.value, c.suite, this.cardpixelwidth, this.cardpixelheight);
+                shift += this.cardpixelwidth;
             }
         });
     }
@@ -394,6 +264,156 @@ class Table {
 
             this.chip.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
         });
+    }
+
+    render() {
+        if (this.drawOnNextUpdate) {
+            this.resize();
+            this.draw();
+
+            this.labels.center.draw(
+                this.centerLabelText,
+                this.textcanvas,
+                this.center[0],
+                this.center[1] - this.cardpixelheight * 0.5
+            );
+
+            this.drawOnNextUpdate = false;
+
+            for (const [si, s] of this.seats) {
+                s.render();
+            }
+
+            for (const [di, dh] of this.drawHandlers) {
+                dh();
+            }
+        }
+    }
+
+    draw() {
+        const ctx = this.canvas.getContext('2d');
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.canvas.width = this.dimensions.w;
+        this.canvas.height = this.dimensions.h;
+
+        ctx.beginPath();
+        ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+        ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+        ctx.fillStyle = 'green';
+        ctx.fill();
+
+        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
+    }
+
+    resize() {
+        this.dimensions.w = Math.floor(this.parentcanvas.width * scalingvalue);
+        this.dimensions.h = Math.floor(this.parentcanvas.height * scalingvalue);
+
+        this.canvasorigin.x = Math.floor(this.dimensions.w * 0.5);
+        this.canvasorigin.y = Math.floor(this.dimensions.h * 0.5);
+
+        this.postion.x = Math.floor(this.parentcanvas.width / 2 - this.canvasorigin.x);
+        this.postion.y = Math.floor(this.parentcanvas.height / 2 - this.canvasorigin.y);
+
+        // TODO: these should be defined elsewhere and the canvas also needs to be sized
+        const wide = { small: 0.25, med: 0.35, large: 0.45 };
+        const long = { small: 0.15, med: 0.30, large: 0.50 };
+
+        this.dimensions.r = Math.floor(this.dimensions.h * wide.large);
+        this.dimensions.off = Math.floor(this.dimensions.w * long.small);
+    }
+
+    redraw() {
+        this.drawOnNextUpdate = true;
+
+        for (const [k, h] of this.redrawHandlers) {
+            h();
+        }
+    }
+
+    init() {
+        let seatindex = 0;
+
+        while (seatindex < this.maxseats) {
+            this.clearSeat(seatindex);
+            seatindex += 1;
+        }
+    }
+
+    clearSeat(seatindex) {
+        if (this.seats.size > this.maxseats) {
+            return false;
+        }
+
+        this.seats.set(seatindex, new Seat(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
+
+        this.redrawHandlers.set(seatindex, () => {
+            this.seats.get(seatindex).redraw(); // attach handler to seat
+        });
+
+        return true;
+    }
+
+    seatPlayer(index, player) {
+        if (!this.seatByIndex(index).vacant) {
+            return false;
+        }
+
+        const seat = this.seatByIndex(index);
+
+        seat.vacant = false;
+        seat.player = player;
+
+        player.seatPositionIndex = index;
+
+        this.setSeatByIndex(index, seat);
+
+        return true;
+    }
+
+    seatOpponents(seatingState, currentPlayerId) {
+        for (const seat of seatingState) {
+            if (seat[1].vacant) {
+                continue;
+            } else if (seat[1].player.id === currentPlayerId) {
+                this.seats.get(seat[0]).player.balance = seat[1].player.balance;
+                continue;
+            }
+
+            const opponent = new Player(
+                seat[1].player.name,
+                seat[1].player.id,
+                seat[1].player.balance,
+                null
+            );
+
+            opponent.seatPositionIndex = seat[0];
+
+            this.seatPlayer(seat[0], opponent);
+        }
+
+        this.redraw();
+    }
+
+    seatsVacant(vacant) {
+        return [...this.seats].filter(([i, s]) => s.vacant === vacant);
+    }
+
+    seatCount(vacant) {
+        return this.seatsVacant(vacant).length;
+    }
+
+    seatByIndex(seatindex) {
+        return this.seats.get(seatindex);
+    }
+
+    setSeatByIndex(seatindex, seat) {
+        this.seats.set(seatindex, seat);
+    }
+
+    cardByKey(c) {
+        return `${c.suite}::${c.value}`;
     }
 
     pointOnTable(position, onchangeHandle) {
@@ -474,5 +494,5 @@ class Table {
         return {
             x: x, y: y
         };
-    };
+    }
 }
