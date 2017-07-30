@@ -120,7 +120,7 @@ class Table {
 
             if (bb === 0 || bb === 1) {
                 offsetx = offsetAmount * -1;
-                offsety = offsetAmount
+                offsety = offsetAmount * 0.5;
             } else if (bb === 2 || bb === 3) {
                 offsetx = offsetAmount * -1;
                 offsety = offsetAmount * -1;
@@ -149,7 +149,7 @@ class Table {
 
             if (sb === 0 || sb === 1) {
                 offsetx = offsetAmount * -1;
-                offsety = offsetAmount
+                offsety = offsetAmount * 0.5;
             } else if (sb === 2 || sb === 3) {
                 offsetx = offsetAmount * -1;
                 offsety = offsetAmount * -1;
