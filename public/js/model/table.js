@@ -13,7 +13,6 @@ class Table {
 
         this.canvasView = canvasView;
 
-        this.parentcanvas = this.canvasView.parentCanvas;
         this.parentcanvas = this.canvasView.getCanvas('table-canvas');
         this.buttoncanvas = this.canvasView.getCanvas('button-canvas');
         this.chipcanvas = this.canvasView.getCanvas('chip-canvas');
@@ -46,6 +45,17 @@ class Table {
         this.labels = {
             center: new Label('serif', 24, 'black')
         };
+
+        this.tableSprite = new TableSprite(this.parentcanvas, 'table');
+
+        this.seatSprites = new Map();
+
+        for (let i = 0; i < 9; i++) {
+            this.seatSprites.set(
+                i,
+                new TableSeatSprite(this.parentcanvas, `seat-${i}`)
+            );
+        }
 
         this.messageHistory = ['... seating ...'];
 

@@ -18,8 +18,10 @@ class TableSprite extends CanvasSprite {
 
         const ctx = this.canvas.getContext('2d');
 
-        const ox = this.parentcanvas.width * 0.65;
-        const oy = this.parentcanvas.height * 0.65
+        const oh = Math.floor(this.parentcanvas.width * 0.65);
+        const ow = Math.floor(this.parentcanvas.height * 0.65);
+        const ox = Math.floor(oh * 0.5);
+        const oy = Math.floor(ow * 0.5);
         /*
             this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r
             this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r
