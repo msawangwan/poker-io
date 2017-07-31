@@ -49,6 +49,8 @@ $(document).ready(() => {
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
             canvasView.clearAndResizeAll();
+
+            current.table.drawTable_prototype();
         });
 
         socket.on('a-player-has-joined', (data) => {

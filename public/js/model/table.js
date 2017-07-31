@@ -285,10 +285,30 @@ class Table {
         });
     }
 
+    drawTable_prototype() {
+        this.drawHandlers.set('drawtable', () => {
+            const p = this.pointOnTable(-2);
+
+            const dx = Math.floor(this.parentcanvas.width / 2 - p.x);
+            const dy = Math.floor(this.parentcanvas.height / 2 - p.y);
+
+            this.tableSprite.draw(
+                p.x,
+                p.y,
+                this.dimensions.r,
+                this.dimensions.off,
+                this.parentcanvas.width,
+                this.parentcanvas.height,
+                dx,
+                dy
+            );
+        });
+    }
+
     render() {
         if (this.drawOnNextUpdate) {
             this.resize();
-            this.draw();
+            // this.draw();
 
             this.labels.center.draw(
                 this.centerLabelText,

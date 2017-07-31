@@ -12,7 +12,7 @@ class TableSprite extends CanvasSprite {
         super(parentcanvas, label);
     }
 
-    draw(x, y, r, w, h, dx, dy) {
+    draw(x, y, r, o, w, h, dx, dy) {
         this.canvas.width = w;
         this.canvas.height = h;
 
@@ -28,8 +28,8 @@ class TableSprite extends CanvasSprite {
         */
 
         ctx.beginPath();
-        ctx.arc(x, y, r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-        ctx.arc(x, y, r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+        ctx.arc(x - o, y, r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+        ctx.arc(x + o, y, r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
         ctx.fillStyle = 'green';
         ctx.fill();
 
