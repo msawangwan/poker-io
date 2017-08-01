@@ -8,9 +8,7 @@ const scalingvalue = 0.65;
 class Table {
     constructor(maxseats, canvasView) {
         this.id = null;
-
         this.maxseats = maxseats;
-
         this.canvasView = canvasView;
 
         this.parentcanvas = this.canvasView.getCanvas('table-canvas');
@@ -23,13 +21,14 @@ class Table {
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('id', 'table-cvs');
 
+        this.tableView = new TableView(this);
+
         this.seats = new Map();
 
         this.game = null;
 
         this.pointCalcHandlers = new Map();
         this.drawHandlers = new Map();
-        // this.redrawHandlers = new Map();
 
         this.postion = {
             x: 0, y: 0
@@ -128,90 +127,90 @@ class Table {
 
     set bbIndex(bb) {
         this.bb = bb;
-        this.drawHandlers.set('draw-bigblind-button', () => {
-            const offsetAmount = 64;
+        // this.drawHandlers.set('draw-bigblind-button', () => {
+        //     const offsetAmount = 64;
 
-            let offsetx = 0;
-            let offsety = 0;
+        //     let offsetx = 0;
+        //     let offsety = 0;
 
-            if (bb === 0 || bb === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * 0.5;
-            } else if (bb === 2 || bb === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (bb === 4) {
-                offsety = offsetAmount * -1;
-            } else if (bb === 5 || bb === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
+        //     if (bb === 0 || bb === 1) {
+        //         offsetx = offsetAmount * -1;
+        //         offsety = offsetAmount * 0.5;
+        //     } else if (bb === 2 || bb === 3) {
+        //         offsetx = offsetAmount * -1;
+        //         offsety = offsetAmount * -1;
+        //     } else if (bb === 4) {
+        //         offsety = offsetAmount * -1;
+        //     } else if (bb === 5 || bb === 6) {
+        //         offsetx = offsetAmount;
+        //         offsety = offsetAmount;
+        //     } else {
+        //         offsetx = offsetAmount;
+        //         offsety = offsetAmount * -1;
+        //     }
 
-            const p = this.pointOnTable(bb);
-            this.bbbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-        });
+        //     const p = this.pointOnTable(bb);
+        //     this.bbbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+        // });
     }
 
     set sbIndex(sb) {
         this.sb = sb;
-        this.drawHandlers.set('draw-smallblind-button', () => {
-            const offsetAmount = 64;
+        // this.drawHandlers.set('draw-smallblind-button', () => {
+        //     const offsetAmount = 64;
 
-            let offsetx = 0;
-            let offsety = 0;
+        //     let offsetx = 0;
+        //     let offsety = 0;
 
-            if (sb === 0 || sb === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * 0.5;
-            } else if (sb === 2 || sb === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (sb === 4) {
-                offsety = offsetAmount * -1;
-            } else if (sb === 5 || sb === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
+        //     if (sb === 0 || sb === 1) {
+        //         offsetx = offsetAmount * -1;
+        //         offsety = offsetAmount * 0.5;
+        //     } else if (sb === 2 || sb === 3) {
+        //         offsetx = offsetAmount * -1;
+        //         offsety = offsetAmount * -1;
+        //     } else if (sb === 4) {
+        //         offsety = offsetAmount * -1;
+        //     } else if (sb === 5 || sb === 6) {
+        //         offsetx = offsetAmount;
+        //         offsety = offsetAmount;
+        //     } else {
+        //         offsetx = offsetAmount;
+        //         offsety = offsetAmount * -1;
+        //     }
 
-            const p = this.pointOnTable(sb);
-            this.sbbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-        });
+        //     const p = this.pointOnTable(sb);
+        //     this.sbbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+        // });
     }
 
     set buttonIndex(db) {
         this.db = db;
-        this.drawHandlers.set('draw-dealer-button', () => {
-            const offsetAmount = 64;
+        // this.drawHandlers.set('draw-dealer-button', () => {
+        //     const offsetAmount = 64;
 
-            let offsetx = 0;
-            let offsety = 0;
+        //     let offsetx = 0;
+        //     let offsety = 0;
 
-            if (db === 0 || db === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount
-            } else if (db === 2 || db === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (db === 4) {
-                offsety = offsetAmount * -1;
-            } else if (db === 5 || db === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
+        //     if (db === 0 || db === 1) {
+        //         offsetx = offsetAmount * -1;
+        //         offsety = offsetAmount
+        //     } else if (db === 2 || db === 3) {
+        //         offsetx = offsetAmount * -1;
+        //         offsety = offsetAmount * -1;
+        //     } else if (db === 4) {
+        //         offsety = offsetAmount * -1;
+        //     } else if (db === 5 || db === 6) {
+        //         offsetx = offsetAmount;
+        //         offsety = offsetAmount;
+        //     } else {
+        //         offsetx = offsetAmount;
+        //         offsety = offsetAmount * -1;
+        //     }
 
-            const p = this.pointOnTable(db);
+        //     const p = this.pointOnTable(db);
 
-            this.dealerbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-        });
+        //     this.dealerbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+        // });
     };
 
     drawCards(seatindex, a, b) {
@@ -335,6 +334,7 @@ class Table {
         if (this.drawOnNextUpdate) {
             this.resize();
             // this.draw();
+            this.tableView.renderViews();
 
             this.labels.center.draw(
                 this.centerLabelText,

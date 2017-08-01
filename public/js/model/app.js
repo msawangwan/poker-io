@@ -69,6 +69,10 @@ $(document).ready(() => {
 
             current.table.centerLabelText = 'pot size: 0';
 
+            current.table.tableView.drawDealerButton(current.table.buttonIndex);
+            current.table.tableView.drawSmallBlindButton(current.table.sbIndex);
+            current.table.tableView.drawBigBlindButton(current.table.bbIndex);
+
             debug.logobject(data);
             debug.delimit(
                 'game is starting',
