@@ -334,7 +334,7 @@ class Table {
         if (this.drawOnNextUpdate) {
             this.resize();
             // this.draw();
-            this.tableView.renderViews();
+            this.tableView.renderViews(true, true);
 
             this.labels.center.draw(
                 this.centerLabelText,

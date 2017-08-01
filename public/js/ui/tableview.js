@@ -40,10 +40,22 @@ class TableView {
         }
     }
 
-    renderViews() {
+    renderViews(renderbtn, renderchip) {
         for (const [id, handler] of this.handlers) {
-            for (const [label, handle] of handler) {
-                handle(true);
+            switch (id) {
+                case 'button':
+                    for (const [label, handle] of handler) {
+                        handle(renderbtn);
+                    }
+                    break;
+                case 'chip':
+                    for (const [label, handle] of handler) {
+
+                        handle(renderchip);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -91,7 +103,7 @@ class TableView {
                 break;
             case 'dealer':
                 handler.set(name, render => {
-                    const sp = this.table.pointOnTable(i, 0);
+                    const sp = this.table.pointOnTable(i);
                     const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
 
                     this.dealerbtn.render(
@@ -117,10 +129,19 @@ class TableView {
 
         const size = 32;
         handler.set(`chips-${i}`, render => {
-            const p = this.pointOnTable(i, this.table.dimensions.r - size);
+            const pp = this.table.pointOnTable(i);
+            const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
 
-            // todo ...
+            this.chip.render(p.x, pp.y, 0, 0, 64, 64);
         });
+
+        this.handlers.set('chip', handler);
+    }
+
+    clearChipDrawHandlers() {
+        const handler = this.handlers.get('chip');
+
+        handler.clear();
 
         this.handlers.set('chip', handler);
     }

@@ -1,9 +1,3 @@
-const drawChips = (t, i, b, e) => {
-    t.seats.get(i).player.balance = b;
-    t.drawChips(i, e);
-    t.redraw();
-};
-
 const tickrate = 1000 / 2;
 const startupt = 800;
 
@@ -206,7 +200,16 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
-            drawChips(current.table, data.playerSeat, data.updatedBalance, data.clearTable);
+            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
+
+            if (data.clearTable) {
+                setTimeout(() => {
+                    canvasView.clearCanvas('chip-canvas');
+                }, 500);
+            } else {
+                current.table.tableView.registerChipDrawHandler(data.playerSeat);
+            }
+            // current.table.tableView.registerChipDrawHandler(data.playerSeat);
         });
     }
 

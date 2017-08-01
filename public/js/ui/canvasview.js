@@ -46,6 +46,16 @@ class CanvasView {
         return this.contexts.get(i);
     }
 
+    clearCanvas(i) {
+        const w = this.parentCanvas.offsetWidth;
+        const h = this.parentCanvas.offsetHeight;
+
+        const c = this.canvi.get(i);
+
+        c.width = w;
+        c.height = h;
+    }
+
     clearAndResizeAll() {
         const w = this.parentCanvas.offsetWidth;
         const h = this.parentCanvas.offsetHeight;
