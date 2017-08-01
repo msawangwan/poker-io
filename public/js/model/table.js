@@ -14,6 +14,7 @@ class Table {
         this.canvasView = canvasView;
 
         this.parentcanvas = this.canvasView.getCanvas('table-canvas');
+        this.playercanvas = this.canvasView.getCanvas('player-canvas');
         this.buttoncanvas = this.canvasView.getCanvas('button-canvas');
         this.chipcanvas = this.canvasView.getCanvas('chip-canvas');
         this.cardcanvas = this.canvasView.getCanvas('card-canvas');
@@ -28,7 +29,7 @@ class Table {
 
         this.pointCalcHandlers = new Map();
         this.drawHandlers = new Map();
-        this.redrawHandlers = new Map();
+        // this.redrawHandlers = new Map();
 
         this.postion = {
             x: 0, y: 0
@@ -53,7 +54,7 @@ class Table {
         for (let i = 0; i < 9; i++) {
             this.seatSprites.set(
                 i,
-                new TableSeatSprite(this.parentcanvas, `seat-${i}`)
+                new TableSeatSprite(this.playercanvas, `seat-${i}`)
             );
         }
 
@@ -305,6 +306,31 @@ class Table {
         });
     }
 
+    drawSeat_prototype(i) {
+        this.drawHandlers.set(`drawseat-${i}`, () => {
+            const p = this.pointOnTable(i);
+
+            const dx = Math.floor(p.x - 32);
+            const dy = Math.floor(p.y - 32);
+
+            this.seatSprites.get(i).draw(64, 64, 32, 0, 64, 64, dx, dy);
+        });
+    }
+
+    drawSeatLabel_prototype(i, txt) {
+        let t = '...';
+
+        if (txt) {
+            t = txt;
+        }
+
+        this.drawHandlers.set(`seatlabel-${i}`, () => {
+            const p = this.pointOnTable(i);
+            const l = new Label('serif', 18, 'white', 'black');
+            l.draw(t, this.textcanvas, p.x, p.y, false);
+        });
+    }
+
     render() {
         if (this.drawOnNextUpdate) {
             this.resize();
@@ -329,21 +355,21 @@ class Table {
         }
     }
 
-    draw() {
-        const ctx = this.canvas.getContext('2d');
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // draw() {
+    //     const ctx = this.canvas.getContext('2d');
+    //     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        this.canvas.width = this.dimensions.w;
-        this.canvas.height = this.dimensions.h;
+    //     this.canvas.width = this.dimensions.w;
+    //     this.canvas.height = this.dimensions.h;
 
-        ctx.beginPath();
-        ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-        ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-        ctx.fillStyle = 'green';
-        ctx.fill();
+    //     ctx.beginPath();
+    //     ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
+    //     ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
+    //     ctx.fillStyle = 'green';
+    //     ctx.fill();
 
-        this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
-    }
+    //     this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
+    // }
 
     resize() {
         this.dimensions.w = Math.floor(this.parentcanvas.width * scalingvalue);
@@ -366,9 +392,10 @@ class Table {
     redraw() {
         this.drawOnNextUpdate = true;
 
-        for (const [k, h] of this.redrawHandlers) {
-            h();
-        }
+        // for (const [k, h] of this.drawHandlers) {
+        // for (const [k, h] of this.redrawHandlers) {
+        // h();
+        // }
     }
 
     init() {
@@ -385,11 +412,31 @@ class Table {
             return false;
         }
 
-        this.seats.set(seatindex, new Seat(this, seatindex, 32, 'black', this.parentcanvas, this.textcanvas));
+        this.seats.set(
+            seatindex,
+            new Seat(
+                this,
+                seatindex,
+                32,
+                'black',
+                this.parentcanvas,
+                this.textcanvas
+            )
+        );
 
-        this.redrawHandlers.set(seatindex, () => {
-            this.seats.get(seatindex).redraw(); // attach handler to seat
-        });
+        this.drawSeat_prototype(seatindex);
+        this.drawSeatLabel_prototype(seatindex);
+        // this.drawHandlers.set(`seatlabel-${seatindex}`, () => {
+        //     const p = this.pointOnTable(seatindex);
+        //     const l = new Label('serif', 18, 'white', 'black');
+        //     l.draw('...', this.textcanvas, p.x, p.y, false);
+        // });
+        // this.redrawHandlers.set(seatindex, () => {
+        // this.drawHandlers.set(`seat-${seatindex}`, () => {
+        //     this.seats.get(seatindex).redraw(); // attach handler to seat
+        // });
+
+        this.drawOnNextUpdate = true;
 
         return true;
     }

@@ -18,10 +18,6 @@ class TableSprite extends CanvasSprite {
 
         const ctx = this.canvas.getContext('2d');
 
-        const oh = Math.floor(this.parentcanvas.width * 0.65);
-        const ow = Math.floor(this.parentcanvas.height * 0.65);
-        const ox = Math.floor(oh * 0.5);
-        const oy = Math.floor(ow * 0.5);
         /*
             this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r
             this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r
@@ -42,7 +38,7 @@ class TableSeatSprite extends CanvasSprite {
         super(parentcanvas, label);
     }
 
-    draw(x, y, r, w, h, dx, dy) {
+    draw(x, y, r, o, w, h, dx, dy) {
         this.canvas.width = w;
         this.canvas.height = h;
 
@@ -52,7 +48,7 @@ class TableSeatSprite extends CanvasSprite {
             this.canvas.width / 2, this.canvas.height / 2, this.dimensions.r
         */
 
-        ctx.arc(x, y, r, Math.PI * 2, false);
+        ctx.arc(x / 2, y / 2, r, Math.PI * 2, false);
         ctx.fillStyle = this.color;
         ctx.fill();
 

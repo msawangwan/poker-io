@@ -62,6 +62,7 @@ $(document).ready(() => {
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
 
+            /* we draw buttons here */
             current.table.buttonIndex = data.buttonIndex;
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;

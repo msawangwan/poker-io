@@ -35,15 +35,15 @@ class Seat {
             }
         };
 
-        this.redrawHandlers = new Map();
+        this.drawHandlers = new Map();
 
         this.drawOnNextUpdate = false;
     };
 
     render() {
         if (this.drawOnNextUpdate) {
-            this.resize();
-            this.draw();
+            // this.resize();
+            // this.draw();
 
             const p = this.table.pointOnTable(this.index);
 
@@ -87,7 +87,7 @@ class Seat {
     redraw() {
         this.drawOnNextUpdate = true;
 
-        for (const [i, h] of this.redrawHandlers) {
+        for (const [i, h] of this.drawHandlers) {
             h();
         }
     }
@@ -101,7 +101,7 @@ class Seat {
 
         this.player = player;
 
-        this.redrawHandlers.set(player.id, () => {
+        this.drawHandlers.set(player.id, () => {
             player.redraw();
         });
 

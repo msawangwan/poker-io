@@ -133,29 +133,29 @@ body {
     width: 100%;
 }
 
-.canvas-layer:nth-child(1) { /* bg */
+.canvas-layer:nth-child(1) { /* table */
     background: var(--accent-tone-cool-grey);
 
     z-index: -1;
 }
 
-.canvas-layer:nth-child(2) { /* fg */
+.canvas-layer:nth-child(2) { /* player */
     z-index: 0;
 }
 
-.canvas-layer:nth-child(3) { /* labels */
+.canvas-layer:nth-child(3) { /* card */
     z-index: 1;
 }
 
-.canvas-layer:nth-child(4) { /* labels */
+.canvas-layer:nth-child(4) { /* button */
     z-index: 2;
 }
 
-.canvas-layer:nth-child(5) { /* labels */
+.canvas-layer:nth-child(5) { /* chip */
     z-index: 3;
 }
 
-.canvas-layer:nth-child(6) { /* labels */
+.canvas-layer:nth-child(6) { /* text */
     z-index: 4;
 }
 
