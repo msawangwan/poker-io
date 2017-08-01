@@ -43,46 +43,23 @@ class TableView {
 
     }
 
-    drawDealerButton(i) {
-        this.viewRenderHandlers.set('draw-dealer-button', () => {
-            const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
-            this.dealerbtn.render(p.x, p.y, 0, 0, 64, 64);
-        });
-    }
-
-    drawSmallBlindButton(i) {
-        this.viewRenderHandlers.set('draw-smallblind-button', () => {
-            const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
-            this.smallblindbtn.render(p.x, p.y, 0, 0, 64, 64);
-        });
-    }
-
-    drawBigBlindButton(i) {
-        this.viewRenderHandlers.set('draw-bigblind-button', () => {
-            const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
-            this.bigblindbtn.render(p.x, p.y, 0, 0, 64, 64);
-        });
-    }
-
     registerButtonDrawHandler(name, i) {
-        // const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
-
         switch (name) {
             case 'sb':
                 this.viewRenderHandlers.set(name, () => {
-                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.35);
                     this.smallblindbtn.render(p.x, p.y, 0, 0, 64, 64);
                 });
                 break;
             case 'bb':
                 this.viewRenderHandlers.set(name, () => {
-                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.35);
                     this.bigblindbtn.render(p.x, p.y, 0, 0, 64, 64);
                 });
                 break;
             case 'dealer':
                 this.viewRenderHandlers.set(name, () => {
-                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.35);
                     this.dealerbtn.render(p.x, p.y, 0, 0, 64, 64);
                 });
                 break;
