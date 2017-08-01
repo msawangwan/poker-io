@@ -2,8 +2,6 @@ class TableView {
     constructor(table) {
         this.table = table;
 
-        this.viewRenderHandlers = new Map();
-
         this.handlers = new Map();
 
         for (const [k, v] of this.table.canvasView.canvi) {
