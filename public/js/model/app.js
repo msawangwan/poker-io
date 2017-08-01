@@ -14,7 +14,7 @@ const current = {
 $(document).ready(() => {
     const debug = new HTMLLogger();
 
-    const clientView = new ClientView();
+    const clientController = new ClientController();
     const canvasView = new CanvasView('container-canvas');
 
     const socket = io.connect(window.location.origin, {
@@ -22,11 +22,11 @@ $(document).ready(() => {
     });
 
     canvasView.clearAndResizeAll();
-    clientView.hideAllButtons();
+    clientController.hideAllButtons();
 
-    clientView.$betrangeslider.on('change', () => {
-        const slidervalue = clientView.$betrangeslider.val();
-        clientView.$bettextfield.val(slidervalue);
+    clientController.$betrangeslider.on('change', () => {
+        const slidervalue = clientController.$betrangeslider.val();
+        clientController.$bettextfield.val(slidervalue);
     });
 
     {
@@ -93,9 +93,9 @@ $(document).ready(() => {
 
             switch (data.blindType) {
                 case 'sb':
-                    clientView.$btnsendblind.toggle(clientView.$hidebtn);
-                    clientView.$btnsendblind.val('post small blind');
-                    clientView.$btnsendblind.on('click', () => {
+                    clientController.$btnsendblind.toggle(clientController.$hidebtn);
+                    clientController.$btnsendblind.val('post small blind');
+                    clientController.$btnsendblind.on('click', () => {
                         socket.emit('post-blind', {
                             blindType: 'sb',
                             betAmount: data.blindBetSize / 2,
@@ -103,13 +103,13 @@ $(document).ready(() => {
                             gameid: current.table.game.id
                         });
 
-                        clientView.$btnsendblind.toggle(clientView.$hidebtn);
+                        clientController.$btnsendblind.toggle(clientController.$hidebtn);
                     });
                     break;
                 case 'bb':
-                    clientView.$btnsendblind.toggle(clientView.$hidebtn);
-                    clientView.$btnsendblind.val('post big blind');
-                    clientView.$btnsendblind.on('click', () => {
+                    clientController.$btnsendblind.toggle(clientController.$hidebtn);
+                    clientController.$btnsendblind.val('post big blind');
+                    clientController.$btnsendblind.on('click', () => {
                         socket.emit('post-blind', {
                             blindType: 'bb',
                             betAmount: data.blindBetSize,
@@ -117,7 +117,7 @@ $(document).ready(() => {
                             gameid: current.table.game.id
                         });
 
-                        clientView.$btnsendblind.toggle(clientView.$hidebtn);
+                        clientController.$btnsendblind.toggle(clientController.$hidebtn);
                     });
                     break;
                 default:
@@ -145,32 +145,32 @@ $(document).ready(() => {
                 });
             };
 
-            clientView.$btnsendcall.toggle(clientView.$hidebtn);
-            clientView.$btnsendraise.toggle(clientView.$hidebtn);
-            clientView.$btnsendfold.toggle(clientView.$hidebtn);
+            clientController.$btnsendcall.toggle(clientController.$hidebtn);
+            clientController.$btnsendraise.toggle(clientController.$hidebtn);
+            clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
-            clientView.$btnsendcall.val(`call ${data.minBetSize}`);
-            clientView.$btnsendcall.on('click', () => {
-                clientView.$btnsendcall.toggle(clientView.$hidebtn);
-                clientView.$btnsendraise.toggle(clientView.$hidebtn);
-                clientView.$btnsendfold.toggle(clientView.$hidebtn);
+            clientController.$btnsendcall.val(`call ${data.minBetSize}`);
+            clientController.$btnsendcall.on('click', () => {
+                clientController.$btnsendcall.toggle(clientController.$hidebtn);
+                clientController.$btnsendraise.toggle(clientController.$hidebtn);
+                clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
                 action('call', data.minBetSize);
             });
 
-            clientView.$btnsendraise.val(`raise ${'x'}`);
-            clientView.$btnsendraise.on('click', () => {
-                clientView.$btnsendcall.toggle(clientView.$hidebtn);
-                clientView.$btnsendraise.toggle(clientView.$hidebtn);
-                clientView.$btnsendfold.toggle(clientView.$hidebtn);
+            clientController.$btnsendraise.val(`raise ${'x'}`);
+            clientController.$btnsendraise.on('click', () => {
+                clientController.$btnsendcall.toggle(clientController.$hidebtn);
+                clientController.$btnsendraise.toggle(clientController.$hidebtn);
+                clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
                 action('raise', data.minBetSize);
             });
 
-            clientView.$btnsendfold.on('click', () => {
-                clientView.$btnsendcall.toggle(clientView.$hidebtn);
-                clientView.$btnsendraise.toggle(clientView.$hidebtn);
-                clientView.$btnsendfold.toggle(clientView.$hidebtn);
+            clientController.$btnsendfold.on('click', () => {
+                clientController.$btnsendcall.toggle(clientController.$hidebtn);
+                clientController.$btnsendraise.toggle(clientController.$hidebtn);
+                clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
                 action('fold', 0);
             });
