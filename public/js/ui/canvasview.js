@@ -31,16 +31,6 @@ class CanvasView {
             [ids[5], this.canvi.get(ids[5]).getContext('2d')]
         ]);
 
-        console.log(this.parentCanvasId);
-
-        for (const [k, v] of this.canvi) {
-            console.log(k);
-        }
-
-        for (const [k, v] of this.contexts) {
-            console.log(k);
-        }
-
         this.layerById = ids;
     }
 

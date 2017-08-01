@@ -4,6 +4,15 @@ class TableView {
 
         this.viewRenderHandlers = new Map();
 
+        this.handlers = new Map();
+
+        for (const [k, v] of this.table.canvasView.canvi) {
+            this.handlers.set(
+                k.split('-')[0],
+                new Map()
+            );
+        }
+
         this.tableSprite = new TableSprite(this.table.parentcanvas, 'table');
         this.seatSprites = new Map();
 
@@ -34,8 +43,10 @@ class TableView {
     }
 
     renderViews() {
-        for (const [id, handler] of this.viewRenderHandlers) {
-            handler();
+        for (const [id, handler] of this.handlers) {
+            for (const [label, handle] of handler) {
+                handle(true);
+            }
         }
     }
 
@@ -44,12 +55,14 @@ class TableView {
     }
 
     registerButtonDrawHandler(name, i) {
+        const handler = this.handlers.get('button');
+
         const innerRadius = 0.90;
         const size = 64;
 
         switch (name) {
             case 'sb':
-                this.viewRenderHandlers.set(name, () => {
+                handler.set(name, render => {
                     const sp = this.table.pointOnTable(i, 0);
                     const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
 
@@ -64,7 +77,7 @@ class TableView {
                 });
                 break;
             case 'bb':
-                this.viewRenderHandlers.set(name, () => {
+                handler.set(name, render => {
                     const sp = this.table.pointOnTable(i, 0);
                     const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
 
@@ -79,7 +92,7 @@ class TableView {
                 });
                 break;
             case 'dealer':
-                this.viewRenderHandlers.set(name, () => {
+                handler.set(name, render => {
                     const sp = this.table.pointOnTable(i, 0);
                     const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
 
@@ -97,11 +110,20 @@ class TableView {
                 console.log('err: unknown draw handler: ' + name);
                 break;
         }
+
+        this.handlers.set('button', handler);
     }
 
-    registerChipDrawHandler(name, i) {
-        this.viewRenderHandlers.set(name, () => {
+    registerChipDrawHandler(i) {
+        const handler = this.handlers.get('chip');
 
+        const size = 32;
+        handler.set(`chips-${i}`, render => {
+            const p = this.pointOnTable(i, this.table.dimensions.r - size);
+
+            // todo ...
         });
+
+        this.handlers.set('chip', handler);
     }
 }
