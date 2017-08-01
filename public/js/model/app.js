@@ -12,18 +12,17 @@ const current = {
 };
 
 $(document).ready(() => {
-    const debug = new HTMLLogger();
-
     const clientController = new ClientController();
     const canvasView = new CanvasView('container-canvas');
+    const debug = new HTMLLogger();
 
     const socket = io.connect(window.location.origin, {
         'reconnection': false
     });
 
     canvasView.clearAndResizeAll();
-    clientController.hideAllButtons();
 
+    clientController.hideAllButtons();
     clientController.$betrangeslider.on('change', () => {
         const slidervalue = clientController.$betrangeslider.val();
         clientController.$bettextfield.val(slidervalue);

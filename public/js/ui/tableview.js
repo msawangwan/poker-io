@@ -44,28 +44,64 @@ class TableView {
     }
 
     registerButtonDrawHandler(name, i) {
+        const innerRadius = 0.90;
+        const size = 64;
+
         switch (name) {
             case 'sb':
                 this.viewRenderHandlers.set(name, () => {
-                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.35);
-                    this.smallblindbtn.render(p.x, p.y, 0, 0, 64, 64);
+                    const sp = this.table.pointOnTable(i, 0);
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
+
+                    this.smallblindbtn.render(
+                        sp.x - (Math.abs(sp.x - p.x) * 2),
+                        sp.y * innerRadius,
+                        0,
+                        0,
+                        64,
+                        64
+                    );
                 });
                 break;
             case 'bb':
                 this.viewRenderHandlers.set(name, () => {
-                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.35);
-                    this.bigblindbtn.render(p.x, p.y, 0, 0, 64, 64);
+                    const sp = this.table.pointOnTable(i, 0);
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
+
+                    this.bigblindbtn.render(
+                        sp.x - (Math.abs(sp.x - p.x) * 2),
+                        sp.y * innerRadius,
+                        0,
+                        0,
+                        64,
+                        64
+                    );
                 });
                 break;
             case 'dealer':
                 this.viewRenderHandlers.set(name, () => {
-                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.35);
-                    this.dealerbtn.render(p.x, p.y, 0, 0, 64, 64);
+                    const sp = this.table.pointOnTable(i, 0);
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
+
+                    this.dealerbtn.render(
+                        sp.x - (Math.abs(sp.x - p.x) * 2),
+                        sp.y * innerRadius,
+                        0,
+                        0,
+                        64,
+                        64
+                    );
                 });
                 break;
             default:
                 console.log('err: unknown draw handler: ' + name);
                 break;
         }
+    }
+
+    registerChipDrawHandler(name, i) {
+        this.viewRenderHandlers.set(name, () => {
+
+        });
     }
 }
