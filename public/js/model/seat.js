@@ -45,7 +45,7 @@ class Seat {
             // this.resize();
             // this.draw();
 
-            const p = this.table.pointOnTable(this.index);
+            const p = this.table.pointOnTable(this.index, 0);
 
             let pname = this.player.name;
 
@@ -65,7 +65,7 @@ class Seat {
         this.dimensions.w = this.canvas.width;
         this.dimensions.h = this.canvas.height;
 
-        const p = this.table.pointOnTable(this.index);
+        const p = this.table.pointOnTable(this.index, 0);
 
         this.position.x = Math.floor(p.x - this.dimensions.w / 2);
         this.position.y = Math.floor(p.y - this.dimensions.h / 2);

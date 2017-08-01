@@ -62,16 +62,18 @@ $(document).ready(() => {
         socket.on('game-started', (data) => {
             current.table.game = new Game(data.gameId, current.table.players);
 
-            /* we draw buttons here */
             current.table.buttonIndex = data.buttonIndex;
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
 
             current.table.centerLabelText = 'pot size: 0';
 
-            current.table.tableView.drawDealerButton(current.table.buttonIndex);
-            current.table.tableView.drawSmallBlindButton(current.table.sbIndex);
-            current.table.tableView.drawBigBlindButton(current.table.bbIndex);
+            // current.table.tableView.drawDealerButton(current.table.buttonIndex);
+            // current.table.tableView.drawSmallBlindButton(current.table.sbIndex);
+            // current.table.tableView.drawBigBlindButton(current.table.bbIndex);
+            current.table.tableView.registerButtonDrawHandler('dealer', current.table.buttonIndex);
+            current.table.tableView.registerButtonDrawHandler('sb', current.table.sbIndex);
+            current.table.tableView.registerButtonDrawHandler('bb', current.table.bbIndex);
 
             debug.logobject(data);
             debug.delimit(

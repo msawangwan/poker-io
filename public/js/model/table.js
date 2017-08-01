@@ -215,7 +215,7 @@ class Table {
 
     drawCards(seatindex, a, b) {
         this.drawHandlers.set('drawcards' + seatindex, () => {
-            const p = this.pointOnTable(seatindex);
+            const p = this.pointOnTable(seatindex, 0);
 
             this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, this.cardpixelwidth, this.cardpixelheight);
             this.cards.get(`${b.suite}::${b.value}`).render(p.x + this.cardpixelwidth, p.y, b.value, b.suite, this.cardpixelwidth, this.cardpixelheight);
@@ -225,7 +225,7 @@ class Table {
                     continue;
                 }
 
-                const p = this.pointOnTable(s);
+                const p = this.pointOnTable(s, 0);
 
                 if (!this.cardbacks.has(s)) {
                     this.cardbacks.set(s, new Sprite(this.cardcanvas, './asset/cards-hand-card-back.png'));
@@ -238,7 +238,7 @@ class Table {
 
     drawCommunityCards(...ccCards) {
         this.drawHandlers.set('drawcommunitycards', () => {
-            const p = this.pointOnTable(-2);
+            const p = this.pointOnTable(-2, 0);
             const numCards = ccCards.length;
             const totalWidth = this.cardpixelwidth * 3;
 
@@ -275,7 +275,7 @@ class Table {
                 offsety = offsetAmount * -1;
             }
 
-            const p = this.pointOnTable(seatindex);
+            const p = this.pointOnTable(seatindex, 0);
 
             if (erase) {
                 this.chip.erase(p.x + offsetx, p.y + offsety, 64, 64, 1, 1);
@@ -287,7 +287,7 @@ class Table {
 
     drawTable_prototype() {
         this.drawHandlers.set('drawtable', () => {
-            const p = this.pointOnTable(-2);
+            const p = this.pointOnTable(-2, 0);
 
             const dx = Math.floor(this.parentcanvas.width / 2 - p.x);
             const dy = Math.floor(this.parentcanvas.height / 2 - p.y);
@@ -307,7 +307,7 @@ class Table {
 
     drawSeat_prototype(i) {
         this.drawHandlers.set(`drawseat-${i}`, () => {
-            const p = this.pointOnTable(i);
+            const p = this.pointOnTable(i, 0);
 
             const dx = Math.floor(p.x - 32);
             const dy = Math.floor(p.y - 32);
@@ -324,7 +324,7 @@ class Table {
         }
 
         this.drawHandlers.set(`seatlabel-${i}`, () => {
-            const p = this.pointOnTable(i);
+            const p = this.pointOnTable(i, 0);
             const l = new Label('serif', 18, 'white', 'black');
             l.draw(t, this.textcanvas, p.x, p.y, false);
         });
@@ -502,14 +502,14 @@ class Table {
         return `${c.suite}::${c.value}`;
     }
 
-    pointOnTable(position, onchangeHandle) {
+    pointOnTable(position, radius, onchangeHandle) {
         if (onchangeHandle) {
             this.pointCalcHandlers.set(position, onchangeHandle);
         }
 
         const ox = this.parentcanvas.width / 2;
         const oy = this.parentcanvas.height / 2;
-        const r = this.dimensions.r;
+        const r = radius ? radius : this.dimensions.r;
         const off = this.dimensions.off;
 
         const offsetLeft = ox - off;

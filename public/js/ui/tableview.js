@@ -45,88 +45,50 @@ class TableView {
 
     drawDealerButton(i) {
         this.viewRenderHandlers.set('draw-dealer-button', () => {
-            const offsetAmount = 64;
-
-            let offsetx = 0;
-            let offsety = 0;
-
-            if (i === 0 || i === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount
-            } else if (i === 2 || i === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (i === 4) {
-                offsety = offsetAmount * -1;
-            } else if (i === 5 || i === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
-
-            const p = this.table.pointOnTable(i);
-
-            this.dealerbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+            const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+            this.dealerbtn.render(p.x, p.y, 0, 0, 64, 64);
         });
     }
 
     drawSmallBlindButton(i) {
         this.viewRenderHandlers.set('draw-smallblind-button', () => {
-            const offsetAmount = 64;
-
-            let offsetx = 0;
-            let offsety = 0;
-
-            if (i === 0 || i === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * 0.5;
-            } else if (i === 2 || i === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (i === 4) {
-                offsety = offsetAmount * -1;
-            } else if (i === 5 || i === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
-
-            const p = this.table.pointOnTable(i);
-
-            this.smallblindbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+            const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+            this.smallblindbtn.render(p.x, p.y, 0, 0, 64, 64);
         });
     }
 
     drawBigBlindButton(i) {
         this.viewRenderHandlers.set('draw-bigblind-button', () => {
-            const offsetAmount = 64;
-
-            let offsetx = 0;
-            let offsety = 0;
-
-            if (i === 0 || i === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * 0.5;
-            } else if (i === 2 || i === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (i === 4) {
-                offsety = offsetAmount * -1;
-            } else if (i === 5 || i === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
-
-            const p = this.table.pointOnTable(i);
-
-            this.bigblindbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+            const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+            this.bigblindbtn.render(p.x, p.y, 0, 0, 64, 64);
         });
+    }
+
+    registerButtonDrawHandler(name, i) {
+        // const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+
+        switch (name) {
+            case 'sb':
+                this.viewRenderHandlers.set(name, () => {
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+                    this.smallblindbtn.render(p.x, p.y, 0, 0, 64, 64);
+                });
+                break;
+            case 'bb':
+                this.viewRenderHandlers.set(name, () => {
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+                    this.bigblindbtn.render(p.x, p.y, 0, 0, 64, 64);
+                });
+                break;
+            case 'dealer':
+                this.viewRenderHandlers.set(name, () => {
+                    const p = this.table.pointOnTable(i, this.table.dimensions.r * 0.5);
+                    this.dealerbtn.render(p.x, p.y, 0, 0, 64, 64);
+                });
+                break;
+            default:
+                console.log('err: unknown draw handler: ' + name);
+                break;
+        }
     }
 }
