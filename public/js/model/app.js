@@ -178,7 +178,6 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
-            // current.table.drawCards(current.seat, data.a, data.b);
             current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
         });
 
@@ -190,7 +189,6 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
-            // current.table.drawCommunityCards(data.a, data.b, data.c);
             current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
         });
 

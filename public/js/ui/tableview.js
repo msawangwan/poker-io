@@ -149,7 +149,7 @@ class TableView {
         let t = '...';
         let tt = ''
 
-        if (txtname) { // note if we send txtbalance = an int 0 this will fail
+        if (txtname) {
             // if (txtname && txtbalance) { // note if we send txtbalance = an int 0 this will fail
             t = txtname;
             tt = txtbalance
@@ -280,7 +280,7 @@ class TableView {
             let shift = 0;
 
             for (const c of ccCards) {
-                table.cards.get(table.cardByKey(c)).render(start + shift, p.y, c.value, c.suite, table.cardpixelwidth, table.cardpixelheight);
+                this.cards.get(table.cardByKey(c)).render(start + shift, p.y, c.value, c.suite, table.cardpixelwidth, table.cardpixelheight);
                 shift += table.cardpixelwidth;
             }
         });

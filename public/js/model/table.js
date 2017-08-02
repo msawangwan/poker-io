@@ -27,8 +27,8 @@ class Table {
 
         this.game = null;
 
-        this.pointCalcHandlers = new Map();
-        this.drawHandlers = new Map();
+        // this.pointCalcHandlers = new Map();
+        // this.drawHandlers = new Map();
 
         this.postion = {
             x: 0, y: 0
@@ -42,44 +42,44 @@ class Table {
             w: 0, h: 0, r: 0, off: 0
         };
 
-        this.labels = {
-            center: new Label('serif', 24, 'black')
-        };
+        // this.labels = {
+        //     center: new Label('serif', 24, 'black')
+        // };
 
-        this.tableSprite = new TableSprite(this.parentcanvas, 'table');
+        // this.tableSprite = new TableSprite(this.parentcanvas, 'table');
 
-        this.seatSprites = new Map();
+        // this.seatSprites = new Map();
 
-        for (let i = 0; i < 9; i++) {
-            this.seatSprites.set(
-                i,
-                new TableSeatSprite(this.playercanvas, `seat-${i}`)
-            );
-        }
+        // for (let i = 0; i < 9; i++) {
+        //     this.seatSprites.set(
+        //         i,
+        //         new TableSeatSprite(this.playercanvas, `seat-${i}`)
+        //     );
+        // }
 
-        this.messageHistory = ['... seating ...'];
+        // this.messageHistory = ['... seating ...'];
 
-        this.dealerbtn = new Sprite(this.buttoncanvas, './asset/btn-dealer.png');
-        this.sbbtn = new Sprite(this.buttoncanvas, './asset/btn-sb.png');
-        this.bbbtn = new Sprite(this.buttoncanvas, './asset/btn-bb.png');
+        // this.dealerbtn = new Sprite(this.buttoncanvas, './asset/btn-dealer.png');
+        // this.sbbtn = new Sprite(this.buttoncanvas, './asset/btn-sb.png');
+        // this.bbbtn = new Sprite(this.buttoncanvas, './asset/btn-bb.png');
 
-        this.chip = new Sprite(this.chipcanvas, './asset/chip.png');
+        // this.chip = new Sprite(this.chipcanvas, './asset/chip.png');
 
-        const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
-        const cardbacksheet = './asset/cards-hand-card-back.png';
+        // const cardspritesheet = './asset/cards_52-card-deck_stylized.png';
+        // const cardbacksheet = './asset/cards-hand-card-back.png';
 
         this.cardpixelwidth = 72.15;
         this.cardpixelheight = 83.25;
 
-        this.cards = new Map();
-        this.cardbacks = new Map();
-        this.communityCards = new Map();
+        // this.cards = new Map();
+        // this.cardbacks = new Map();
+        // this.communityCards = new Map();
 
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 13; j++) {
-                this.cards.set(`${i}::${j}`, new Sprite(this.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
-            }
-        }
+        // for (let i = 0; i < 4; i++) {
+        //     for (let j = 0; j < 13; j++) {
+        //         this.cards.set(`${i}::${j}`, new Sprite(this.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
+        //     }
+        // }
 
         this.drawOnNextUpdate = false;
     };
@@ -127,249 +127,140 @@ class Table {
 
     set bbIndex(bb) {
         this.bb = bb;
-        // this.drawHandlers.set('draw-bigblind-button', () => {
-        //     const offsetAmount = 64;
-
-        //     let offsetx = 0;
-        //     let offsety = 0;
-
-        //     if (bb === 0 || bb === 1) {
-        //         offsetx = offsetAmount * -1;
-        //         offsety = offsetAmount * 0.5;
-        //     } else if (bb === 2 || bb === 3) {
-        //         offsetx = offsetAmount * -1;
-        //         offsety = offsetAmount * -1;
-        //     } else if (bb === 4) {
-        //         offsety = offsetAmount * -1;
-        //     } else if (bb === 5 || bb === 6) {
-        //         offsetx = offsetAmount;
-        //         offsety = offsetAmount;
-        //     } else {
-        //         offsetx = offsetAmount;
-        //         offsety = offsetAmount * -1;
-        //     }
-
-        //     const p = this.pointOnTable(bb);
-        //     this.bbbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-        // });
     }
 
     set sbIndex(sb) {
         this.sb = sb;
-        // this.drawHandlers.set('draw-smallblind-button', () => {
-        //     const offsetAmount = 64;
-
-        //     let offsetx = 0;
-        //     let offsety = 0;
-
-        //     if (sb === 0 || sb === 1) {
-        //         offsetx = offsetAmount * -1;
-        //         offsety = offsetAmount * 0.5;
-        //     } else if (sb === 2 || sb === 3) {
-        //         offsetx = offsetAmount * -1;
-        //         offsety = offsetAmount * -1;
-        //     } else if (sb === 4) {
-        //         offsety = offsetAmount * -1;
-        //     } else if (sb === 5 || sb === 6) {
-        //         offsetx = offsetAmount;
-        //         offsety = offsetAmount;
-        //     } else {
-        //         offsetx = offsetAmount;
-        //         offsety = offsetAmount * -1;
-        //     }
-
-        //     const p = this.pointOnTable(sb);
-        //     this.sbbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-        // });
     }
 
     set buttonIndex(db) {
         this.db = db;
-        // this.drawHandlers.set('draw-dealer-button', () => {
-        //     const offsetAmount = 64;
-
-        //     let offsetx = 0;
-        //     let offsety = 0;
-
-        //     if (db === 0 || db === 1) {
-        //         offsetx = offsetAmount * -1;
-        //         offsety = offsetAmount
-        //     } else if (db === 2 || db === 3) {
-        //         offsetx = offsetAmount * -1;
-        //         offsety = offsetAmount * -1;
-        //     } else if (db === 4) {
-        //         offsety = offsetAmount * -1;
-        //     } else if (db === 5 || db === 6) {
-        //         offsetx = offsetAmount;
-        //         offsety = offsetAmount;
-        //     } else {
-        //         offsetx = offsetAmount;
-        //         offsety = offsetAmount * -1;
-        //     }
-
-        //     const p = this.pointOnTable(db);
-
-        //     this.dealerbtn.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-        // });
     };
 
-    drawCards(seatindex, a, b) {
-        this.drawHandlers.set('drawcards' + seatindex, () => {
-            const p = this.pointOnTable(seatindex, 0);
+    // drawCards(seatindex, a, b) {
+    //     this.drawHandlers.set('drawcards' + seatindex, () => {
+    //         const p = this.pointOnTable(seatindex, 0);
 
-            this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, this.cardpixelwidth, this.cardpixelheight);
-            this.cards.get(`${b.suite}::${b.value}`).render(p.x + this.cardpixelwidth, p.y, b.value, b.suite, this.cardpixelwidth, this.cardpixelheight);
+    //         this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, this.cardpixelwidth, this.cardpixelheight);
+    //         this.cards.get(`${b.suite}::${b.value}`).render(p.x + this.cardpixelwidth, p.y, b.value, b.suite, this.cardpixelwidth, this.cardpixelheight);
 
-            for (const [s, p] of this.seatsVacant(false)) {
-                if (s === seatindex) {
-                    continue;
-                }
+    //         for (const [s, p] of this.seatsVacant(false)) {
+    //             if (s === seatindex) {
+    //                 continue;
+    //             }
 
-                const p = this.pointOnTable(s, 0);
+    //             const p = this.pointOnTable(s, 0);
 
-                if (!this.cardbacks.has(s)) {
-                    this.cardbacks.set(s, new Sprite(this.cardcanvas, './asset/cards-hand-card-back.png'));
-                }
+    //             if (!this.cardbacks.has(s)) {
+    //                 this.cardbacks.set(s, new Sprite(this.cardcanvas, './asset/cards-hand-card-back.png'));
+    //             }
 
-                this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
-            }
-        });
-    }
+    //             this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
+    //         }
+    //     });
+    // }
 
-    drawCommunityCards(...ccCards) {
-        this.drawHandlers.set('drawcommunitycards', () => {
-            const p = this.pointOnTable(-2, 0);
-            const numCards = ccCards.length;
-            const totalWidth = this.cardpixelwidth * 3;
+    // drawCommunityCards(...ccCards) {
+    //     this.drawHandlers.set('drawcommunitycards', () => {
+    //         const p = this.pointOnTable(-2, 0);
+    //         const numCards = ccCards.length;
+    //         const totalWidth = this.cardpixelwidth * 3;
 
-            let start = p.x - (totalWidth / 2);
-            let shift = 0;
+    //         let start = p.x - (totalWidth / 2);
+    //         let shift = 0;
 
-            for (const c of ccCards) {
-                this.cards.get(this.cardByKey(c)).render(start + shift, p.y, c.value, c.suite, this.cardpixelwidth, this.cardpixelheight);
-                shift += this.cardpixelwidth;
-            }
-        });
-    }
+    //         for (const c of ccCards) {
+    //             this.cards.get(this.cardByKey(c)).render(start + shift, p.y, c.value, c.suite, this.cardpixelwidth, this.cardpixelheight);
+    //             shift += this.cardpixelwidth;
+    //         }
+    //     });
+    // }
 
-    drawChips(seatindex, erase) {
-        this.drawHandlers.set('drawchips' + seatindex, () => {
-            const offsetAmount = 96;
+    // drawChips(seatindex, erase) {
+    //     this.drawHandlers.set('drawchips' + seatindex, () => {
+    //         const offsetAmount = 96;
 
-            let offsetx = 0;
-            let offsety = 0;
+    //         let offsetx = 0;
+    //         let offsety = 0;
 
-            if (seatindex === 0 || seatindex === 1) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount;
-            } else if (seatindex === 2 || seatindex === 3) {
-                offsetx = offsetAmount * -1;
-                offsety = offsetAmount * -1;
-            } else if (seatindex === 4) {
-                offsety = offsetAmount * -1;
-            } else if (seatindex === 5 || seatindex === 6) {
-                offsetx = offsetAmount;
-                offsety = offsetAmount;
-            } else {
-                offsetx = offsetAmount;
-                offsety = offsetAmount * -1;
-            }
+    //         if (seatindex === 0 || seatindex === 1) {
+    //             offsetx = offsetAmount * -1;
+    //             offsety = offsetAmount;
+    //         } else if (seatindex === 2 || seatindex === 3) {
+    //             offsetx = offsetAmount * -1;
+    //             offsety = offsetAmount * -1;
+    //         } else if (seatindex === 4) {
+    //             offsety = offsetAmount * -1;
+    //         } else if (seatindex === 5 || seatindex === 6) {
+    //             offsetx = offsetAmount;
+    //             offsety = offsetAmount;
+    //         } else {
+    //             offsetx = offsetAmount;
+    //             offsety = offsetAmount * -1;
+    //         }
 
-            const p = this.pointOnTable(seatindex, 0);
+    //         const p = this.pointOnTable(seatindex, 0);
 
-            if (erase) {
-                this.chip.erase(p.x + offsetx, p.y + offsety, 64, 64, 1, 1);
-            } else {
-                this.chip.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
-            }
-        });
-    }
+    //         if (erase) {
+    //             this.chip.erase(p.x + offsetx, p.y + offsety, 64, 64, 1, 1);
+    //         } else {
+    //             this.chip.render(p.x + offsetx, p.y + offsety, 0, 0, 64, 64);
+    //         }
+    //     });
+    // }
 
-    drawTable_prototype() {
-        this.drawHandlers.set('drawtable', () => {
-            const p = this.pointOnTable(-2, 0);
+    // drawTable_prototype() {
+    //     this.drawHandlers.set('drawtable', () => {
+    //         const p = this.pointOnTable(-2, 0);
 
-            const dx = Math.floor(this.parentcanvas.width / 2 - p.x);
-            const dy = Math.floor(this.parentcanvas.height / 2 - p.y);
+    //         const dx = Math.floor(this.parentcanvas.width / 2 - p.x);
+    //         const dy = Math.floor(this.parentcanvas.height / 2 - p.y);
 
-            this.tableSprite.draw(
-                p.x,
-                p.y,
-                this.dimensions.r,
-                this.dimensions.off,
-                this.parentcanvas.width,
-                this.parentcanvas.height,
-                dx,
-                dy
-            );
-        });
-    }
+    //         this.tableSprite.draw(
+    //             p.x,
+    //             p.y,
+    //             this.dimensions.r,
+    //             this.dimensions.off,
+    //             this.parentcanvas.width,
+    //             this.parentcanvas.height,
+    //             dx,
+    //             dy
+    //         );
+    //     });
+    // }
 
-    drawSeat_prototype(i) {
-        this.drawHandlers.set(`drawseat-${i}`, () => {
-            const p = this.pointOnTable(i, 0);
+    // drawSeat_prototype(i) {
+    //     this.drawHandlers.set(`drawseat-${i}`, () => {
+    //         const p = this.pointOnTable(i, 0);
 
-            const dx = Math.floor(p.x - 32);
-            const dy = Math.floor(p.y - 32);
+    //         const dx = Math.floor(p.x - 32);
+    //         const dy = Math.floor(p.y - 32);
 
-            this.seatSprites.get(i).draw(64, 64, 32, 0, 64, 64, dx, dy);
-        });
-    }
+    //         this.seatSprites.get(i).draw(64, 64, 32, 0, 64, 64, dx, dy);
+    //     });
+    // }
 
-    drawSeatLabel_prototype(i, txt) {
-        let t = '...';
+    // drawSeatLabel_prototype(i, txt) {
+    //     let t = '...';
 
-        if (txt) {
-            t = txt;
-        }
+    //     if (txt) {
+    //         t = txt;
+    //     }
 
-        this.drawHandlers.set(`seatlabel-${i}`, () => {
-            const p = this.pointOnTable(i, 0);
-            const l = new Label('serif', 18, 'white', 'black');
-            l.draw(t, this.textcanvas, p.x, p.y, false);
-        });
-    }
+    //     this.drawHandlers.set(`seatlabel-${i}`, () => {
+    //         const p = this.pointOnTable(i, 0);
+    //         const l = new Label('serif', 18, 'white', 'black');
+    //         l.draw(t, this.textcanvas, p.x, p.y, false);
+    //     });
+    // }
 
     render() {
         if (this.drawOnNextUpdate) {
             this.resize();
-            // this.draw();
             this.tableView.renderViews(true, true);
-
-            // this.labels.center.draw(
-            //     this.centerLabelText,
-            //     this.textcanvas,
-            //     this.center[0],
-            //     this.center[1] - this.cardpixelheight * 0.5
-            // );
-
             this.drawOnNextUpdate = false;
-
-            // for (const [si, s] of this.seats) {
-            //     s.render();
-            // }
-
-            // for (const [di, dh] of this.drawHandlers) {
-            //     dh();
-            // }
         }
     }
-
-    // draw() {
-    //     const ctx = this.canvas.getContext('2d');
-    //     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-    //     this.canvas.width = this.dimensions.w;
-    //     this.canvas.height = this.dimensions.h;
-
-    //     ctx.beginPath();
-    //     ctx.arc(this.canvasorigin.x - this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5, Math.PI * 0.5 + Math.PI);
-    //     ctx.arc(this.canvasorigin.x + this.dimensions.off, this.canvasorigin.y, this.dimensions.r, Math.PI * 0.5 + Math.PI, Math.PI * 0.5);
-    //     ctx.fillStyle = 'green';
-    //     ctx.fill();
-
-    //     this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
-    // }
 
     // TODO: rename
     resize() {
@@ -393,11 +284,6 @@ class Table {
     // TODO: rename
     redraw() {
         this.drawOnNextUpdate = true;
-
-        // for (const [k, h] of this.drawHandlers) {
-        // for (const [k, h] of this.redrawHandlers) {
-        // h();
-        // }
     }
 
     init() {
@@ -426,19 +312,8 @@ class Table {
             )
         );
 
-        // this.drawSeat_prototype(seatindex);
-        // this.drawSeatLabel_prototype(seatindex);
         this.tableView.registerSeatDrawHandler(seatindex);
         this.tableView.registerSeatLabelDrawHandler(seatindex);
-        // this.drawHandlers.set(`seatlabel-${seatindex}`, () => {
-        //     const p = this.pointOnTable(seatindex);
-        //     const l = new Label('serif', 18, 'white', 'black');
-        //     l.draw('...', this.textcanvas, p.x, p.y, false);
-        // });
-        // this.redrawHandlers.set(seatindex, () => {
-        // this.drawHandlers.set(`seat-${seatindex}`, () => {
-        //     this.seats.get(seatindex).redraw(); // attach handler to seat
-        // });
 
         this.drawOnNextUpdate = true;
 
@@ -509,9 +384,9 @@ class Table {
     }
 
     pointOnTable(position, radius, onchangeHandle) {
-        if (onchangeHandle) {
-            this.pointCalcHandlers.set(position, onchangeHandle);
-        }
+        // if (onchangeHandle) {
+        //     this.pointCalcHandlers.set(position, onchangeHandle);
+        // }
 
         const ox = this.parentcanvas.width / 2;
         const oy = this.parentcanvas.height / 2;
@@ -577,11 +452,11 @@ class Table {
         x = Math.floor(x);
         y = Math.floor(y);
 
-        for (const [p, h] of this.pointCalcHandlers) {
-            if (p === position) {
-                h(x, y);
-            }
-        }
+        // for (const [p, h] of this.pointCalcHandlers) {
+        //     if (p === position) {
+        //         h(x, y);
+        //     }
+        // }
 
         return {
             x: x, y: y
