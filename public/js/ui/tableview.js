@@ -12,6 +12,7 @@ class TableView {
         }
 
         this.tableSprite = new TableSprite(this.table.parentcanvas, 'table');
+        this.seatOutlineSprite = new TableSeatOutlineSprite(this.table.cardcanvas, 'seat-outline');
         this.seatSprites = new Map();
 
         for (let i = 0; i < 9; i++) {
@@ -89,8 +90,9 @@ class TableView {
 
     registerTableDrawHandler() {
         const handler = this.handlers.get('table');
+        const handlerlabel = 'table';
 
-        handler.set('table', render => {
+        handler.set(handlerlabel, render => {
             const table = this.table;
 
             const p = table.pointOnTable(-2, 0);
@@ -111,10 +113,13 @@ class TableView {
         });
 
         this.handlers.set('table', handler);
+
+        return handlerlabel;
     }
 
     registerTableCenterLabelDrawHandler(txt) {
         const handler = this.handlers.get('text');
+        const handlerlabel = `label-table-center`;
 
         let t = '...';
 
@@ -122,18 +127,21 @@ class TableView {
             t = txt;
         }
 
-        handler.set(`label-table-center`, () => {
+        handler.set(handlerlabel, () => {
             const p = this.table.pointOnTable(-2);
             this.labels.table.center.draw(t, this.table.textcanvas, p.x, p.y - 64, false);
         });
 
         this.handlers.set('text', handler);
+
+        return handlerlabel;
     }
 
     registerSeatDrawHandler(i) {
         const handler = this.handlers.get('player');
+        const handlerlabel = `seat-${i}`;
 
-        handler.set(`seat-${i}`, render => {
+        handler.set(handlerlabel, render => {
             const p = this.table.pointOnTable(i);
 
             const dx = Math.floor(p.x - 32);
@@ -143,6 +151,26 @@ class TableView {
         });
 
         this.handlers.set('player', handler);
+
+        return handlerlabel;
+    }
+
+    registerActivePlayerSeatOutline(i) {
+        const handler = this.handlers.get('card');
+        const handlerlabel = 'seat-active-player-outline';
+
+        handler.set(handlerlabel, render => {
+            const p = this.table.pointOnTable(i);
+
+            const dx = Math.floor(p.x - 32);
+            const dy = Math.floor(p.y - 32);
+
+            this.seatOutlineSprite.draw(64, 64, 32, 0, 64, 64, dx, dy);
+        });
+
+        this.handlers.set('card', handler);
+
+        return handlerlabel;
     }
 
     registerSeatLabelDrawHandler(i, txtname, txtbalance) {
@@ -156,14 +184,17 @@ class TableView {
         }
 
         const handler = this.handlers.get('text');
+        const handlerlabel = `label-seat-${i}`;
 
-        handler.set(`label-seat-${i}`, render => {
+        handler.set(handlerlabel, render => {
             const p = this.table.pointOnTable(i);
             this.labels.seat.name.get(i).draw(t, this.table.textcanvas, p.x, p.y - 16, true);
             this.labels.seat.balance.get(i).draw(tt, this.table.textcanvas, p.x, p.y + 16, false);
         });
 
         this.handlers.set('text', handler);
+
+        return handlerlabel;
     }
 
     registerButtonDrawHandler(name, i) {
@@ -224,13 +255,16 @@ class TableView {
         }
 
         this.handlers.set('button', handler);
+
+        return name;
     }
 
     registerChipDrawHandler(i) {
         const handler = this.handlers.get('chip');
+        const handlerlabel = `chips-${i}`;
 
         const size = 32;
-        handler.set(`chips-${i}`, render => {
+        handler.set(handlerlabel, render => {
             const pp = this.table.pointOnTable(i);
             const p = this.table.pointOnTable(i, this.table.dimensions.r - size);
 
@@ -238,12 +272,15 @@ class TableView {
         });
 
         this.handlers.set('chip', handler);
+
+        return handlerlabel;
     }
 
     registerCardDrawHandler(i, a, b) {
         const handler = this.handlers.get('card');
+        const handlerlabel = `card-${i}`;
 
-        handler.set(`card-${i}`, render => {
+        handler.set(handlerlabel, render => {
             const table = this.table;
             const p = table.pointOnTable(i);
 
@@ -264,12 +301,15 @@ class TableView {
                 this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
             }
         });
+
+        return handlerlabel;
     }
 
     registerCommunityCardsDrawHandler(...ccCards) {
         const handler = this.handlers.get('card');
+        const handlerlabel = 'community';
 
-        handler.set(`community`, render => {
+        handler.set(handlerlabel, render => {
             const table = this.table;
             const p = table.pointOnTable(-2);
 
@@ -286,6 +326,16 @@ class TableView {
         });
 
         this.handlers.set('card', handler);
+
+        return handlerlabel;
+    }
+
+    clearHandler(handlerid, handlerlabel) {
+        const handler = this.handlers.get(handlerid);
+
+        handler.delete(handlerlabel);
+
+        this.handlers.set(handlerid, handler);
     }
 
     clearHandlers(handlerid) {

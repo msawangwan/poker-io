@@ -198,7 +198,7 @@ $(document).ready(() => {
         });
 
         socket.on('update-table-state', (data) => {
-            debug.delimit('player posted bet')
+            debug.delimit('player posted bet', `${data.playerSeat}`);
             debug.logobject(data);
 
             const centerlabel = `pot size: ${data.potsize}`;
@@ -207,13 +207,14 @@ $(document).ready(() => {
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
             if (data.clearTable) {
-                // TODO: animate
                 setTimeout(() => {
                     canvasView.clearCanvas('chip-canvas');
                     current.table.tableView.clearHandlers('chip');
+                    current.table.tableView.clearHandler('card', 'seat-active-player-outline');
                 }, 1500);
             } else {
                 current.table.tableView.registerChipDrawHandler(data.playerSeat);
+                current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
             }
 
             canvasView.clearAndResizeAll();
