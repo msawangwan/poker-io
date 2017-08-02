@@ -30,8 +30,8 @@ $(document).ready(() => {
             current.table.redraw();
         });
 
-        socket.on('assigned-table', (data) => {
-            current.player = new Player(data.guestname, socket.id, 0, canvasView.getCanvas('player-canvas'));
+        socket.on('assigned-table', (data) => { // TODO: send a balance
+            current.player = new Player(data.guestname, socket.id, 500, canvasView.getCanvas('player-canvas'));
 
             current.seat = data.table.assignedSeat;
 
@@ -43,7 +43,8 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
-            current.table.drawTable_prototype();
+            // current.table.drawTable_prototype();
+            current.table.tableView.registerTableDrawHandler();
         });
 
         socket.on('a-player-has-joined', (data) => {
@@ -205,11 +206,11 @@ $(document).ready(() => {
             if (data.clearTable) {
                 setTimeout(() => {
                     canvasView.clearCanvas('chip-canvas');
+                    current.table.tableView.clearHandlers('chip');
                 }, 500);
             } else {
                 current.table.tableView.registerChipDrawHandler(data.playerSeat);
             }
-            // current.table.tableView.registerChipDrawHandler(data.playerSeat);
         });
     }
 

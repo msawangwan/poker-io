@@ -242,7 +242,7 @@ class Table {
             const numCards = ccCards.length;
             const totalWidth = this.cardpixelwidth * 3;
 
-            let start = p.x - (totalWidth / 2); // (this.cardpixelwidth / 2) -
+            let start = p.x - (totalWidth / 2);
             let shift = 0;
 
             for (const c of ccCards) {
@@ -371,6 +371,7 @@ class Table {
     //     this.parentcanvas.getContext('2d').drawImage(this.canvas, this.postion.x, this.postion.y);
     // }
 
+    // TODO: rename
     resize() {
         this.dimensions.w = Math.floor(this.parentcanvas.width * scalingvalue);
         this.dimensions.h = Math.floor(this.parentcanvas.height * scalingvalue);
@@ -389,6 +390,7 @@ class Table {
         this.dimensions.off = Math.floor(this.dimensions.w * long.small);
     }
 
+    // TODO: rename
     redraw() {
         this.drawOnNextUpdate = true;
 
@@ -424,8 +426,10 @@ class Table {
             )
         );
 
-        this.drawSeat_prototype(seatindex);
-        this.drawSeatLabel_prototype(seatindex);
+        // this.drawSeat_prototype(seatindex);
+        // this.drawSeatLabel_prototype(seatindex);
+        this.tableView.registerSeatDrawHandler(seatindex);
+        this.tableView.registerSeatLabelDrawHandler(seatindex);
         // this.drawHandlers.set(`seatlabel-${seatindex}`, () => {
         //     const p = this.pointOnTable(seatindex);
         //     const l = new Label('serif', 18, 'white', 'black');
@@ -452,6 +456,8 @@ class Table {
         seat.player = player;
 
         player.seatPositionIndex = index;
+
+        this.tableView.registerSeatLabelDrawHandler(index, player.name, player.balance);
 
         this.setSeatByIndex(index, seat);
 

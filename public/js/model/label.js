@@ -18,7 +18,7 @@ class Label {
             textalign: 'center',
             textbaseline: 'middle'
         };
-        
+
         this.bg = {
             color: bgcolor || 'white'
         };
@@ -38,10 +38,10 @@ class Label {
 
         if (drawbg) {
             ctx.fillStyle = this.bg.color;
-            ctx.fillRect(0,0, this.canvas.width, this.canvas.height);
+            ctx.fillRect(0, this.canvas.height / 2 - this.style.fontsize / 2, this.canvas.width, this.style.fontsize + this.style.fontsize * 0.15);
             this.canvas.style.opacity = 0.1;
         }
-        
+
         ctx.font = formatfontstr(this.style.font, this.style.fontsize);
         ctx.fillStyle = this.style.fontcolor;
         ctx.textAlign = this.style.textalign;
