@@ -1,6 +1,5 @@
 class ClientController {
     constructor() {
-        this.$betrangeslider = $('#bet-range-slider');
         this.$bettextfield = $('#bet-amount-text-field');
 
         this.$btnsendbet = $('#btn-send-bet');
@@ -22,6 +21,24 @@ class ClientController {
         this.$ids = {
             hidebtn: '#hide-button'
         };
+
+        this.callbackHandlers = new Map([
+            ['bet-range-slider', new Map()],
+        ]);
+
+        this.$betrangeslider = $('#bet-range-slider');
+
+        this.$betrangeslider.on('change', () => {
+            const val = this.$betrangeslider.val();
+
+            this.$bettextfield.val(val);
+
+            if (this.callbackHandlers.get('bet-range-slider').size) {
+                for (const [id, h] of this.callbackHandlers.get('bet-range-slider')) {
+                    h(val);
+                }
+            }
+        });
     }
 
     hideAllButtons() {

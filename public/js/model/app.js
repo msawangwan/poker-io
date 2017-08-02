@@ -2,7 +2,7 @@ const tickrate = 1000 / 2;
 const startupt = 800;
 
 const current = {
-    player: null, table: null, seat: null
+    player: null, table: null, seat: null, bet: 0
 };
 
 $(document).ready(() => {
@@ -17,9 +17,12 @@ $(document).ready(() => {
     canvasView.clearAndResizeAll();
 
     clientController.hideAllButtons();
-    clientController.$betrangeslider.on('change', () => {
-        const slidervalue = clientController.$betrangeslider.val();
-        clientController.$bettextfield.val(slidervalue);
+
+    clientController.callbackHandlers.get('bet-range-slider').set('update-button-txt', val => {
+        current.bet = current.player.balance * (val * 0.01);
+
+        clientController.$btnsendbet.val(current.bet);
+        clientController.$btnsendraise.val(current.bet);
     });
 
     {
@@ -122,13 +125,13 @@ $(document).ready(() => {
         socket.on('collect-ante', (data) => {
             {
                 debug.delimit(
-                    `${current.player.name} ante up!`,
+                    `${current.player.name} action on you ...`, '... post ante, raise or fold'
                 );
 
                 debug.logobject(data);
-            }
+            };
 
-            debug.delimit('action is open and on you', 'bet', 'check', 'fold');
+            let minbet = data.minbet;
 
             let action = (type, amount) => {
                 socket.emit('post-ante', {

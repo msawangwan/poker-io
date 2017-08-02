@@ -150,9 +150,9 @@ class TableView {
         let tt = ''
 
         if (txtname) {
-            // if (txtname && txtbalance) { // note if we send txtbalance = an int 0 this will fail
             t = txtname;
-            tt = txtbalance
+            if (txtbalance === 0 || txtbalance)
+                tt = txtbalance
         }
 
         const handler = this.handlers.get('text');
