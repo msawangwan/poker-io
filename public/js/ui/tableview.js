@@ -245,13 +245,13 @@ class TableView {
 
         handler.set(`card-${i}`, render => {
             const table = this.table;
-            const p = table.pointOnTable(seatindex);
+            const p = table.pointOnTable(i);
 
             this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
             this.cards.get(`${b.suite}::${b.value}`).render(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
 
             for (const [s, p] of table.seatsVacant(false)) {
-                if (s === seatindex) {
+                if (s === i) {
                     continue;
                 }
 

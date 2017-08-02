@@ -60,8 +60,6 @@ $(document).ready(() => {
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
 
-            // current.table.centerLabelText = 'pot size: 0';
-
             current.table.tableView.registerButtonDrawHandler('dealer', current.table.buttonIndex);
             current.table.tableView.registerButtonDrawHandler('sb', current.table.sbIndex);
             current.table.tableView.registerButtonDrawHandler('bb', current.table.bbIndex);
@@ -180,7 +178,8 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
-            current.table.drawCards(current.seat, data.a, data.b);
+            // current.table.drawCards(current.seat, data.a, data.b);
+            current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
         });
 
         socket.on('flop-dealt', (data) => {
@@ -191,7 +190,8 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
-            current.table.drawCommunityCards(data.a, data.b, data.c);
+            // current.table.drawCommunityCards(data.a, data.b, data.c);
+            current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
         });
 
         socket.on('update-table-state', (data) => {
