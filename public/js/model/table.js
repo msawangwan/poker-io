@@ -336,22 +336,22 @@ class Table {
             // this.draw();
             this.tableView.renderViews(true, true);
 
-            this.labels.center.draw(
-                this.centerLabelText,
-                this.textcanvas,
-                this.center[0],
-                this.center[1] - this.cardpixelheight * 0.5
-            );
+            // this.labels.center.draw(
+            //     this.centerLabelText,
+            //     this.textcanvas,
+            //     this.center[0],
+            //     this.center[1] - this.cardpixelheight * 0.5
+            // );
 
             this.drawOnNextUpdate = false;
 
-            for (const [si, s] of this.seats) {
-                s.render();
-            }
+            // for (const [si, s] of this.seats) {
+            //     s.render();
+            // }
 
-            for (const [di, dh] of this.drawHandlers) {
-                dh();
-            }
+            // for (const [di, dh] of this.drawHandlers) {
+            //     dh();
+            // }
         }
     }
 

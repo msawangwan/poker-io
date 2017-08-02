@@ -122,9 +122,9 @@ class TableView {
             t = txt;
         }
 
-        this.drawHandlers.set(`seatlabel-${i}`, () => {
-            const p = this.pointOnTable(-2);
-            this.labels.table.center.draw(t, this.textcanvas, p.x, p.y, false);
+        handler.set(`label-table-center`, () => {
+            const p = this.table.pointOnTable(-2);
+            this.labels.table.center.draw(t, this.table.textcanvas, p.x, p.y - 64, false);
         });
 
         this.handlers.set('text', handler);
@@ -157,7 +157,7 @@ class TableView {
 
         const handler = this.handlers.get('text');
 
-        handler.set(`seat-label-${i}`, render => {
+        handler.set(`label-seat-${i}`, render => {
             const p = this.table.pointOnTable(i);
             this.labels.seat.name.get(i).draw(t, this.table.textcanvas, p.x, p.y - 16, true);
             this.labels.seat.balance.get(i).draw(tt, this.table.textcanvas, p.x, p.y + 16, false);
@@ -289,7 +289,7 @@ class TableView {
     }
 
     clearHandlers(handlerid) {
-        const handler = this.handlers.get(handerid);
+        const handler = this.handlers.get(handlerid);
 
         handler.clear();
 

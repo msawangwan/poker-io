@@ -36,14 +36,14 @@ $(document).ready(() => {
             current.seat = data.table.assignedSeat;
 
             current.table.assignedId = data.table.id;
-            current.table.centerLabelText = 'waiting for players ...';
+
+            current.table.tableView.registerTableCenterLabelDrawHandler('waiting for players ...');
 
             current.table.seatPlayer(data.table.assignedSeat, current.player);
             current.table.seatOpponents(data.table.seatingState, socket.id);
 
             canvasView.clearAndResizeAll();
 
-            // current.table.drawTable_prototype();
             current.table.tableView.registerTableDrawHandler();
         });
 
@@ -60,11 +60,13 @@ $(document).ready(() => {
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
             current.table.bbIndex = (data.buttonIndex + 2 % current.table.playerCount) % current.table.playerCount;
 
-            current.table.centerLabelText = 'pot size: 0';
+            // current.table.centerLabelText = 'pot size: 0';
 
             current.table.tableView.registerButtonDrawHandler('dealer', current.table.buttonIndex);
             current.table.tableView.registerButtonDrawHandler('sb', current.table.sbIndex);
             current.table.tableView.registerButtonDrawHandler('bb', current.table.bbIndex);
+
+            current.table.tableView.registerTableCenterLabelDrawHandler('game starting ...');
 
             debug.logobject(data);
             debug.delimit(
@@ -196,11 +198,9 @@ $(document).ready(() => {
             debug.delimit('player posted bet')
             debug.logobject(data);
 
-            current.table.centerLabelText = `pot size: ${data.potsize}`;
-            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
+            const centerlabel = `pot size: ${data.potsize}`;
 
-            canvasView.clearAndResizeAll();
-
+            current.table.tableView.registerTableCenterLabelDrawHandler(centerlabel);
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
             if (data.clearTable) {
@@ -211,6 +211,9 @@ $(document).ready(() => {
             } else {
                 current.table.tableView.registerChipDrawHandler(data.playerSeat);
             }
+
+            canvasView.clearAndResizeAll();
+            current.table.redraw();
         });
     }
 
