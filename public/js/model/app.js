@@ -21,8 +21,8 @@ $(document).ready(() => {
     clientController.callbackHandlers.get('bet-range-slider').set('update-button-txt', val => {
         current.bet = current.player.balance * (val * 0.01);
 
-        clientController.$btnsendbet.val(current.bet);
-        clientController.$btnsendraise.val(current.bet);
+        clientController.$btnsendbet.val(`bet ${current.bet}`);
+        clientController.$btnsendraise.val(`raise ${current.bet}`);
     });
 
     {
@@ -125,13 +125,13 @@ $(document).ready(() => {
         socket.on('collect-ante', (data) => {
             {
                 debug.delimit(
-                    `${current.player.name} action on you ...`, '... post ante, raise or fold'
+                    `${current.player.name} action on you ...`, `... the last player did: ${data.actionType}`
                 );
 
                 debug.logobject(data);
             };
 
-            let minbet = data.minbet;
+            current.bet = data.minBetAmount;
 
             let action = (type, amount) => {
                 socket.emit('post-ante', {
@@ -140,28 +140,30 @@ $(document).ready(() => {
                     tableid: current.table.id,
                     gameid: current.table.game.id
                 });
+
+                current.bet = 0;
             };
 
             clientController.$btnsendcall.toggle(clientController.$hidebtn);
             clientController.$btnsendraise.toggle(clientController.$hidebtn);
             clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
-            clientController.$btnsendcall.val(`call ${data.minBetSize}`);
+            clientController.$btnsendcall.val(`call ${data.minBetAmount}`);
             clientController.$btnsendcall.on('click', () => {
                 clientController.$btnsendcall.toggle(clientController.$hidebtn);
                 clientController.$btnsendraise.toggle(clientController.$hidebtn);
                 clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
-                action('call', data.minBetSize);
+                action('call', data.minBetAmount);
             });
 
-            clientController.$btnsendraise.val(`raise ${'x'}`);
+            clientController.$btnsendraise.val(`raise ${data.minBetAmount}`);
             clientController.$btnsendraise.on('click', () => {
                 clientController.$btnsendcall.toggle(clientController.$hidebtn);
                 clientController.$btnsendraise.toggle(clientController.$hidebtn);
                 clientController.$btnsendfold.toggle(clientController.$hidebtn);
 
-                action('raise', data.minBetSize);
+                action('raise', current.bet);
             });
 
             clientController.$btnsendfold.on('click', () => {
@@ -205,15 +207,17 @@ $(document).ready(() => {
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
             if (data.clearTable) {
+                // TODO: animate
                 setTimeout(() => {
                     canvasView.clearCanvas('chip-canvas');
                     current.table.tableView.clearHandlers('chip');
-                }, 500);
+                }, 1500);
             } else {
                 current.table.tableView.registerChipDrawHandler(data.playerSeat);
             }
 
             canvasView.clearAndResizeAll();
+
             current.table.redraw();
         });
     }

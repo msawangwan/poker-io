@@ -207,9 +207,9 @@ body {
     align-self: center;
 }
 
-#bet-amount-text-field {
+/* #bet-amount-text-field {
     width: 75px;
-}
+} */
 
 .hide-button {
     display: hidden;
