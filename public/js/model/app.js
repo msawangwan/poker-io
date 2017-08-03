@@ -69,7 +69,7 @@ $(document).ready(() => {
 
             current.table.tableView.registerTableCenterLabelDrawHandler('game starting ...');
 
-            socket.emit('poll-for-updated-table-state', {
+            socket.emit('poll-game-state', {
                 tableid: current.table.id,
                 gameid: data.gameId
             });
@@ -84,6 +84,14 @@ $(document).ready(() => {
                 `small blind index: ${current.table.sbIndex}`,
                 `big blind index: ${current.table.bbIndex}`
             );
+        });
+
+        socket.on('game-state', (data) => {
+            debug.delimit('current game state');
+            debug.logobject(data);
+            debug.logobject(data.actionOn);
+
+            // TODO: LEFT OFF HERE, THIS IS FOR DETERMINING WHO TO HIGHLIGHT
         });
 
         socket.on('collect-blind', (data) => {
