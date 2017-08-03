@@ -266,11 +266,12 @@ class TableView {
         return name;
     }
 
-    registerChipDrawHandler(i) {
+    registerChipDrawHandler(i, bets) {
         const handler = this.handlers.get('chip');
         const handlerlabel = `chips-${i}`;
 
         const size = 32;
+
         handler.set(handlerlabel, render => {
             const pp = this.table.pointOnTable(i);
             const p = this.table.pointOnTable(i, this.table.dimensions.r - size);

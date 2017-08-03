@@ -139,7 +139,21 @@ $(document).ready(() => {
                 debug.logobject(data);
             };
 
-            current.bet = data.minBetAmount;
+            let min = data.minBetAmount;
+
+            const previousBets = current.game.getPlayerBets(socket.id);
+
+            if (previousBets) {
+                const lastBet = previousBets[previousBets.length - 1];
+
+                debug.delimit(`last bet was ${lastBet}`);
+
+                min = Math.abs(lastBet - data.minBetAmount);
+            }
+
+            debug.delimit(`min bet allowed is ${min}`);
+
+            current.bet = min;
 
             let action = (type, amount) => {
                 socket.emit('post-ante', {
@@ -152,30 +166,42 @@ $(document).ready(() => {
                 current.bet = 0;
             };
 
-            const toggleHidden = () => {
+            const toggleHidden = (minbet) => {
                 clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
 
-                clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                if (minbet === 0) {
+                    clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
+                } else {
+                    clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                }
+
                 clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
                 clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
             };
 
-            toggleHidden();
+            toggleHidden(min);
 
-            clientController.$btnsendcall.val(`call ${data.minBetAmount}`);
+            if (min === 0) {
+                clientController.$btnsendcheck.on('click', () => {
+                    toggleHidden(min);
+                    action('check', 0);
+                });
+            }
+
+            clientController.$btnsendcall.val(`call ${min}`);
             clientController.$btnsendcall.on('click', () => {
-                toggleHidden();
-                action('call', data.minBetAmount);
+                toggleHidden(min);
+                action('call', current.bet);
             });
 
             clientController.$btnsendraise.val(`raise ${data.minBetAmount}`);
             clientController.$btnsendraise.on('click', () => {
-                toggleHidden();
+                toggleHidden(min);
                 action('raise', current.bet);
             });
 
             clientController.$btnsendfold.on('click', () => {
-                toggleHidden();
+                toggleHidden(min);
                 action('fold', 0);
             });
 
@@ -224,7 +250,14 @@ $(document).ready(() => {
             current.table.tableView.registerTableCenterLabelDrawHandler(centerlabel);
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
-            if (data.bet > 0) {
+            if (data.betAmount > 0) {
+                current.game.playerPlacedBet(data.playerId, data.betAmount);
+
+                const bets = current.game.getPlayerBets(data.playerId);
+
+                debug.delimit('bets:');
+                debug.logobject(bets);
+
                 if (data.clearTable) {
                     setTimeout(() => {
                         canvasView.clearCanvas('chip-canvas');
@@ -232,11 +265,8 @@ $(document).ready(() => {
                         current.table.tableView.clearHandler('card', 'seat-active-player-outline');
                     }, 1500);
                 } else {
-                    current.table.tableView.registerChipDrawHandler(data.playerSeat);
-                    // current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
+                    current.table.tableView.registerChipDrawHandler(data.playerSeat, bets);
                 }
-            } else {
-                // current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
             }
 
             socket.emit('poll-game-state', {
