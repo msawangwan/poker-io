@@ -2,7 +2,7 @@ const tickrate = 1000 / 2;
 const startupt = 800;
 
 const current = {
-    player: null, table: null, seat: null, bet: 0
+    player: null, table: null, game: null, seat: null, bet: 0
 };
 
 $(document).ready(() => {
@@ -57,7 +57,9 @@ $(document).ready(() => {
         });
 
         socket.on('game-started', (data) => {
-            current.table.game = new Game(data.gameId, current.table.players);
+            current.table.game = new Game(data.gameId, current.table.players); // todo: deprecate
+
+            current.game = current.table.game; // use this instead of current.table.game
 
             current.table.buttonIndex = data.buttonIndex;
             current.table.sbIndex = (data.buttonIndex + 1 % current.table.playerCount) % current.table.playerCount;
@@ -86,13 +88,6 @@ $(document).ready(() => {
             );
         });
 
-        socket.on('game-state', (data) => {
-            debug.delimit('current game state');
-            debug.logobject(data);
-            debug.logobject(data.actionOn);
-
-            // TODO: LEFT OFF HERE, THIS IS FOR DETERMINING WHO TO HIGHLIGHT
-        });
 
         socket.on('collect-blind', (data) => {
             debug.delimit(
@@ -207,7 +202,20 @@ $(document).ready(() => {
             current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
         });
 
-        socket.on('update-table-state', (data) => {
+        socket.on('game-state', (data) => {
+            debug.delimit('current game state');
+
+            debug.logobject(data.potsize);
+            debug.logobject(data.actionOn);
+            debug.logobject(data.actionOn.player);
+
+            current.table.tableView.registerActivePlayerSeatOutline(data.actionOn.seat);
+
+            canvasView.clearAndResizeAll();
+            current.table.redraw();
+        });
+
+        socket.on('table-state', (data) => {
             debug.delimit(`player seated in seat ${data.playerSeat} is in action`);
             debug.logobject(data);
 
@@ -225,11 +233,16 @@ $(document).ready(() => {
                     }, 1500);
                 } else {
                     current.table.tableView.registerChipDrawHandler(data.playerSeat);
-                    current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
+                    // current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
                 }
             } else {
-                current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
+                // current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
             }
+
+            socket.emit('poll-game-state', {
+                tableid: current.table.id,
+                gameid: current.game.id
+            });
 
             canvasView.clearAndResizeAll();
             current.table.redraw();

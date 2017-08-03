@@ -174,22 +174,29 @@ class TableView {
     }
 
     registerSeatLabelDrawHandler(i, txtname, txtbalance) {
-        let t = '...';
-        let tt = ''
-
-        if (txtname) {
-            t = txtname;
-            if (txtbalance === 0 || txtbalance)
-                tt = txtbalance
-        }
-
         const handler = this.handlers.get('text');
         const handlerlabel = `label-seat-${i}`;
 
         handler.set(handlerlabel, render => {
+            const seat = this.table.seats.get(i);
+
+            let n = '...';
+            let b = ''
+
+            if (seat) {
+                if (seat.player.name !== 'empty') {
+                    n = seat.player.name;
+                }
+
+                if (seat.player.balance || seat.player.balance === 0) {
+                    b = seat.player.balance;
+                }
+            }
+
             const p = this.table.pointOnTable(i);
-            this.labels.seat.name.get(i).draw(t, this.table.textcanvas, p.x, p.y - 16, true);
-            this.labels.seat.balance.get(i).draw(tt, this.table.textcanvas, p.x, p.y + 16, false);
+
+            this.labels.seat.name.get(i).draw(n, this.table.textcanvas, p.x, p.y - 16, true);
+            this.labels.seat.balance.get(i).draw(b, this.table.textcanvas, p.x, p.y + 16, false);
         });
 
         this.handlers.set('text', handler);
