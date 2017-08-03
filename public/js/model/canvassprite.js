@@ -65,7 +65,7 @@ class TableSeatOutlineSprite extends CanvasSprite {
         const ctx = this.initCtx(w, h);
 
         ctx.strokeStyle = 'red';
-        ctx.lineWidth = 10;
+        ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(x / 2, y / 2, r, Math.PI * 2, false);
         ctx.stroke();

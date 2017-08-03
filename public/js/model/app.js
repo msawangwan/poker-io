@@ -16,7 +16,7 @@ $(document).ready(() => {
 
     canvasView.clearAndResizeAll();
 
-    clientController.hideAllButtons();
+    clientController.hideAllButtons(true);
 
     clientController.callbackHandlers.get('bet-range-slider').set('update-button-txt', val => {
         current.bet = current.player.balance * (val * 0.01);
@@ -90,7 +90,7 @@ $(document).ready(() => {
 
             switch (data.blindType) {
                 case 'sb':
-                    clientController.$btnsendblind.toggle(clientController.$hidebtn);
+                    clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
                     clientController.$btnsendblind.val('post small blind');
                     clientController.$btnsendblind.on('click', () => {
                         socket.emit('post-blind', {
@@ -100,11 +100,11 @@ $(document).ready(() => {
                             gameid: current.table.game.id
                         });
 
-                        clientController.$btnsendblind.toggle(clientController.$hidebtn);
+                        clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
                     });
                     break;
                 case 'bb':
-                    clientController.$btnsendblind.toggle(clientController.$hidebtn);
+                    clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
                     clientController.$btnsendblind.val('post big blind');
                     clientController.$btnsendblind.on('click', () => {
                         socket.emit('post-blind', {
@@ -114,7 +114,7 @@ $(document).ready(() => {
                             gameid: current.table.game.id
                         });
 
-                        clientController.$btnsendblind.toggle(clientController.$hidebtn);
+                        clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
                     });
                     break;
                 default:
@@ -144,33 +144,30 @@ $(document).ready(() => {
                 current.bet = 0;
             };
 
-            clientController.$btnsendcall.toggle(clientController.$hidebtn);
-            clientController.$btnsendraise.toggle(clientController.$hidebtn);
-            clientController.$btnsendfold.toggle(clientController.$hidebtn);
+            const toggleHidden = () => {
+                clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+
+                clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
+                clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+            };
+
+            toggleHidden();
 
             clientController.$btnsendcall.val(`call ${data.minBetAmount}`);
             clientController.$btnsendcall.on('click', () => {
-                clientController.$btnsendcall.toggle(clientController.$hidebtn);
-                clientController.$btnsendraise.toggle(clientController.$hidebtn);
-                clientController.$btnsendfold.toggle(clientController.$hidebtn);
-
+                toggleHidden();
                 action('call', data.minBetAmount);
             });
 
             clientController.$btnsendraise.val(`raise ${data.minBetAmount}`);
             clientController.$btnsendraise.on('click', () => {
-                clientController.$btnsendcall.toggle(clientController.$hidebtn);
-                clientController.$btnsendraise.toggle(clientController.$hidebtn);
-                clientController.$btnsendfold.toggle(clientController.$hidebtn);
-
+                toggleHidden();
                 action('raise', current.bet);
             });
 
             clientController.$btnsendfold.on('click', () => {
-                clientController.$btnsendcall.toggle(clientController.$hidebtn);
-                clientController.$btnsendraise.toggle(clientController.$hidebtn);
-                clientController.$btnsendfold.toggle(clientController.$hidebtn);
-
+                toggleHidden();
                 action('fold', 0);
             });
 

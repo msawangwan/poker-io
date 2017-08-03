@@ -16,7 +16,9 @@ class ClientController {
             this.$btnsendraise
         ];
 
-        this.$ids = {
+        this.$formbetrangeslider = $('#form-betting-slider');
+
+        this.ids = {
             hidebtn: '.hide-button'
         };
 
@@ -37,9 +39,13 @@ class ClientController {
         });
     }
 
-    hideAllButtons() {
+    hideAllButtons(hideform) {
         for (const $b of this.$allbtns) {
-            $b.toggle(this.$hidebtn);
+            $b.toggle(this.ids.hidebtn);
+        }
+
+        if (hideform) {
+            this.$formbetrangeslider.toggle(this.ids.hidebtn);
         }
     }
 }
