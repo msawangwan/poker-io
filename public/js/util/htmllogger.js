@@ -29,10 +29,6 @@ class HTMLLogger {
     delimit(...lines) {
         this.log('*')
         this.log(...lines);
-
-        // this.$messageContainer.animate({
-        //     scrollTop: this.$messages.prop('scrollHeight') // TODO: blink instead of scroll?
-        // }, 'fast');
     };
 
     toHtml(m) {
@@ -42,9 +38,5 @@ class HTMLLogger {
         );
 
         this.$messageContainer.scrollTop(this.output.scrollHeight);
-
-        // this.$messageContainer.animate({
-        //     scrollTop: this.$messages.prop('scrollHeight') // TODO: blink instead of scroll?
-        // }, 'fast');
     };
 }
