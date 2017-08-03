@@ -69,6 +69,11 @@ $(document).ready(() => {
 
             current.table.tableView.registerTableCenterLabelDrawHandler('game starting ...');
 
+            socket.emit('poll-for-updated-table-state', {
+                tableid: current.table.id,
+                gameid: data.gameId
+            });
+
             debug.logobject(data);
             debug.delimit(
                 'game is starting',
@@ -195,7 +200,7 @@ $(document).ready(() => {
         });
 
         socket.on('update-table-state', (data) => {
-            debug.delimit('player posted bet', `${data.playerSeat}`);
+            debug.delimit(`player seated in seat ${data.playerSeat} is in action`);
             debug.logobject(data);
 
             const centerlabel = `pot size: ${data.potsize}`;
@@ -203,19 +208,22 @@ $(document).ready(() => {
             current.table.tableView.registerTableCenterLabelDrawHandler(centerlabel);
             current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
 
-            if (data.clearTable) {
-                setTimeout(() => {
-                    canvasView.clearCanvas('chip-canvas');
-                    current.table.tableView.clearHandlers('chip');
-                    current.table.tableView.clearHandler('card', 'seat-active-player-outline');
-                }, 1500);
+            if (data.bet > 0) {
+                if (data.clearTable) {
+                    setTimeout(() => {
+                        canvasView.clearCanvas('chip-canvas');
+                        current.table.tableView.clearHandlers('chip');
+                        current.table.tableView.clearHandler('card', 'seat-active-player-outline');
+                    }, 1500);
+                } else {
+                    current.table.tableView.registerChipDrawHandler(data.playerSeat);
+                    current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
+                }
             } else {
-                current.table.tableView.registerChipDrawHandler(data.playerSeat);
                 current.table.tableView.registerActivePlayerSeatOutline(data.playerSeat);
             }
 
             canvasView.clearAndResizeAll();
-
             current.table.redraw();
         });
     }
