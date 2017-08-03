@@ -219,13 +219,20 @@ $(document).ready(() => {
 
         socket.on('flop-dealt', (data) => {
             debug.delimit('flop dealt');
+
             debug.logobject(data.a);
             debug.logobject(data.b);
             debug.logobject(data.c);
 
             canvasView.clearAndResizeAll();
 
+            current.table.tableView.registerActivePlayerSeatOutline(data.utg);
             current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
+
+            socket.emit('poll-game-state', {
+                tableid: current.table.id,
+                gameid: current.game.id
+            });
         });
 
         socket.on('game-state', (data) => {
