@@ -181,7 +181,7 @@ $(document).ready(() => {
 
             toggleHidden(min);
 
-            if (min === 0) {
+            if (min <= 0) {
                 clientController.$btnsendcheck.on('click', () => {
                     toggleHidden(min);
                     action('check', 0);
