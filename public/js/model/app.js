@@ -38,19 +38,14 @@ $(document).ready(() => {
         socket.on('assigned-table', (data) => {
             current.balance = 500; // TODO: get from server
             current.player = new Player(data.guestname, socket.id, current.balance, canvasView.getCanvas('player-canvas'));
-
             current.seat = data.table.assignedSeat;
-
             current.table.assignedId = data.table.id;
-
             current.table.tableView.registerTableCenterLabelDrawHandler('waiting for players ...');
-
             current.table.seatPlayer(data.table.assignedSeat, current.player);
             current.table.seatOpponents(data.table.seatingState, socket.id);
+            current.table.tableView.registerTableDrawHandler();
 
             canvasView.clearAndResizeAll();
-
-            current.table.tableView.registerTableDrawHandler();
         });
 
         socket.on('a-player-has-joined', (data) => {
@@ -104,8 +99,8 @@ $(document).ready(() => {
             const blindbet = data.blindType === 'sb' ? data.blindBetSize * 0.5 : data.blindBetSize;
 
             actionConsole.log(
-                `player: ${current.player.name} action is on you`,
-                `id: ${socket.id}`,
+                `${current.player.name} action is on you`,
+                `${socket.id}`,
                 nullchar,
                 `${loc}`,
                 nullchar
@@ -129,7 +124,6 @@ $(document).ready(() => {
         socket.on('collect-ante', (data) => {
             actionConsole.log(
                 `${current.player.name} post ante`,
-                `(last player action: ${data.actionType})`,
                 nullchar
             );
 
@@ -160,63 +154,85 @@ $(document).ready(() => {
                 current.bet = 0;
             };
 
-            const toggleHidden = (minbet) => {
-                clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+            const toggleAvailableActions = (allowed) => {
+                actionConsole.log('toggling allowed actions:');
 
-                if (minbet === 0) {
-                    clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
-                } else {
-                    clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                for (const a of allowed) {
+                    actionConsole.log(`${a}`);
+
+                    switch (a) {
+                        case 'call':
+                            clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                            break;
+                        case 'raise':
+                            clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
+                            clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+                            break;
+                        case 'check':
+                            clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
+                            break;
+                        case 'fold':
+                            clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
-                clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
-                clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+                actionConsole.log(nullchar);
             };
 
-            toggleHidden(min);
+            toggleAvailableActions(data.allowedActions);
 
-            if (min <= 0) {
-                clientController.$btnsendcheck.on('click', () => {
-                    toggleHidden(min);
-                    action('check', 0);
-                });
-            }
+            clientController.$btnsendcheck.on('click', () => {
+                toggleAvailableActions(data.allowedActions);
+                action('check', 0);
+            });
 
             clientController.$btnsendcall.val(`call ${min}`);
             clientController.$btnsendcall.on('click', () => {
-                toggleHidden(min);
+                toggleAvailableActions(data.allowedActions);
                 action('call', current.bet);
             });
 
             clientController.$btnsendraise.val(`raise ${data.minBetAmount}`);
             clientController.$btnsendraise.on('click', () => {
-                toggleHidden(min);
+                toggleAvailableActions(data.allowedActions);
                 action('raise', current.bet);
             });
 
             clientController.$btnsendfold.on('click', () => {
-                toggleHidden(min);
+                toggleAvailableActions(data.allowedActions);
                 action('fold', 0);
             });
 
         });
 
         socket.on('player-dealt-cards', (data) => {
-            actionConsole.log('player was dealt hole cards:');
-            actionConsole.logobject(data.a);
-            actionConsole.logobject(data.b);
-
-            canvasView.clearAndResizeAll();
+            actionConsole.log(
+                'player dealt hole cards:',
+                `suite: ${data.a.suite}`,
+                `value: ${data.a.value}`,
+                `suite: ${data.b.suite}`,
+                `value: ${data.b.value}`,
+                nullchar
+            );
 
             current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
+            canvasView.clearAndResizeAll();
         });
 
         socket.on('flop-dealt', (data) => {
-            actionConsole.log('flop dealt', );
-
-            actionConsole.logobject(data.a);
-            actionConsole.logobject(data.b);
-            actionConsole.logobject(data.c);
+            actionConsole.log(
+                'flop dealt',
+                `suite: ${data.a.suite}`,
+                `value: ${data.a.value}`,
+                `suite: ${data.b.suite}`,
+                `value: ${data.b.value}`,
+                `suite: ${data.c.suite}`,
+                `value: ${data.c.value}`,
+                nullchar
+            );
 
             canvasView.clearAndResizeAll();
 
@@ -254,7 +270,9 @@ $(document).ready(() => {
 
         socket.on('table-state', (data) => {
             actionConsole.log(
-                `player seated in seat ${data.playerSeat} is in action`,
+                `table state`,
+                `table id: ${current.table.id}`,
+                `action on seat ${data.playerSeat}`,
                 nullchar
             );
 
