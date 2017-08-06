@@ -16,19 +16,17 @@ class HTMLLogger {
 
         for (const p in o) {
             if (o.hasOwnProperty(p)) {
+                // if (props.length) {
+
+                // }
                 props.push(`${p}: ${o[p]}`);
             }
         }
 
-        this.delimit(
-            `${o.constructor.name !== 'Object' ? o.constructor.name : '* * *'}`,
+        this.log(
+            `${o.constructor.name !== 'Object' ? o.constructor.name : 'data_object'}`,
             ...props
         );
-    };
-
-    delimit(...lines) {
-        this.log('*')
-        this.log(...lines);
     };
 
     toHtml(m) {

@@ -20,11 +20,27 @@ class Game {
         return this.bets.get(id) ? this.bets.get(id) : null;
     }
 
+    set theBigBlind(i) {
+        this.bigBlind = i;
+    }
+
+    set theSmallBlind(i) {
+        this.smallBlind = i;
+    }
+
     set theButton(i) {
         this.button = i;
     }
 
-    get onTheButton() {
+    get theBigBlind() {
+        return this.bigBlind;
+    }
+
+    get theSmallBlind() {
+        return this.smallBlind;
+    }
+
+    get theButton() {
         return this.button;
     }
 }
