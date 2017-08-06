@@ -1,6 +1,8 @@
 const tickrate = 1000 / 2;
 const startupt = 800;
 
+const nullchar = '\n';
+
 const current = {
     player: null, table: null, game: null, seat: null, balance: 0, bet: 0
 };
@@ -82,17 +84,17 @@ $(document).ready(() => {
             });
 
             actionConsole.log(
-                `==`,
                 'game started',
                 `id: ${data.gameId}`,
-                `==`,
-                `id: ${socket.id}`,
+                nullchar,
                 `name: ${current.player.name}`,
                 `seat: ${current.seat}`,
+                `id: ${socket.id}`,
+                nullchar,
                 `button index: ${current.table.buttonIndex}`,
                 `small blind index: ${current.table.sbIndex}`,
                 `big blind index: ${current.table.bbIndex}`,
-                `==`,
+                nullchar,
             );
         });
 
@@ -102,12 +104,11 @@ $(document).ready(() => {
             const blindbet = data.blindType === 'sb' ? data.blindBetSize * 0.5 : data.blindBetSize;
 
             actionConsole.log(
-                `==`,
                 `player: ${current.player.name} action is on you`,
                 `id: ${socket.id}`,
-                `==`,
+                nullchar,
                 `${loc}`,
-                `==`
+                nullchar
             );
 
             clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
@@ -126,13 +127,11 @@ $(document).ready(() => {
         });
 
         socket.on('collect-ante', (data) => {
-            {
-                actionConsole.log(
-                    `${current.player.name} action on you ...`, `... the last player did: ${data.actionType}`
-                );
-
-                actionConsole.logobject(data);
-            };
+            actionConsole.log(
+                `${current.player.name} post ante`,
+                `(last player action: ${data.actionType})`,
+                nullchar
+            );
 
             let min = data.minBetAmount;
 
@@ -213,7 +212,7 @@ $(document).ready(() => {
         });
 
         socket.on('flop-dealt', (data) => {
-            actionConsole.log('flop dealt');
+            actionConsole.log('flop dealt', );
 
             actionConsole.logobject(data.a);
             actionConsole.logobject(data.b);
@@ -231,21 +230,33 @@ $(document).ready(() => {
         });
 
         socket.on('game-state', (data) => {
-            actionConsole.log('current game state');
-
-            actionConsole.logobject(data.potsize);
-            actionConsole.logobject(data.actionOn);
-            actionConsole.logobject(data.actionOn.player);
-
-            current.table.tableView.registerActivePlayerSeatOutline(data.actionOn.seat);
+            actionConsole.log(
+                `game state`,
+                `turn id: -1`,
+                nullchar,
+                `player in action:`,
+                `name: ${data.actionOn.player.name}`,
+                `id: ${data.actionOn.player.id}`,
+                `seat: ${data.actionOn.seat}`,
+                nullchar,
+                `round info:`,
+                `type: ${data.round.type}`,
+                `circs: ${data.round.circulations}`,
+                `pot: ${data.potsize}`,
+                nullchar
+            );
 
             canvasView.clearAndResizeAll();
+
+            current.table.tableView.registerActivePlayerSeatOutline(data.actionOn.seat);
             current.table.redraw();
         });
 
         socket.on('table-state', (data) => {
-            actionConsole.log(`player seated in seat ${data.playerSeat} is in action`);
-            actionConsole.logobject(data);
+            actionConsole.log(
+                `player seated in seat ${data.playerSeat} is in action`,
+                nullchar
+            );
 
             const centerlabel = `pot size: ${data.potsize}`;
 
@@ -294,12 +305,9 @@ $(document).ready(() => {
     }
 
     actionConsole.log(
-        `==`,
         'lobby loaded',
-        `==`,
-        `==`,
-        'waiting for more players to start ...',
-        `==`,
+        'waiting for game start ...',
+        nullchar
     );
 
     $(window).on('resize', () => {

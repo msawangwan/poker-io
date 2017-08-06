@@ -16,9 +16,6 @@ class HTMLLogger {
 
         for (const p in o) {
             if (o.hasOwnProperty(p)) {
-                // if (props.length) {
-
-                // }
                 props.push(`${p}: ${o[p]}`);
             }
         }
@@ -30,9 +27,15 @@ class HTMLLogger {
     };
 
     toHtml(m) {
+        let t = `<small><b>|</b></small>`;
+
+        if (m !== '\n') {
+            t = `<small><b>[${this.timestamp.toLocaleString()}]</b> ${m}</small>`;
+        }
+
         this.output.insertAdjacentHTML(
             'beforeend',
-            `<small><b>[${this.timestamp.toLocaleString()}]</b> ${m}</small>`
+            `${t}`
         );
 
         this.$messageContainer.scrollTop(this.output.scrollHeight);

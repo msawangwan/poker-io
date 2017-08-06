@@ -217,6 +217,7 @@ body {
 
 #container-output {
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 #table-log-output {
