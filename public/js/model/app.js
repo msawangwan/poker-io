@@ -93,6 +93,20 @@ $(document).ready(() => {
             );
         });
 
+        // note: all the client has to do is render the data
+        // TODO left off here
+
+        socket.on('pass-action-to-player', (data) => {
+            actionConsole.log(
+                `action was passed to you`,
+                `${current.player.name}`,
+                `${data.round}`,
+                `${data.potsize}`,
+                `${data.minbet}`,
+                `${data.actions}`,
+                nullchar
+            );
+        });
 
         socket.on('collect-blind', (data) => {
             const loc = `post ${data.blindType === 'sb' ? 'small' : 'big'} blind`;
