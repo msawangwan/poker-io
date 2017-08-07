@@ -99,14 +99,24 @@ $(document).ready(() => {
         socket.on('pass-action-to-player', (data) => {
             actionConsole.log(
                 `action was passed to you`,
-                `${current.player.name}`,
-                `${data.round}`,
-                `${data.potsize}`,
-                `${data.minbet}`,
-                `${data.actions}`,
+                `id: ${socket.id}`,
+                `name: ${current.player.name}`,
+                `round: ${data.round}`,
+                `potsize: ${data.potsize}`,
+                `minbet: ${data.minbet}`,
+                `actions allowed: ${data.actions}`,
                 nullchar
             );
+
+            switch (data.round) {
+                case 'blind':
+                    break;
+            }
         });
+
+        const handleBlinds = () => {
+
+        };
 
         socket.on('collect-blind', (data) => {
             const loc = `post ${data.blindType === 'sb' ? 'small' : 'big'} blind`;
