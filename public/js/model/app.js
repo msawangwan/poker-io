@@ -164,7 +164,7 @@ $(document).ready(() => {
                         case 'call':
                             clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
                             break;
-                        case 'raise':
+                        case 'raise' || 'reraise':
                             clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
                             clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
                             break;
