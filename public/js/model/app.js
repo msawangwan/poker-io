@@ -113,7 +113,12 @@ $(document).ready(() => {
 
             switch (data.round) {
                 case 'blind':
-                    handleBlind(data.order, data.acted, data.minbet, data.actions);
+                    // handleBlind(data.order, data.acted, data.minbet, data.actions);
+                    const b = data.order === 0 ? 'sb' : 'bb';
+                    const bb = b === 'sb' ? data.minbet * 0.5 : data.minbet;
+                    if (!data.acted) {
+                        allowPlayerToPostBlind(b, bb, current.table.id, current.game.id);
+                    }
                     break;
                 case 'deal':
                     break;
@@ -122,17 +127,17 @@ $(document).ready(() => {
             }
         });
 
-        const handleBlind = (betOrder, hasActed, minBet, actionsAllowed) => {
-            if (!hasActed) {
-                if (betOrder === 0) {
-                    allowPlayerToPostBlind('sb', minbet * 0.5);
-                } else if (betOrder === 1) {
-                    allowPlayerToPostBlind('bb', minbet);
-                }
-            }
-        };
+        // const handleBlind = (betOrder, hasActed, minBet, actionsAllowed) => {
+        //     if (!hasActed) {
+        //         if (betOrder === 0) {
+        //             allowPlayerToPostBlind('sb', minBet * 0.5, current.table.id, current.table.game.id);
+        //         } else if (betOrder === 1) {
+        //             allowPlayerToPostBlind('bb', minBet, current.table.id, current.table.game.id);
+        //         }
+        //     }
+        // };
 
-        const allowPlayerToPostBlind = (type, blindbet) => {
+        const allowPlayerToPostBlind = (type, blindbet, tableid, gameid) => {
             const loc = `post ${type === 'sb' ? 'small' : 'big'} blind`;
             const order = type === 'sb' ? 0 : 1;
 
@@ -145,8 +150,8 @@ $(document).ready(() => {
                     actionType: 'bet',
                     betOrder: order,
                     betAmount: blindbet,
-                    tableid: current.table.id,
-                    gameid: current.table.game.id
+                    tableid: tableid,
+                    gameid: gameid
                 });
 
                 clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
