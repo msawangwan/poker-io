@@ -101,7 +101,10 @@ $(document).ready(() => {
                 `action was passed to you`,
                 `id: ${socket.id}`,
                 `name: ${current.player.name}`,
-                `round: ${data.round}`,
+                `seat: ${data.seat}`,
+                `has acted: ${data.acted}`,
+                `bet order: ${data.order}`,
+                `betting round: ${data.round}`,
                 `potsize: ${data.potsize}`,
                 `minbet: ${data.minbet}`,
                 `actions allowed: ${data.actions}`,
@@ -110,12 +113,44 @@ $(document).ready(() => {
 
             switch (data.round) {
                 case 'blind':
+                    handleBlind(data.order, data.acted, data.minbet, data.actions);
+                    break;
+                case 'deal':
+                    break;
+                default:
                     break;
             }
         });
 
-        const handleBlinds = () => {
+        const handleBlind = (betOrder, hasActed, minBet, actionsAllowed) => {
+            if (!hasActed) {
+                if (betOrder === 0) {
+                    allowPlayerToPostBlind('sb', minbet * 0.5);
+                } else if (betOrder === 1) {
+                    allowPlayerToPostBlind('bb', minbet);
+                }
+            }
+        };
 
+        const allowPlayerToPostBlind = (type, blindbet) => {
+            const loc = `post ${type === 'sb' ? 'small' : 'big'} blind`;
+            const order = type === 'sb' ? 0 : 1;
+
+            clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+            clientController.$btnsendblind.val(`${loc}`);
+
+            clientController.$btnsendblind.on('click', () => {
+                socket.emit('player-completed-action', {
+                    round: 'blind',
+                    actionType: 'bet',
+                    betOrder: order,
+                    betAmount: blindbet,
+                    tableid: current.table.id,
+                    gameid: current.table.game.id
+                });
+
+                clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+            });
         };
 
         socket.on('collect-blind', (data) => {
