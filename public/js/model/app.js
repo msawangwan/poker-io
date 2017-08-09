@@ -50,7 +50,6 @@ $(document).ready(() => {
 
         socket.on('a-player-has-joined', (data) => {
             current.table.seatOpponents(data.table.seatingState, socket.id);
-
             canvasView.clearAndResizeAll();
         });
 
@@ -81,11 +80,11 @@ $(document).ready(() => {
             actionConsole.log(
                 'game started',
                 `id: ${data.gameId}`,
-                nullchar,
+                // nullchar,
                 `name: ${current.player.name}`,
                 `seat: ${current.seat}`,
                 `id: ${socket.id}`,
-                nullchar,
+                // nullchar,
                 `button index: ${current.table.buttonIndex}`,
                 `small blind index: ${current.table.sbIndex}`,
                 `big blind index: ${current.table.bbIndex}`,
@@ -153,7 +152,7 @@ $(document).ready(() => {
             actionConsole.log(
                 `${current.player.name} action is on you`,
                 `${socket.id}`,
-                nullchar,
+                // nullchar,
                 `${loc}`,
                 nullchar
             );
@@ -299,17 +298,16 @@ $(document).ready(() => {
 
         socket.on('game-state', (data) => {
             actionConsole.log(
-                `game state`,
+                `*game state*`,
                 `turn id: -1`,
-                nullchar,
-                `player in action:`,
+                `*player in action*`,
                 `name: ${data.actionOn.player.name}`,
                 `id: ${data.actionOn.player.id}`,
                 `seat: ${data.actionOn.seat}`,
-                nullchar,
-                `hand info:`,
+                `*hand info*`,
                 `phase: ${data.hand.phase}`,
                 `round: ${data.hand.round}`,
+                `anchor position: ${data.hand.anchor}`,
                 `pot: ${data.potsize}`,
                 nullchar
             );
