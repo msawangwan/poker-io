@@ -93,9 +93,6 @@ $(document).ready(() => {
             );
         });
 
-        // note: all the client has to do is render the data
-        // TODO left off here
-
         socket.on('pass-action-to-player', (data) => {
             actionConsole.log(
                 `action was passed to you`,
@@ -113,12 +110,13 @@ $(document).ready(() => {
 
             switch (data.round) {
                 case 'blind':
-                    // handleBlind(data.order, data.acted, data.minbet, data.actions);
                     const b = data.order === 0 ? 'sb' : 'bb';
                     const bb = b === 'sb' ? data.minbet * 0.5 : data.minbet;
+
                     if (!data.acted) {
                         allowPlayerToPostBlind(b, bb, current.table.id, current.game.id);
                     }
+
                     break;
                 case 'deal':
                     break;
@@ -126,16 +124,6 @@ $(document).ready(() => {
                     break;
             }
         });
-
-        // const handleBlind = (betOrder, hasActed, minBet, actionsAllowed) => {
-        //     if (!hasActed) {
-        //         if (betOrder === 0) {
-        //             allowPlayerToPostBlind('sb', minBet * 0.5, current.table.id, current.table.game.id);
-        //         } else if (betOrder === 1) {
-        //             allowPlayerToPostBlind('bb', minBet, current.table.id, current.table.game.id);
-        //         }
-        //     }
-        // };
 
         const allowPlayerToPostBlind = (type, blindbet, tableid, gameid) => {
             const loc = `post ${type === 'sb' ? 'small' : 'big'} blind`;
@@ -319,9 +307,9 @@ $(document).ready(() => {
                 `id: ${data.actionOn.player.id}`,
                 `seat: ${data.actionOn.seat}`,
                 nullchar,
-                `round info:`,
-                `type: ${data.round.type}`,
-                `circs: ${data.round.circulations}`,
+                `hand info:`,
+                `phase: ${data.hand.phase}`,
+                `round: ${data.hand.round}`,
                 `pot: ${data.potsize}`,
                 nullchar
             );
