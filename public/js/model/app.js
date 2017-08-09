@@ -270,7 +270,12 @@ $(document).ready(() => {
             );
 
             current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
-            canvasView.clearAndResizeAll();
+            // canvasView.clearAndResizeAll();
+
+            socket.emit('poll-game-state', {
+                tableid: current.table.id,
+                gameid: current.game.id
+            });
         });
 
         socket.on('flop-dealt', (data) => {
