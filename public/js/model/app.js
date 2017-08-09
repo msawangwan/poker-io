@@ -27,6 +27,27 @@ $(document).ready(() => {
         clientController.$btnsendraise.val(`raise ${current.bet}`);
     });
 
+    const allowPlayerToPostBlind = (type, blindbet, tableid, gameid) => {
+        const loc = `post ${type === 'sb' ? 'small' : 'big'} blind`;
+        const order = type === 'sb' ? 0 : 1;
+
+        clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+        clientController.$btnsendblind.val(`${loc}`);
+
+        clientController.$btnsendblind.on('click', () => {
+            socket.emit('player-completed-action', {
+                round: 'blind',
+                actionType: 'bet',
+                betOrder: order,
+                betAmount: blindbet,
+                tableid: tableid,
+                gameid: gameid
+            });
+
+            clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+        });
+    };
+
     {
         socket.on('connect', (data) => {
             current.table = new Table(9, canvasView);
@@ -124,141 +145,6 @@ $(document).ready(() => {
             }
         });
 
-        const allowPlayerToPostBlind = (type, blindbet, tableid, gameid) => {
-            const loc = `post ${type === 'sb' ? 'small' : 'big'} blind`;
-            const order = type === 'sb' ? 0 : 1;
-
-            clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
-            clientController.$btnsendblind.val(`${loc}`);
-
-            clientController.$btnsendblind.on('click', () => {
-                socket.emit('player-completed-action', {
-                    round: 'blind',
-                    actionType: 'bet',
-                    betOrder: order,
-                    betAmount: blindbet,
-                    tableid: tableid,
-                    gameid: gameid
-                });
-
-                clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
-            });
-        };
-
-        socket.on('collect-blind', (data) => {
-            const loc = `post ${data.blindType === 'sb' ? 'small' : 'big'} blind`;
-            const blindbet = data.blindType === 'sb' ? data.blindBetSize * 0.5 : data.blindBetSize;
-
-            actionConsole.log(
-                `${current.player.name} action is on you`,
-                `${socket.id}`,
-                // nullchar,
-                `${loc}`,
-                nullchar
-            );
-
-            clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
-            clientController.$btnsendblind.val(`${loc}`);
-
-            clientController.$btnsendblind.on('click', () => {
-                socket.emit('post-blind', {
-                    blindType: data.blindType,
-                    betAmount: blindbet,
-                    tableid: current.table.id,
-                    gameid: current.table.game.id
-                });
-
-                clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
-            });
-        });
-
-        socket.on('collect-ante', (data) => {
-            actionConsole.log(
-                `${current.player.name} post ante`,
-                nullchar
-            );
-
-            let min = data.minBetAmount;
-
-            const previousBets = current.game.getPlayerBets(socket.id);
-
-            if (previousBets) {
-                const lastBet = previousBets[previousBets.length - 1];
-
-                actionConsole.log(`last bet was ${lastBet}`);
-
-                min = Math.abs(lastBet - data.minBetAmount);
-            }
-
-            actionConsole.log(`min bet allowed is ${min}`);
-
-            current.bet = min;
-
-            let action = (type, amount) => {
-                socket.emit('post-ante', {
-                    betType: type,
-                    betAmount: amount,
-                    tableid: current.table.id,
-                    gameid: current.table.game.id
-                });
-
-                current.bet = 0;
-            };
-
-            const toggleAvailableActions = (allowed) => {
-                actionConsole.log('toggling allowed actions:');
-
-                for (const a of allowed) {
-                    actionConsole.log(`${a}`);
-
-                    switch (a) {
-                        case 'call':
-                            clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
-                            break;
-                        case 'raise' || 'reraise':
-                            clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
-                            clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
-                            break;
-                        case 'check':
-                            clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
-                            break;
-                        case 'fold':
-                            clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                actionConsole.log(nullchar);
-            };
-
-            toggleAvailableActions(data.allowedActions);
-
-            clientController.$btnsendcheck.on('click', () => {
-                toggleAvailableActions(data.allowedActions);
-                action('check', 0);
-            });
-
-            clientController.$btnsendcall.val(`call ${min}`);
-            clientController.$btnsendcall.on('click', () => {
-                toggleAvailableActions(data.allowedActions);
-                action('call', current.bet);
-            });
-
-            clientController.$btnsendraise.val(`raise ${data.minBetAmount}`);
-            clientController.$btnsendraise.on('click', () => {
-                toggleAvailableActions(data.allowedActions);
-                action('raise', current.bet);
-            });
-
-            clientController.$btnsendfold.on('click', () => {
-                toggleAvailableActions(data.allowedActions);
-                action('fold', 0);
-            });
-
-        });
-
         socket.on('player-dealt-cards', (data) => {
             actionConsole.log(
                 'player dealt hole cards:',
@@ -270,7 +156,6 @@ $(document).ready(() => {
             );
 
             current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
-            // canvasView.clearAndResizeAll();
 
             socket.emit('poll-game-state', {
                 tableid: current.table.id,
@@ -323,46 +208,160 @@ $(document).ready(() => {
             current.table.redraw();
         });
 
-        socket.on('table-state', (data) => {
-            actionConsole.log(
-                `table state`,
-                `table id: ${current.table.id}`,
-                `action on seat ${data.playerSeat}`,
-                nullchar
-            );
+        // socket.on('collect-blind', (data) => {
+        //     const loc = `post ${data.blindType === 'sb' ? 'small' : 'big'} blind`;
+        //     const blindbet = data.blindType === 'sb' ? data.blindBetSize * 0.5 : data.blindBetSize;
 
-            const centerlabel = `pot size: ${data.potsize}`;
+        //     actionConsole.log(
+        //         `${current.player.name} action is on you`,
+        //         `${socket.id}`,
+        //         // nullchar,
+        //         `${loc}`,
+        //         nullchar
+        //     );
 
-            current.table.tableView.registerTableCenterLabelDrawHandler(centerlabel);
-            current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
+        //     clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+        //     clientController.$btnsendblind.val(`${loc}`);
 
-            if (data.betAmount > 0) {
-                current.game.playerPlacedBet(data.playerId, data.betAmount);
+        //     clientController.$btnsendblind.on('click', () => {
+        //         socket.emit('post-blind', {
+        //             blindType: data.blindType,
+        //             betAmount: blindbet,
+        //             tableid: current.table.id,
+        //             gameid: current.table.game.id
+        //         });
 
-                const bets = current.game.getPlayerBets(data.playerId);
+        //         clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+        //     });
+        // });
 
-                actionConsole.log('bets:');
-                actionConsole.logobject(bets);
+        // socket.on('collect-ante', (data) => {
+        //     actionConsole.log(
+        //         `${current.player.name} post ante`,
+        //         nullchar
+        //     );
 
-                if (data.clearTable) {
-                    setTimeout(() => {
-                        canvasView.clearCanvas('chip-canvas');
-                        current.table.tableView.clearHandlers('chip');
-                        current.table.tableView.clearHandler('card', 'seat-active-player-outline');
-                    }, 1500);
-                } else {
-                    current.table.tableView.registerChipDrawHandler(data.playerSeat, bets);
-                }
-            }
+        //     let min = data.minBetAmount;
 
-            socket.emit('poll-game-state', {
-                tableid: current.table.id,
-                gameid: current.game.id
-            });
+        //     const previousBets = current.game.getPlayerBets(socket.id);
 
-            canvasView.clearAndResizeAll();
-            current.table.redraw();
-        });
+        //     if (previousBets) {
+        //         const lastBet = previousBets[previousBets.length - 1];
+
+        //         actionConsole.log(`last bet was ${lastBet}`);
+
+        //         min = Math.abs(lastBet - data.minBetAmount);
+        //     }
+
+        //     actionConsole.log(`min bet allowed is ${min}`);
+
+        //     current.bet = min;
+
+        //     let action = (type, amount) => {
+        //         socket.emit('post-ante', {
+        //             betType: type,
+        //             betAmount: amount,
+        //             tableid: current.table.id,
+        //             gameid: current.table.game.id
+        //         });
+
+        //         current.bet = 0;
+        //     };
+
+        //     const toggleAvailableActions = (allowed) => {
+        //         actionConsole.log('toggling allowed actions:');
+
+        //         for (const a of allowed) {
+        //             actionConsole.log(`${a}`);
+
+        //             switch (a) {
+        //                 case 'call':
+        //                     clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+        //                     break;
+        //                 case 'raise' || 'reraise':
+        //                     clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
+        //                     clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+        //                     break;
+        //                 case 'check':
+        //                     clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
+        //                     break;
+        //                 case 'fold':
+        //                     clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+        //                     break;
+        //                 default:
+        //                     break;
+        //             }
+        //         }
+
+        //         actionConsole.log(nullchar);
+        //     };
+
+        //     toggleAvailableActions(data.allowedActions);
+
+        //     clientController.$btnsendcheck.on('click', () => {
+        //         toggleAvailableActions(data.allowedActions);
+        //         action('check', 0);
+        //     });
+
+        //     clientController.$btnsendcall.val(`call ${min}`);
+        //     clientController.$btnsendcall.on('click', () => {
+        //         toggleAvailableActions(data.allowedActions);
+        //         action('call', current.bet);
+        //     });
+
+        //     clientController.$btnsendraise.val(`raise ${data.minBetAmount}`);
+        //     clientController.$btnsendraise.on('click', () => {
+        //         toggleAvailableActions(data.allowedActions);
+        //         action('raise', current.bet);
+        //     });
+
+        //     clientController.$btnsendfold.on('click', () => {
+        //         toggleAvailableActions(data.allowedActions);
+        //         action('fold', 0);
+        //     });
+
+        // });
+
+        // socket.on('table-state', (data) => {
+        //     actionConsole.log(
+        //         `table state`,
+        //         `table id: ${current.table.id}`,
+        //         `action on seat ${data.playerSeat}`,
+        //         nullchar
+        //     );
+
+        //     const centerlabel = `pot size: ${data.potsize}`;
+
+        //     current.table.tableView.registerTableCenterLabelDrawHandler(centerlabel);
+        //     current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
+
+        //     if (data.betAmount > 0) {
+        //         current.game.playerPlacedBet(data.playerId, data.betAmount);
+
+        //         const bets = current.game.getPlayerBets(data.playerId);
+
+        //         actionConsole.log('bets:');
+        //         actionConsole.logobject(bets);
+
+        //         if (data.clearTable) {
+        //             setTimeout(() => {
+        //                 canvasView.clearCanvas('chip-canvas');
+        //                 current.table.tableView.clearHandlers('chip');
+        //                 current.table.tableView.clearHandler('card', 'seat-active-player-outline');
+        //             }, 1500);
+        //         } else {
+        //             current.table.tableView.registerChipDrawHandler(data.playerSeat, bets);
+        //         }
+        //     }
+
+        //     socket.emit('poll-game-state', {
+        //         tableid: current.table.id,
+        //         gameid: current.game.id
+        //     });
+
+        //     canvasView.clearAndResizeAll();
+        //     current.table.redraw();
+        // });
     }
 
     let renderLoop = null;
