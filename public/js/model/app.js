@@ -27,77 +27,108 @@ $(document).ready(() => {
         clientController.$btnsendraise.val(`raise ${current.bet}`);
     });
 
+    const parseBetAmountFromText = (t) => {
+        return parseFloat(t.split(' ')[1]);
+    };
+
+    const toggleAvailableActions = (allowed) => {
+        for (const a of allowed) {
+            switch (a) {
+                case 'postblind':
+                    clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'bet':
+                    clientController.$btnsendbet.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'call':
+                    clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'raise' || 'reraise':
+                    clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
+                    clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'check':
+                    clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'fold':
+                    clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    const sendActionToServer = (round, type, orderindex, amount, tid, gid) => {
+        actionConsole.log(
+            `*action completed:*`,
+            `current round ${round}`,
+            `action type ${type}`,
+            `bet amount ${amount}`,
+            nullchar
+        );
+
+        // todo: notify other players about this
+
+        socket.emit('player-completed-action', {
+            round: round,
+            actionType: type,
+            betOrder: orderindex,
+            betAmount: amount,
+            tableid: tid,
+            gameid: gid
+        });
+    };
+
     const enablePostBlindUI = (type, blindbet, tableid, gameid) => {
         const loc = `post ${type === 'sb' ? 'small' : 'big'} blind`;
         const order = type === 'sb' ? 0 : 1;
 
-        clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+        toggleAvailableActions(['postblind']);
+
         clientController.$btnsendblind.val(`${loc}`);
-
         clientController.$btnsendblind.on('click', () => {
-            socket.emit('player-completed-action', {
-                round: 'blind',
-                actionType: 'bet',
-                betOrder: order,
-                betAmount: blindbet,
-                tableid: tableid,
-                gameid: gameid
-            });
-
-            clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+            toggleAvailableActions(['postblind']);
+            sendActionToServer('blind', 'bet', order, blindbet, tableid, gameid);
         });
     };
 
-    const enablePostBetUI = (allowedactions, minbet, tableid, gameid) => {
-        const toggleAvailableActions = (allowed) => {
-            actionConsole.log('toggling allowed actions:');
-
-            for (const a of allowed) {
-                actionConsole.log(`${a}`);
-
-                switch (a) {
-                    case 'bet':
-                        clientController.$btnsendbet.toggle(clientController.ids.hidebtn);
-                        break;
-                    case 'call':
-                        clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
-                        break;
-                    case 'raise' || 'reraise':
-                        clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
-                        clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
-                        break;
-                    case 'check':
-                        clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
-                        break;
-                    case 'fold':
-                        clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            actionConsole.log(nullchar);
-        };
-
+    const enablePostBetUI = (round, order, allowedactions, minbet, tableid, gameid) => {
         toggleAvailableActions(allowedactions);
 
-        clientController.$btnsendcheck.on('click', () => {
+        let bet = minbet;
+
+        clientController.$btnsendbet.val(`bet ${minbet}`);
+        clientController.$btnsendbet.on('click', () => {
+            bet = parseBetAmountFromText(clientController.$btnsendbet.val());
             toggleAvailableActions(allowedactions);
+            sendActionToServer(round, 'bet', order, bet, tableid, gameid);
+        });
+
+        clientController.$btnsendcheck.on('click', () => {
+            bet = 0;
+            toggleAvailableActions(allowedactions);
+            sendActionToServer(round, 'check', order, bet, tableid, gameid);
         });
 
         clientController.$btnsendcall.val(`call ${minbet}`);
         clientController.$btnsendcall.on('click', () => {
+            bet = minbet;
             toggleAvailableActions(allowedactions);
+            sendActionToServer(round, 'call', order, bet, tableid, gameid);
         });
 
         clientController.$btnsendraise.val(`raise ${minbet}`);
         clientController.$btnsendraise.on('click', () => {
+            bet = parseBetAmountFromText(clientController.$btnsendraise.val());
             toggleAvailableActions(allowedactions);
+            sendActionToServer(round, 'raise', order, bet, tableid, gameid);
         });
 
         clientController.$btnsendfold.on('click', () => {
+            bet = 0;
             toggleAvailableActions(allowedactions);
+            sendActionToServer(round, 'fold', order, bet, tableid, gameid);
         });
     };
 
@@ -154,11 +185,9 @@ $(document).ready(() => {
             actionConsole.log(
                 'game started',
                 `id: ${data.gameId}`,
-                // nullchar,
                 `name: ${current.player.name}`,
                 `seat: ${current.seat}`,
                 `id: ${socket.id}`,
-                // nullchar,
                 `button index: ${current.table.buttonIndex}`,
                 `small blind index: ${current.table.sbIndex}`,
                 `big blind index: ${current.table.bbIndex}`,
@@ -187,13 +216,25 @@ $(document).ready(() => {
                     const bb = b === 'sb' ? data.minbet * 0.5 : data.minbet;
 
                     if (!data.acted) {
-                        enablePostBlindUI(b, bb, current.table.id, current.game.id);
+                        enablePostBlindUI(
+                            b,
+                            bb,
+                            current.table.id,
+                            current.game.id
+                        );
                     }
 
                     break;
                 case 'deal':
                     if (!data.acted) {
-                        enablePostBetUI(data.actions, data.minbet, current.table.id, current.game.id);
+                        enablePostBetUI(
+                            data.round,
+                            data.order,
+                            data.actions,
+                            data.minbet,
+                            current.table.id,
+                            current.game.id
+                        );
                     }
 
                     break;
@@ -254,7 +295,7 @@ $(document).ready(() => {
                 `*hand info*`,
                 `phase: ${data.hand.phase}`,
                 `round: ${data.hand.round}`,
-                `anchor position: ${data.hand.anchor}`,
+                `anchor id: ${data.hand.anchor}`,
                 `pot: ${data.potsize}`,
                 nullchar
             );
