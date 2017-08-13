@@ -227,15 +227,17 @@ $(document).ready(() => {
                     break;
                 case 'deal':
                     if (!data.acted) {
-                        enablePostBetUI(
-                            data.round,
-                            data.order,
-                            data.actions,
-                            data.minbet,
-                            current.table.id,
-                            current.game.id
-                        );
+                        actionConsole.log(`this is your second action!`, nullchar);
                     }
+
+                    enablePostBetUI(
+                        data.round,
+                        data.order,
+                        data.actions,
+                        data.minbet,
+                        current.table.id,
+                        current.game.id
+                    );
 
                     break;
                 default:
