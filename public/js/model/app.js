@@ -93,7 +93,7 @@ $(document).ready(() => {
         });
     };
 
-    const enablePostBetUI = (round, order, allowedactions, minbet, tableid, gameid) => {
+    const enablePostBetUI = (round, order, allowedactions, minbet, blindbet, tableid, gameid) => {
         toggleAvailableActions(allowedactions);
 
         let bet = minbet;
@@ -105,6 +105,7 @@ $(document).ready(() => {
             sendActionToServer(round, 'bet', order, bet, tableid, gameid);
         });
 
+        clientController.$btnsendcheck.val('check');
         clientController.$btnsendcheck.on('click', () => {
             bet = 0;
             toggleAvailableActions(allowedactions);
@@ -118,7 +119,7 @@ $(document).ready(() => {
             sendActionToServer(round, 'call', order, bet, tableid, gameid);
         });
 
-        clientController.$btnsendraise.val(`raise ${minbet}`);
+        clientController.$btnsendraise.val(`raise ${minbet ? minbet : blindbet}`);
         clientController.$btnsendraise.on('click', () => {
             bet = parseBetAmountFromText(clientController.$btnsendraise.val());
             toggleAvailableActions(allowedactions);
@@ -235,6 +236,19 @@ $(document).ready(() => {
                         data.order,
                         data.actions,
                         data.minbet,
+                        10, // todo: get from server
+                        current.table.id,
+                        current.game.id
+                    );
+
+                    break;
+                case 'flop':
+                    enablePostBetUI(
+                        data.round,
+                        data.order,
+                        data.acttions,
+                        data.minbet,
+                        10, // todo: get from server
                         current.table.id,
                         current.game.id
                     );
@@ -295,7 +309,7 @@ $(document).ready(() => {
                 `id: ${data.actionOn.player.id}`,
                 `seat: ${data.actionOn.seat}`,
                 `*hand info*`,
-                `phase: ${data.hand.phase}`,
+                `phase: ${data.hand.phase}`, // TODO FIX
                 `round: ${data.hand.round}`,
                 `anchor id: ${data.hand.anchor}`,
                 `pot: ${data.potsize}`,
@@ -307,47 +321,6 @@ $(document).ready(() => {
             current.table.tableView.registerActivePlayerSeatOutline(data.actionOn.seat);
             current.table.redraw();
         });
-
-        // socket.on('table-state', (data) => {
-        //     actionConsole.log(
-        //         `table state`,
-        //         `table id: ${current.table.id}`,
-        //         `action on seat ${data.playerSeat}`,
-        //         nullchar
-        //     );
-
-        //     const centerlabel = `pot size: ${data.potsize}`;
-
-        //     current.table.tableView.registerTableCenterLabelDrawHandler(centerlabel);
-        //     current.table.seats.get(data.playerSeat).player.balance = data.updatedBalance;
-
-        //     if (data.betAmount > 0) {
-        //         current.game.playerPlacedBet(data.playerId, data.betAmount);
-
-        //         const bets = current.game.getPlayerBets(data.playerId);
-
-        //         actionConsole.log('bets:');
-        //         actionConsole.logobject(bets);
-
-        //         if (data.clearTable) {
-        //             setTimeout(() => {
-        //                 canvasView.clearCanvas('chip-canvas');
-        //                 current.table.tableView.clearHandlers('chip');
-        //                 current.table.tableView.clearHandler('card', 'seat-active-player-outline');
-        //             }, 1500);
-        //         } else {
-        //             current.table.tableView.registerChipDrawHandler(data.playerSeat, bets);
-        //         }
-        //     }
-
-        //     socket.emit('poll-game-state', {
-        //         tableid: current.table.id,
-        //         gameid: current.game.id
-        //     });
-
-        //     canvasView.clearAndResizeAll();
-        //     current.table.redraw();
-        // });
     }
 
     let renderLoop = null;
