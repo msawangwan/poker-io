@@ -309,8 +309,8 @@ $(document).ready(() => {
                 `id: ${data.actionOn.player.id}`,
                 `seat: ${data.actionOn.seat}`,
                 `*hand info*`,
-                `phase: ${data.hand.phase}`, // TODO FIX
                 `round: ${data.hand.round}`,
+                `betting round count: ${data.hand.roundsbet}`,
                 `anchor id: ${data.hand.anchor}`,
                 `pot: ${data.potsize}`,
                 nullchar
