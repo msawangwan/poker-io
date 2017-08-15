@@ -89,7 +89,7 @@ $(document).ready(() => {
         clientController.$btnsendblind.val(`${loc}`);
         clientController.$btnsendblind.on('click', () => {
             toggleAvailableActions(['postblind']);
-            sendActionToServer('blind', 'bet', order, blindbet, tableid, gameid);
+            sendActionToServer('blind', 'check', order, blindbet, tableid, gameid);
         });
     };
 
