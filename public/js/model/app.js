@@ -60,13 +60,13 @@ $(document).ready(() => {
     };
 
     const sendActionToServer = (round, type, orderindex, amount, tid, gid) => {
-        actionConsole.log(
-            `*action completed:*`,
-            `current round ${round}`,
-            `action type ${type}`,
-            `bet amount ${amount}`,
-            nullchar
-        );
+        // actionConsole.log(
+        //     `*action completed:*`,
+        //     `current round ${round}`,
+        //     `action type ${type}`,
+        //     `bet amount ${amount}`,
+        //     nullchar
+        // );
 
         // todo: notify other players about this
 
@@ -85,6 +85,8 @@ $(document).ready(() => {
         const order = type === 'sb' ? 0 : 1;
 
         toggleAvailableActions(['postblind']);
+
+        actionConsole.log(`posting blind! amount: ${blindbet}`);
 
         clientController.$btnsendblind.val(`${loc}`);
         clientController.$btnsendblind.on('click', () => {
@@ -214,7 +216,8 @@ $(document).ready(() => {
             switch (data.round) {
                 case 'blind':
                     const b = data.order === 0 ? 'sb' : 'bb';
-                    const bb = b === 'sb' ? data.minbet * 0.5 : data.minbet;
+                    // const bb = b === 'sb' ? data.minbet * 0.5 : data.minbet;
+                    const bb = data.minbet;
 
                     if (!data.acted) {
                         enablePostBlindUI(
