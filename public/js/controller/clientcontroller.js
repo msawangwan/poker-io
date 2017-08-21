@@ -19,7 +19,7 @@ class ClientController {
         this.$formbetrangeslider = $('#form-betting-slider');
 
         this.ids = {
-            hidebtn: '.hide-button'
+            inactive: 'inactive'
         };
 
         this.callbackHandlers = new Map([
@@ -41,11 +41,21 @@ class ClientController {
 
     hideAllButtons(hideform) {
         for (const $b of this.$allbtns) {
-            $b.toggle(this.ids.hidebtn);
+            this.setActive($b);
         }
 
         if (hideform) {
-            this.$formbetrangeslider.toggle(this.ids.hidebtn);
+            this.setActive(this.$formbetrangeslider);
+        }
+    }
+
+    setActive($b) {
+        const id = this.ids.inactive;
+
+        if ($b.hasClass(id)) {
+            $b.removeClass(id);
+        } else {
+            $b.addClass(id);
         }
     }
 }

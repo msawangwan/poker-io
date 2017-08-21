@@ -1,3 +1,10 @@
+const mns = { app: {} };
+
+mns.app.round = (n, precision) => {
+    const factor = Math.pow(10, precision);
+    return Math.round(n * factor) / factor;
+};
+
 const tickrate = 1000 / 2;
 const startupt = 800;
 
@@ -22,6 +29,7 @@ $(document).ready(() => {
 
     clientController.callbackHandlers.get('bet-range-slider').set('update-button-txt', val => {
         current.bet = current.player.balance * (val * 0.01);
+        current.bet = mns.app.round(current.bet, 2);
 
         clientController.$btnsendbet.val(`bet ${current.bet}`);
         clientController.$btnsendraise.val(`raise ${current.bet}`);
@@ -44,23 +52,23 @@ $(document).ready(() => {
         for (const a of actions) {
             switch (a) {
                 case 'blind':
-                    clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+                    clientController.setActive(clientController.$btnsendblind);
                     break;
                 case 'bet':
-                    clientController.$btnsendbet.toggle(clientController.ids.hidebtn);
+                    clientController.setActive(clientController.$btnsendbet);
                     break;
                 case 'call':
-                    clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                    clientController.setActive(clientController.$btnsendcall);
                     break;
                 case 'raise' || 'reraise':
-                    clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
-                    clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+                    clientController.setActive(clientController.$btnsendraise);
+                    clientController.setActive(clientController.$formbetrangeslider);
                     break;
                 case 'check':
-                    clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
+                    clientController.setActive(clientController.$btnsendcheck);
                     break;
                 case 'fold':
-                    clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+                    clientController.setActive(clientController.$btnsendfold);
                     break;
                 default:
                     break;
@@ -129,13 +137,16 @@ $(document).ready(() => {
             const actions = data.turn.actions;
             const minbet = data.turn.owes;
             const orderIndex = data.turn.index;
+            const turnid = data.game.turnId;
             const tableid = current.table.id;
             const gameid = current.game.id;
 
             actionConsole.log(
                 `${current.player.name}'s turn`,
+                `turn id: ${turnid}`,
                 `bet order index: ${orderIndex}`,
                 `available actions ${actions}`,
+                `match amount: ${minbet}`,
                 nullchar
             );
 
@@ -150,43 +161,74 @@ $(document).ready(() => {
             let bet = minbet;
 
             clientController.$btnsendblind.val(`${loc}`);
-            clientController.$btnsendblind.on('click', () => {
+            clientController.$btnsendblind.on('click', (e) => {
                 toggleUi(actions);
                 completeTurn('check', bet);
+
+                return false;
             });
 
             clientController.$btnsendbet.val(`bet ${minbet}`);
-            clientController.$btnsendbet.on('click', () => {
+            clientController.$btnsendbet.on('click', (e) => {
                 bet = parseBetAmountFromText(clientController.$btnsendbet.val());
                 toggleUi(actions);
                 completeTurn('bet', bet);
+
+                return false;
             });
 
             clientController.$btnsendcheck.val('check');
-            clientController.$btnsendcheck.on('click', () => {
+            clientController.$btnsendcheck.on('click', (e) => {
                 bet = 0;
                 toggleUi(actions);
                 completeTurn('check', bet);
+
+                return false;
             });
 
             clientController.$btnsendcall.val(`call ${minbet}`);
-            clientController.$btnsendcall.on('click', () => {
+            clientController.$btnsendcall.on('click', (e) => {
+                bet = parseBetAmountFromText(clientController.$btnsendcall.val());
                 toggleUi(actions);
                 completeTurn('call', bet);
+
+                return false;
             });
 
             clientController.$btnsendraise.val(`raise ${minbet * 2}`);
-            clientController.$btnsendraise.on('click', () => {
+            clientController.$btnsendraise.on('click', (e) => {
                 bet = parseBetAmountFromText(clientController.$btnsendraise.val());
                 toggleUi(actions);
                 completeTurn('raise', bet);
+
+                return false;
             });
 
-            clientController.$btnsendfold.on('click', () => {
+            clientController.$btnsendfold.on('click', (e) => {
                 bet = 0;
                 toggleUi(actions);
                 completeTurn('fold', bet);
+
+                return false;
             });
+        });
+
+        socket.on('state', (data) => {
+            actionConsole.log(
+                `game state`,
+                `turn id: ${data.game.turnId}`,
+                `round: ${data.game.state}`,
+                `pot total: ${data.pot.size}`,
+                `pot current: ${data.pot.current}`,
+                `acting: ${data.player.acting.id}`,
+                `acting seat: ${data.player.acting.order}`,
+                nullchar
+            );
+
+            canvasView.clearAndResizeAll();
+
+            current.table.tableView.registerActivePlayerSeatOutline(data.player.acting.order);
+            current.table.redraw();
         });
 
         socket.on('player-dealt-cards', (data) => {
@@ -218,21 +260,6 @@ $(document).ready(() => {
 
             current.table.tableView.registerActivePlayerSeatOutline(data.utg);
             current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
-        });
-
-        socket.on('state', (data) => {
-            actionConsole.log(
-                `game state`,
-                `round: ${data.game.state}`,
-                `pot total: ${data.pot.size}`,
-                `pot current: ${data.pot.current}`,
-                nullchar
-            );
-
-            canvasView.clearAndResizeAll();
-
-            current.table.tableView.registerActivePlayerSeatOutline(data.player.acting.order);
-            current.table.redraw();
         });
     }
 

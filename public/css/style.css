@@ -211,8 +211,8 @@ body {
     width: 75px;
 } */
 
-.hide-button {
-    display: hidden;
+.inactive {
+    display: none;
 }
 
 #container-output {
@@ -223,7 +223,6 @@ body {
 #table-log-output {
     display: flex;
     flex-direction: column;
-    /* font-weight: bold; */
     color: black;
     height: 100%;
 }
