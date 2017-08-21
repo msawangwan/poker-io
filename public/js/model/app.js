@@ -59,17 +59,35 @@ $(document).ready(() => {
         }
     };
 
+    const toggleUi = (actions) => {
+        for (const a of actions) {
+            switch (a) {
+                case 'blind':
+                    clientController.$btnsendblind.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'bet':
+                    clientController.$btnsendbet.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'call':
+                    clientController.$btnsendcall.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'raise' || 'reraise':
+                    clientController.$btnsendraise.toggle(clientController.ids.hidebtn);
+                    clientController.$formbetrangeslider.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'check':
+                    clientController.$btnsendcheck.toggle(clientController.ids.hidebtn);
+                    break;
+                case 'fold':
+                    clientController.$btnsendfold.toggle(clientController.ids.hidebtn);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     const sendActionToServer = (round, type, orderindex, amount, tid, gid) => {
-        // actionConsole.log(
-        //     `*action completed:*`,
-        //     `current round ${round}`,
-        //     `action type ${type}`,
-        //     `bet amount ${amount}`,
-        //     nullchar
-        // );
-
-        // todo: notify other players about this
-
         socket.emit('player-completed-action', {
             round: round,
             actionType: type,
@@ -198,13 +216,71 @@ $(document).ready(() => {
             );
         });
 
+        socket.on('turn', (data) => {
+            const round = data.game.state.name;
+            const actions = data.turn.actions;
+            const minbet = data.turn.owes;
+            const orderIndex = data.turn.betOrderIndex;
+            const tableid = current.table.id;
+            const gameid = current.game.id;
+
+            let loc = 'post small blind';
+
+            if (orderIndex === '1') {
+                loc = 'post big blind';
+            }
+
+            toggleUi(actions);
+
+            let bet = minbet;
+
+            clientController.$btnsendblind.val(`${loc}`);
+            clientController.$btnsendblind.on('click', () => {
+                toggleUi(['postblind']);
+                sendActionToServer('blind', 'check', order, bet, tableid, gameid);
+            });
+
+            clientController.$btnsendbet.val(`bet ${minbet}`);
+            clientController.$btnsendbet.on('click', () => {
+                bet = parseBetAmountFromText(clientController.$btnsendbet.val());
+                toggleUi(actions);
+                sendActionToServer(round, 'bet', order, bet, tableid, gameid);
+            });
+
+            clientController.$btnsendcheck.val('check');
+            clientController.$btnsendcheck.on('click', () => {
+                bet = 0;
+                toggleUi(actions);
+                sendActionToServer(round, 'check', order, bet, tableid, gameid);
+            });
+
+            clientController.$btnsendcall.val(`call ${minbet}`);
+            clientController.$btnsendcall.on('click', () => {
+                bet = minbet;
+                toggleUi(actions);
+                sendActionToServer(round, 'call', order, bet, tableid, gameid);
+            });
+
+            clientController.$btnsendraise.val(`raise ${minbet ? minbet : blindbet}`);
+            clientController.$btnsendraise.on('click', () => {
+                bet = parseBetAmountFromText(clientController.$btnsendraise.val());
+                toggleUi(actions);
+                sendActionToServer(round, 'raise', order, bet, tableid, gameid);
+            });
+
+            clientController.$btnsendfold.on('click', () => {
+                bet = 0;
+                toggleUi(actions);
+                sendActionToServer(round, 'fold', order, bet, tableid, gameid);
+            });
+        });
+
         socket.on('pass-action-to-player', (data) => {
             actionConsole.log(
                 `action was passed to you`,
                 `id: ${socket.id}`,
                 `name: ${current.player.name}`,
                 `seat: ${data.seat}`,
-                `has acted: ${data.acted}`,
                 `bet order: ${data.order}`,
                 `betting round: ${data.round}`,
                 `potsize: ${data.potsize}`,
