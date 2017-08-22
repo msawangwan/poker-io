@@ -58,4 +58,18 @@ class ClientController {
             $b.addClass(id);
         }
     }
+
+    setInactive($e) {
+        const id = this.ids.inactive;
+
+        if (!$e.hasClass(id)) {
+            $e.addClass(id);
+        }
+    }
+
+    deactiveGroup($r) {
+        for (const $e of $r) {
+            this.setInactive($e);
+        }
+    }
 }

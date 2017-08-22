@@ -48,34 +48,6 @@ $(document).ready(() => {
         });
     };
 
-    const toggleUi = (actions) => {
-        for (const a of actions) {
-            switch (a) {
-                case 'blind':
-                    clientController.setActive(clientController.$btnsendblind);
-                    break;
-                case 'bet':
-                    clientController.setActive(clientController.$btnsendbet);
-                    break;
-                case 'call':
-                    clientController.setActive(clientController.$btnsendcall);
-                    break;
-                case 'raise' || 'reraise':
-                    clientController.setActive(clientController.$btnsendraise);
-                    clientController.setActive(clientController.$formbetrangeslider);
-                    break;
-                case 'check':
-                    clientController.setActive(clientController.$btnsendcheck);
-                    break;
-                case 'fold':
-                    clientController.setActive(clientController.$btnsendfold);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
     {
         socket.on('connect', (data) => {
             current.table = new Table(9, canvasView);
@@ -150,67 +122,111 @@ $(document).ready(() => {
                 nullchar
             );
 
-            let loc = 'post small blind';
-
-            if (orderIndex === 1) {
-                loc = 'post big blind';
-            }
-
-            toggleUi(actions);
-
             let bet = minbet;
 
-            clientController.$btnsendblind.val(`${loc}`);
-            clientController.$btnsendblind.on('click', (e) => {
-                toggleUi(actions);
-                completeTurn('check', bet);
+            for (const a of actions) {
+                switch (a) {
+                    case 'blind':
+                        let loc = 'post small blind';
 
-                return false;
-            });
+                        if (orderIndex === 1) {
+                            loc = 'post big blind';
+                        }
 
-            clientController.$btnsendbet.val(`bet ${minbet}`);
-            clientController.$btnsendbet.on('click', (e) => {
-                bet = parseBetAmountFromText(clientController.$btnsendbet.val());
-                toggleUi(actions);
-                completeTurn('bet', bet);
+                        clientController.setActive(clientController.$btnsendblind);
 
-                return false;
-            });
+                        clientController.$btnsendblind.val(`${loc}`);
+                        clientController.$btnsendblind.on('click', (e) => {
+                            completeTurn('check', bet);
+                            // clientController.setActive(clientController.$btnsendblind);
+                            clientController.deactiveGroup(clientController.$allbtns);
 
-            clientController.$btnsendcheck.val('check');
-            clientController.$btnsendcheck.on('click', (e) => {
-                bet = 0;
-                toggleUi(actions);
-                completeTurn('check', bet);
+                            return false;
+                        });
 
-                return false;
-            });
+                        break;
+                    case 'bet':
+                        clientController.setActive(clientController.$btnsendbet);
 
-            clientController.$btnsendcall.val(`call ${minbet}`);
-            clientController.$btnsendcall.on('click', (e) => {
-                bet = parseBetAmountFromText(clientController.$btnsendcall.val());
-                toggleUi(actions);
-                completeTurn('call', bet);
+                        clientController.$btnsendbet.val(`bet ${minbet}`);
+                        clientController.$btnsendbet.on('click', (e) => {
+                            bet = parseBetAmountFromText(clientController.$btnsendbet.val());
 
-                return false;
-            });
+                            completeTurn('bet', bet);
+                            // clientController.setActive(clientController.$btnsendbet);
+                            clientController.deactiveGroup(clientController.$allbtns);
 
-            clientController.$btnsendraise.val(`raise ${minbet * 2}`);
-            clientController.$btnsendraise.on('click', (e) => {
-                bet = parseBetAmountFromText(clientController.$btnsendraise.val());
-                toggleUi(actions);
-                completeTurn('raise', bet);
+                            return false;
+                        });
 
-                return false;
-            });
+                        break;
+                    case 'call':
+                        clientController.setActive(clientController.$btnsendcall);
 
-            clientController.$btnsendfold.on('click', (e) => {
-                bet = 0;
-                toggleUi(actions);
-                completeTurn('fold', bet);
+                        clientController.$btnsendcall.val(`call ${minbet}`);
+                        clientController.$btnsendcall.on('click', (e) => {
+                            bet = parseBetAmountFromText(clientController.$btnsendcall.val());
 
-                return false;
-            });
+                            completeTurn('call', bet);
+                            // clientController.setActive(clientController.$btnsendcall);
+                            clientController.deactiveGroup(clientController.$allbtns);
+
+                            return false;
+                        });
+
+                        break;
+                    case 'raise' || 'reraise':
+                        clientController.setActive(clientController.$btnsendraise);
+                        clientController.setActive(clientController.$formbetrangeslider);
+
+                        clientController.$btnsendraise.val(`raise ${minbet * 2}`);
+                        clientController.$btnsendraise.on('click', (e) => {
+                            bet = parseBetAmountFromText(clientController.$btnsendraise.val());
+
+                            completeTurn('raise', bet);
+
+                            // clientController.setActive(clientController.$btnsendraise);
+                            clientController.deactiveGroup(clientController.$allbtns);
+                            clientController.setActive(clientController.$formbetrangeslider);
+
+                            return false;
+                        });
+
+                        break;
+                    case 'check':
+                        clientController.setActive(clientController.$btnsendcheck);
+
+                        clientController.$btnsendcheck.val('check');
+                        clientController.$btnsendcheck.on('click', (e) => {
+                            bet = 0;
+
+                            completeTurn('check', bet);
+                            // clientController.setActive(clientController.$btnsendcheck);
+                            clientController.deactiveGroup(clientController.$allbtns);
+
+                            return false;
+                        });
+
+                        break;
+                    case 'fold':
+                        clientController.setActive(clientController.$btnsendfold);
+
+                        clientController.$btnsendfold.on('click', (e) => {
+                            bet = 0;
+
+                            completeTurn('fold', bet);
+                            // clientController.setActive(clientController.$btnsendfold);
+                            clientController.deactiveGroup(clientController.$allbtns);
+
+                            return false;
+                        });
+
+                        break;
+                    default:
+                        console.log('invalid action!');
+                        break;
+                }
+            }
         });
 
         socket.on('state', (data) => {
