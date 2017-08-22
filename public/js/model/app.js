@@ -138,7 +138,6 @@ $(document).ready(() => {
                         clientController.$btnsendblind.val(`${loc}`);
                         clientController.$btnsendblind.on('click', (e) => {
                             completeTurn('check', bet);
-                            // clientController.setActive(clientController.$btnsendblind);
                             clientController.deactiveGroup(clientController.$allbtns);
 
                             return false;
@@ -153,7 +152,6 @@ $(document).ready(() => {
                             bet = parseBetAmountFromText(clientController.$btnsendbet.val());
 
                             completeTurn('bet', bet);
-                            // clientController.setActive(clientController.$btnsendbet);
                             clientController.deactiveGroup(clientController.$allbtns);
 
                             return false;
@@ -168,7 +166,6 @@ $(document).ready(() => {
                             bet = parseBetAmountFromText(clientController.$btnsendcall.val());
 
                             completeTurn('call', bet);
-                            // clientController.setActive(clientController.$btnsendcall);
                             clientController.deactiveGroup(clientController.$allbtns);
 
                             return false;
@@ -185,7 +182,6 @@ $(document).ready(() => {
 
                             completeTurn('raise', bet);
 
-                            // clientController.setActive(clientController.$btnsendraise);
                             clientController.deactiveGroup(clientController.$allbtns);
                             clientController.setActive(clientController.$formbetrangeslider);
 
@@ -201,7 +197,6 @@ $(document).ready(() => {
                             bet = 0;
 
                             completeTurn('check', bet);
-                            // clientController.setActive(clientController.$btnsendcheck);
                             clientController.deactiveGroup(clientController.$allbtns);
 
                             return false;
@@ -215,7 +210,6 @@ $(document).ready(() => {
                             bet = 0;
 
                             completeTurn('fold', bet);
-                            // clientController.setActive(clientController.$btnsendfold);
                             clientController.deactiveGroup(clientController.$allbtns);
 
                             return false;
