@@ -11,6 +11,10 @@ class CanvasSprite {
         this.canvas.height = h;
         return this.canvas.getContext('2d');
     }
+    
+    tint() {
+        
+    }
 }
 
 class TableSprite extends CanvasSprite {
