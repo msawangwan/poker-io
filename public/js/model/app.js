@@ -11,7 +11,16 @@ const startupt = 800;
 const nullchar = '\n';
 
 const current = {
-    player: null, table: null, game: null, seat: null, balance: 0, bet: 0
+    player: null,
+    table: null,
+    game: null,
+    seat: null,
+    hand: {
+        a: null,
+        b: null
+    },
+    balance: 0,
+    bet: 0
 };
 
 $(document).ready(() => {
@@ -212,6 +221,13 @@ $(document).ready(() => {
                             completeTurn('fold', bet);
                             clientController.deactiveGroup(clientController.$allbtns);
 
+                            current.table.tableView.registerCardDrawHandler(
+                                current.seat,
+                                current.hand.a,
+                                current.hand.b,
+                                true
+                            );
+
                             return false;
                         });
 
@@ -237,6 +253,7 @@ $(document).ready(() => {
 
             canvasView.clearAndResizeAll();
 
+            current.table.tableView.registerTableCenterLabelDrawHandler(`Pot: ${data.pot.size} Current Hand: ${data.pot.current}`);
             current.table.tableView.registerActivePlayerSeatOutline(data.player.acting.order);
             current.table.redraw();
         });
@@ -250,6 +267,9 @@ $(document).ready(() => {
                 `value: ${data.b.value}`,
                 nullchar
             );
+
+            current.hand.a = data.a;
+            current.hand.b = data.b;
 
             current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
         });
