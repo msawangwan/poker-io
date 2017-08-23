@@ -19,6 +19,13 @@ const current = {
         a: null,
         b: null
     },
+    community: {
+        a: null,
+        b: null,
+        c: null,
+        d: null,
+        e: null
+    },
     balance: 0,
     bet: 0
 };
@@ -258,7 +265,7 @@ $(document).ready(() => {
             current.table.redraw();
         });
 
-        socket.on('player-dealt-cards', (data) => {
+        socket.on('holecards-dealt', (data) => {
             actionConsole.log(
                 'player dealt hole cards:',
                 `suite: ${data.a.suite}`,
@@ -292,6 +299,21 @@ $(document).ready(() => {
             current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
         });
     }
+
+    socket.on('deal-community-cards', (data) => {
+        const dealt = data.cards;
+
+        actionConsole.log(`community cards dealt`, `${dealt}`);
+
+        for (const c of dealt) {
+            const i = c[0];
+            if (current.community[i] === null) {
+                current.community[i] = c[1];
+            }
+        }
+
+        console.log(current.community);
+    });
 
     let renderLoop = null;
 
