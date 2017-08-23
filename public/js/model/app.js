@@ -146,7 +146,7 @@ $(document).ready(() => {
 
                         clientController.$btnsendblind.val(`${loc}`);
                         clientController.$btnsendblind.on('click', (e) => {
-                            completeTurn('check', bet);
+                            completeTurn('blind', bet);
                             clientController.deactiveGroup(clientController.$allbtns);
 
                             return false;
