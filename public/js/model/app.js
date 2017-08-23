@@ -65,14 +65,14 @@ $(document).ready(() => {
     };
 
     {
-        socket.on('connect', (data) => {
+        socket.on('connect', data => {
             current.table = new Table(9, canvasView);
 
             current.table.init();
             current.table.redraw();
         });
 
-        socket.on('assigned-table', (data) => {
+        socket.on('assigned-table', data => {
             current.balance = 500; // TODO: get from server
             current.player = new Player(data.guestname, socket.id, current.balance, canvasView.getCanvas('player-canvas'));
             current.seat = data.table.assignedSeat;
@@ -85,12 +85,12 @@ $(document).ready(() => {
             canvasView.clearAndResizeAll();
         });
 
-        socket.on('a-player-has-joined', (data) => {
+        socket.on('a-player-has-joined', data => {
             current.table.seatOpponents(data.table.seatingState, socket.id);
             canvasView.clearAndResizeAll();
         });
 
-        socket.on('game-started', (data) => {
+        socket.on('game-started', data => {
             { // todo: deprecate
                 current.table.game = new Game(data.gameId, current.table.players);
                 current.table.buttonIndex = data.buttonIndex;
@@ -265,55 +265,116 @@ $(document).ready(() => {
             current.table.redraw();
         });
 
-        socket.on('holecards-dealt', (data) => {
+        // socket.on('holecards-dealt', (data) => {
+        //     actionConsole.log(
+        //         'player dealt hole cards:',
+        //         `suite: ${data.a.suite}`,
+        //         `value: ${data.a.value}`,
+        //         `suite: ${data.b.suite}`,
+        //         `value: ${data.b.value}`,
+        //         nullchar
+        //     );
+
+        //     current.hand.a = data.a;
+        //     current.hand.b = data.b;
+
+        //     current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
+        // });
+
+        //     socket.on('flop-dealt', (data) => {
+        //         actionConsole.log(
+        //             'flop dealt',
+        //             `suite: ${data.a.suite}`,
+        //             `value: ${data.a.value}`,
+        //             `suite: ${data.b.suite}`,
+        //             `value: ${data.b.value}`,
+        //             `suite: ${data.c.suite}`,
+        //             `value: ${data.c.value}`,
+        //             nullchar
+        //         );
+
+        //         canvasView.clearAndResizeAll();
+
+        //         current.table.tableView.registerActivePlayerSeatOutline(data.utg);
+        //         current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
+        //     });
+
+        socket.on('deal-player-cards', data => {
+            const c1 = data.cards.a;
+            const c2 = data.cards.b;
+
             actionConsole.log(
-                'player dealt hole cards:',
-                `suite: ${data.a.suite}`,
-                `value: ${data.a.value}`,
-                `suite: ${data.b.suite}`,
-                `value: ${data.b.value}`,
+                'house dealt holecards!',
+                nullchar,
+                `player hand:`,
+                `${Card.stringify(c1)}`,
+                `${Card.stringify(c2)}`,
                 nullchar
             );
 
-            current.hand.a = data.a;
-            current.hand.b = data.b;
+            current.hand.a = c1;
+            current.hand.b = c2;
 
-            current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
+            current.table.tableView.registerCardDrawHandler(current.seat, c1, c2);
         });
 
-        socket.on('flop-dealt', (data) => {
-            actionConsole.log(
-                'flop dealt',
-                `suite: ${data.a.suite}`,
-                `value: ${data.a.value}`,
-                `suite: ${data.b.suite}`,
-                `value: ${data.b.value}`,
-                `suite: ${data.c.suite}`,
-                `value: ${data.c.value}`,
-                nullchar
-            );
+        socket.on('deal-community-cards', data => {
+            const round = data.round;
+            const dealt = data.cards;
+
+            switch (round) {
+                case 'flop':
+                    current.community.a = dealt[0];
+                    current.community.b = dealt[1];
+                    current.community.c = dealt[2];
+                    break;
+                case 'turn':
+                    current.community.d = dealt[0];
+                    break;
+                case 'river':
+                    current.community.e = dealt[0];
+                    break;
+                default:
+                    console.log('invalid community card and/or round!');
+                    break;
+            }
+
+            {
+                actionConsole.log(`community cards dealt`, `round: ${round}`);
+
+                for (const c of dealt) {
+                    actionConsole.log(`${Card.stringify(c)}`);
+                }
+            }
+
+            const community = [];
+
+            if (current.community.a) {
+                community.push(current.community.a);
+            }
+
+            if (current.community.b) {
+                community.push(current.community.b);
+            }
+
+            if (current.community.c) {
+                community.push(current.community.c);
+            }
+
+            if (current.community.d) {
+                community.push(current.community.d);
+            }
+
+            if (current.community.e) {
+                community.push(current.community.e);
+            }
 
             canvasView.clearAndResizeAll();
 
-            current.table.tableView.registerActivePlayerSeatOutline(data.utg);
-            current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
+            current.table.tableView.registerActivePlayerSeatOutline(0);
+            current.table.tableView.registerCommunityCardsDrawHandler(...community);
         });
     }
-
-    socket.on('deal-community-cards', (data) => {
-        const dealt = data.cards;
-
-        actionConsole.log(`community cards dealt`, `${dealt}`);
-
-        for (const c of dealt) {
-            const i = c[0];
-            if (current.community[i] === null) {
-                current.community[i] = c[1];
-            }
-        }
-
-        console.log(current.community);
-    });
 
     let renderLoop = null;
 
