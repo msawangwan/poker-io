@@ -265,47 +265,11 @@ $(document).ready(() => {
             current.table.redraw();
         });
 
-        // socket.on('holecards-dealt', (data) => {
-        //     actionConsole.log(
-        //         'player dealt hole cards:',
-        //         `suite: ${data.a.suite}`,
-        //         `value: ${data.a.value}`,
-        //         `suite: ${data.b.suite}`,
-        //         `value: ${data.b.value}`,
-        //         nullchar
-        //     );
-
-        //     current.hand.a = data.a;
-        //     current.hand.b = data.b;
-
-        //     current.table.tableView.registerCardDrawHandler(current.seat, data.a, data.b);
-        // });
-
-        //     socket.on('flop-dealt', (data) => {
-        //         actionConsole.log(
-        //             'flop dealt',
-        //             `suite: ${data.a.suite}`,
-        //             `value: ${data.a.value}`,
-        //             `suite: ${data.b.suite}`,
-        //             `value: ${data.b.value}`,
-        //             `suite: ${data.c.suite}`,
-        //             `value: ${data.c.value}`,
-        //             nullchar
-        //         );
-
-        //         canvasView.clearAndResizeAll();
-
-        //         current.table.tableView.registerActivePlayerSeatOutline(data.utg);
-        //         current.table.tableView.registerCommunityCardsDrawHandler(data.a, data.b, data.c);
-        //     });
-
         socket.on('deal-player-cards', data => {
             const c1 = data.cards.a;
             const c2 = data.cards.b;
 
             actionConsole.log(
-                'house dealt holecards!',
-                nullchar,
                 `player hand:`,
                 `${Card.stringify(c1)}`,
                 `${Card.stringify(c2)}`,
@@ -335,7 +299,7 @@ $(document).ready(() => {
                     current.community.e = dealt[0];
                     break;
                 default:
-                    console.log('invalid community card and/or round!');
+                    console.error('invalid community card and/or round!');
                     break;
             }
 
