@@ -55,6 +55,13 @@ $(document).ready(() => {
         return parseFloat(t.split(' ')[1]);
     };
 
+    const validateBalance = (local, remote) => {
+        if (local !== remote) {
+            return remote;
+        }
+        return local;
+    };
+
     const completeTurn = (actionType, betAmount) => {
         socket.emit('exit-turn', {
             tableId: current.table.id,
@@ -73,7 +80,7 @@ $(document).ready(() => {
         });
 
         socket.on('assigned-table', data => {
-            current.balance = 500; // TODO: get from server
+            current.balance = data.balance;
             current.player = new Player(data.guestname, socket.id, current.balance, canvasView.getCanvas('player-canvas'));
             current.seat = data.table.assignedSeat;
             current.table.assignedId = data.table.id;
@@ -122,12 +129,15 @@ $(document).ready(() => {
 
         socket.on('enter-turn', data => {
             const round = data.game.state.name;
+            const balance = data.player.balance;
             const actions = data.turn.actions;
             const minbet = data.turn.owes;
             const orderIndex = data.turn.index;
             const turnid = data.game.turnId;
             const tableid = current.table.id;
             const gameid = current.game.id;
+
+            current.balance = validateBalance(current.balance, balance);
 
             actionConsole.log(
                 `${current.player.name}'s turn`,
@@ -152,7 +162,7 @@ $(document).ready(() => {
                         clientController.setActive(clientController.$btnsendblind);
 
                         clientController.$btnsendblind.val(`${loc}`);
-                        clientController.$btnsendblind.on('click', (e) => {
+                        clientController.$btnsendblind.on('click', e => {
                             completeTurn('blind', bet);
 
                             clientController.deactiveGroup(clientController.$allbtns);
@@ -166,7 +176,7 @@ $(document).ready(() => {
                         clientController.setActive(clientController.$btnsendbet);
 
                         clientController.$btnsendbet.val(`bet ${minbet}`);
-                        clientController.$btnsendbet.on('click', (e) => {
+                        clientController.$btnsendbet.on('click', e => {
                             bet = parseBetAmountFromText(clientController.$btnsendbet.val());
 
                             completeTurn('bet', bet);
@@ -182,7 +192,7 @@ $(document).ready(() => {
                         clientController.setActive(clientController.$btnsendcall);
 
                         clientController.$btnsendcall.val(`call ${minbet}`);
-                        clientController.$btnsendcall.on('click', (e) => {
+                        clientController.$btnsendcall.on('click', e => {
                             bet = parseBetAmountFromText(clientController.$btnsendcall.val());
 
                             completeTurn('call', bet);
@@ -199,7 +209,7 @@ $(document).ready(() => {
                         clientController.setActive(clientController.$formbetrangeslider);
 
                         clientController.$btnsendraise.val(`raise ${minbet * 2}`);
-                        clientController.$btnsendraise.on('click', (e) => {
+                        clientController.$btnsendraise.on('click', e => {
                             bet = parseBetAmountFromText(clientController.$btnsendraise.val());
 
                             completeTurn('raise', bet);
@@ -215,7 +225,7 @@ $(document).ready(() => {
                         clientController.setActive(clientController.$btnsendcheck);
 
                         clientController.$btnsendcheck.val('check');
-                        clientController.$btnsendcheck.on('click', (e) => {
+                        clientController.$btnsendcheck.on('click', e => {
                             bet = 0;
 
                             completeTurn('check', bet);
@@ -230,7 +240,7 @@ $(document).ready(() => {
                     case 'fold':
                         clientController.setActive(clientController.$btnsendfold);
 
-                        clientController.$btnsendfold.on('click', (e) => {
+                        clientController.$btnsendfold.on('click', e => {
                             bet = 0;
 
                             completeTurn('fold', bet);
@@ -269,6 +279,8 @@ $(document).ready(() => {
             );
 
             canvasView.clearAndResizeAll();
+
+            current.balance = validateBalance(current.balance, data.player.client.balance);
 
             current.table.tableView.registerTableCenterLabelDrawHandler(`Pot: ${data.pot.size} Current Hand: ${data.pot.current}`);
             current.table.tableView.registerActivePlayerSeatOutline(data.player.acting.order);

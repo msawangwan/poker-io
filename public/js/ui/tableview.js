@@ -30,6 +30,7 @@ class TableView {
         this.cardpixelwidth = 72.15;
         this.cardpixelheight = 83.25;
 
+        this.cardsSPRITERENDERER = new Map();
         this.cards = new Map();
         this.cardbacks = new Map();
         this.communityCards = new Map();
@@ -37,6 +38,7 @@ class TableView {
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 13; j++) {
                 this.cards.set(`${i}::${j}`, new Sprite(this.table.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
+                this.cardsSPRITERENDERER.set(`${i}::${j}`, new SpriteRenderer(this.table.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
             }
         }
 
@@ -288,25 +290,35 @@ class TableView {
         const handler = this.handlers.get('card');
         const handlerlabel = `card-${i}`;
 
+        const createTransform = (dx, dy, row, col, w, h, scale) => {
+            return {
+                dx: dx, dy: dy, row: row, col: col, w: w, h: h, scale: scale || 1
+            };
+        }
+
         handler.set(handlerlabel, render => {
             const table = this.table;
             const p = table.pointOnTable(i);
 
-            const c1 = this.cards.get(`${a.suite}::${a.value}`);
-            const c2 = this.cards.get(`${b.suite}::${b.value}`);
+            const t1 = createTransform(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
+            const t2 = createTransform(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
 
-            // c1.tintez()
-            // c2.tintez();
+            const c1 = this.cardsSPRITERENDERER.get(`${a.suite}::${a.value}`);
+            const c2 = this.cardsSPRITERENDERER.get(`${b.suite}::${b.value}`);
 
-            c1.render(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
-            c2.render(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
+            if (tint) {
+                const tnt = { color: 'red' };
 
-            // if (tint) {
-            //     c1.tint(20);
-            //     c2.tint(20);
-            // }
-            // this.cards.get(`${a.suite}::${a.value}`).render(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
-            // this.cards.get(`${b.suite}::${b.value}`).render(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
+                c1.render(t1, tnt);
+                c2.render(t2, tnt);
+            } else {
+                c1.render(t1);
+                c2.render(t2);
+            }
+            // const c1 = this.cards.get(`${a.suite}::${a.value}`);
+            // const c2 = this.cards.get(`${b.suite}::${b.value}`);
+            // c1.render(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
+            // c2.render(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
 
             for (const [s, p] of table.seatsVacant(false)) {
                 if (s === i) {
