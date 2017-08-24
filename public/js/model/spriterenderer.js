@@ -18,12 +18,17 @@ class SpriteRenderer {
             img.onload = () => {
                 let buftint = null;
 
+                const r = row * w;
+                const c = col * h;
+                const sw = w * scale;
+                const sh = h * scale;
+
                 this.buf.width = w;
                 this.buf.height = h;
 
                 const bufctx = this.buf.getContext('2d');
 
-                // tinting algorithm adapted from:
+                // method for tinting adopted from:
                 // https://stackoverflow.com/questions/2688961/how-do-i-tint-an-image-with-html5-canvas
 
                 if (tint) {
@@ -38,30 +43,10 @@ class SpriteRenderer {
                     buftintctx.fillRect(0, 0, w, h);
 
                     buftintctx.globalCompositeOperation = "destination-atop";
-                    buftintctx.drawImage(
-                        img,
-                        row * w,
-                        col * h,
-                        w,
-                        h,
-                        0,
-                        0,
-                        w * scale,
-                        h * scale
-                    );
+                    buftintctx.drawImage(img, r, c, w, h, 0, 0, sw, sh);
                 }
 
-                bufctx.drawImage(
-                    img,
-                    row * w,
-                    col * h,
-                    w,
-                    h,
-                    0,
-                    0,
-                    w * scale,
-                    h * scale
-                );
+                bufctx.drawImage(img, r, c, w, h, 0, 0, sw, sh);
 
                 const canvasctx = this.canvas.getContext('2d');
 
