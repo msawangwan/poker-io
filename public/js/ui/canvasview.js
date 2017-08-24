@@ -3,6 +3,7 @@ class CanvasView {
         this.parentCanvasId = parentCanvasId;
 
         this.parentCanvas = document.getElementById(this.parentCanvasId);
+        this.parentCanvas.addEventListener('selectstart', e => e.preventDefault()); // don't highlight text if we dbl click the canvas area
 
         const ids = [
             'table-canvas',

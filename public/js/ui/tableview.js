@@ -2,6 +2,12 @@ class TableView {
     constructor(table) {
         this.table = table;
 
+        this.colors = {
+            mediumgray: '#C2C2C2',
+            flatred: '#FF0000',
+            lavender: '#CF5CE8'
+        }
+
         this.handlers = new Map();
 
         for (const [k, v] of this.table.canvasView.canvi) {
@@ -307,7 +313,7 @@ class TableView {
             const c2 = this.cardsSPRITERENDERER.get(`${b.suite}::${b.value}`);
 
             if (tint) {
-                const tnt = { color: 'red' };
+                const tnt = { color: this.colors.mediumgray };
 
                 c1.render(t1, tnt);
                 c2.render(t2, tnt);
