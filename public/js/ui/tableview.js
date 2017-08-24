@@ -315,10 +315,6 @@ class TableView {
                 c1.render(t1);
                 c2.render(t2);
             }
-            // const c1 = this.cards.get(`${a.suite}::${a.value}`);
-            // const c2 = this.cards.get(`${b.suite}::${b.value}`);
-            // c1.render(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
-            // c2.render(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
 
             for (const [s, p] of table.seatsVacant(false)) {
                 if (s === i) {
