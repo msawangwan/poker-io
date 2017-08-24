@@ -120,7 +120,7 @@ $(document).ready(() => {
             );
         });
 
-        socket.on('enter-turn', (data) => {
+        socket.on('enter-turn', data => {
             const round = data.game.state.name;
             const actions = data.turn.actions;
             const minbet = data.turn.owes;
@@ -154,7 +154,9 @@ $(document).ready(() => {
                         clientController.$btnsendblind.val(`${loc}`);
                         clientController.$btnsendblind.on('click', (e) => {
                             completeTurn('blind', bet);
+
                             clientController.deactiveGroup(clientController.$allbtns);
+                            clientController.setInactive(clientController.$formbetrangeslider);
 
                             return false;
                         });
@@ -168,7 +170,9 @@ $(document).ready(() => {
                             bet = parseBetAmountFromText(clientController.$btnsendbet.val());
 
                             completeTurn('bet', bet);
+
                             clientController.deactiveGroup(clientController.$allbtns);
+                            clientController.setInactive(clientController.$formbetrangeslider);
 
                             return false;
                         });
@@ -182,7 +186,9 @@ $(document).ready(() => {
                             bet = parseBetAmountFromText(clientController.$btnsendcall.val());
 
                             completeTurn('call', bet);
+
                             clientController.deactiveGroup(clientController.$allbtns);
+                            clientController.setInactive(clientController.$formbetrangeslider);
 
                             return false;
                         });
@@ -199,7 +205,7 @@ $(document).ready(() => {
                             completeTurn('raise', bet);
 
                             clientController.deactiveGroup(clientController.$allbtns);
-                            clientController.setActive(clientController.$formbetrangeslider);
+                            clientController.setInactive(clientController.$formbetrangeslider);
 
                             return false;
                         });
@@ -213,7 +219,9 @@ $(document).ready(() => {
                             bet = 0;
 
                             completeTurn('check', bet);
+
                             clientController.deactiveGroup(clientController.$allbtns);
+                            clientController.setInactive(clientController.$formbetrangeslider);
 
                             return false;
                         });
@@ -226,7 +234,9 @@ $(document).ready(() => {
                             bet = 0;
 
                             completeTurn('fold', bet);
+
                             clientController.deactiveGroup(clientController.$allbtns);
+                            clientController.setInactive(clientController.$formbetrangeslider);
 
                             current.table.tableView.registerCardDrawHandler(
                                 current.seat,
