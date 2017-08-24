@@ -43,18 +43,19 @@ class SpriteRenderer {
                     buftintctx.fillRect(0, 0, w, h);
 
                     buftintctx.globalCompositeOperation = "destination-atop";
+                    // buftintctx.globalAlpha = 0.75;
                     buftintctx.drawImage(img, r, c, w, h, 0, 0, sw, sh);
                 }
 
-                bufctx.drawImage(img, r, c, w, h, 0, 0, sw, sh);
-
                 const canvasctx = this.canvas.getContext('2d');
 
+                bufctx.drawImage(img, r, c, w, h, 0, 0, sw, sh);
                 canvasctx.drawImage(this.buf, dx, dy);
 
                 if (buftint) {
                     canvasctx.globalAlpha = 0.5;
                     canvasctx.drawImage(buftint, dx, dy);
+                    canvasctx.globalAlpha = 1.0;
                 }
             };
 
