@@ -12,6 +12,9 @@ const nullchar = '\n';
 
 const current = {
     player: null,
+    other: {
+        folded: [],
+    },
     table: null,
     game: null,
     seat: null,
@@ -267,6 +270,8 @@ $(document).ready(() => {
         });
 
         socket.on('state', (data) => {
+            const foldedIds = data.player.other.foldedIds;
+
             actionConsole.log(
                 `game state`,
                 `turn id: ${data.game.turnId}`,
@@ -275,8 +280,13 @@ $(document).ready(() => {
                 `pot current: ${data.pot.current}`,
                 `acting: ${data.player.acting.id}`,
                 `acting seat: ${data.player.acting.order}`,
+                `folded players: ${foldedIds.length ? foldedIds : 'none'}`,
                 nullchar
             );
+
+            if (foldedIds.length && (current.hand.a || current.hand.b)) {
+                current.table.tableView.registerCardBackDrawHandler(current.player.id, ...foldedIds);
+            }
 
             canvasView.clearAndResizeAll();
 
@@ -302,6 +312,7 @@ $(document).ready(() => {
             current.hand.b = c2;
 
             current.table.tableView.registerCardDrawHandler(current.seat, c1, c2);
+            current.table.tableView.registerCardBackDrawHandler(current.player.id);
         });
 
         socket.on('deal-community-cards', data => {

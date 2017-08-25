@@ -8,7 +8,7 @@ class TableView {
             lavender: '#CF5CE8'
         };
 
-        this.handlers = new Map();
+        this.handlers = new Map(); // todo: rename to CANVAS LAYERS or somthing ...
 
         for (const [k, v] of this.table.canvasView.canvi) {
             this.handlers.set(
@@ -44,6 +44,12 @@ class TableView {
             for (let j = 0; j < 13; j++) {
                 this.deckOfCards.set(`${i}::${j}`, new SpriteRenderer(this.table.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
             }
+        }
+
+        this.opponentHands = new Map();
+
+        for (let i = 0; i < 9; i++) {
+            this.opponentHands.set(i, new SpriteRenderer(table.cardcanvas, './asset/cards-hand-card-back.png'));
         }
 
         this.labels = {
@@ -316,25 +322,54 @@ class TableView {
                 c2.render(t2);
             }
 
-            for (const [s, p] of table.seatsVacant(false)) {
-                if (s === i) {
-                    continue;
-                }
+            // for (const [s, p] of table.seatsVacant(false)) {
+            //     if (s === i) {
+            //         continue;
+            //     }
 
-                const p = table.pointOnTable(s, 0);
-                const t = SpriteRenderer.createTransform(269, 188, p.x, p.y, 0, 0, 0.25);
+            //     const p = table.pointOnTable(s, 0);
+            //     const t = SpriteRenderer.createTransform(269, 188, p.x, p.y, 0, 0, 0.25);
 
-                if (!this.cardbacks.has(s)) {
-                    // this.cardbacks.set(s, new Sprite(table.cardcanvas, './asset/cards-hand-card-back.png'));
-                    this.cardbacks.set(s, new SpriteRenderer(table.cardcanvas, './asset/cards-hand-card-back.png'));
-                }
+            //     if (!this.cardbacks.has(s)) {
+            //         this.cardbacks.set(s, new SpriteRenderer(table.cardcanvas, './asset/cards-hand-card-back.png'));
+            //     }
 
-                // this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
-                this.cardbacks.get(s).render(t);
-            }
+            //     this.cardbacks.get(s).render(t);
+            // }
         });
 
         return handlerlabel;
+    }
+
+    registerCardBackDrawHandler(selfId, ...foldedById) {
+        const handler = this.handlers.get('card');
+
+        handler.set('cardbacks', render => {
+            const table = this.table;
+
+            for (const seat of table.seatsVacant(false)) {
+                const curId = seat[1].player.id;
+                const i = seat[0];
+
+                if (curId === selfId) {
+                    continue;
+                }
+
+                const h = this.opponentHands.get(i);
+                const p = table.pointOnTable(i, 0);
+                const t = SpriteRenderer.createTransform(269, 188, p.x, p.y, 0, 0, 0.25);
+
+                if (foldedById.includes(curId)) {
+                    h.render(t, { color: this.colors.mediumgray });
+                } else {
+                    h.render(t);
+                }
+            }
+        });
+
+        this.handlers.set('card', handler);
+
+        return 'cardbacks';
     }
 
     registerCommunityCardsDrawHandler(...communityCards) {
