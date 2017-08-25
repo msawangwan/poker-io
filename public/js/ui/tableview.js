@@ -6,7 +6,7 @@ class TableView {
             mediumgray: '#C2C2C2',
             flatred: '#FF0000',
             lavender: '#CF5CE8'
-        }
+        };
 
         this.handlers = new Map();
 
@@ -36,15 +36,13 @@ class TableView {
         this.cardpixelwidth = 72.15;
         this.cardpixelheight = 83.25;
 
-        this.cardsSPRITERENDERER = new Map();
-        this.cards = new Map();
+        this.deckOfCards = new Map();
         this.cardbacks = new Map();
         this.communityCards = new Map();
 
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 13; j++) {
-                this.cards.set(`${i}::${j}`, new Sprite(this.table.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
-                this.cardsSPRITERENDERER.set(`${i}::${j}`, new SpriteRenderer(this.table.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
+                this.deckOfCards.set(`${i}::${j}`, new SpriteRenderer(this.table.cardcanvas, './asset/cards_52-card-deck_stylized.png'));
             }
         }
 
@@ -296,21 +294,17 @@ class TableView {
         const handler = this.handlers.get('card');
         const handlerlabel = `card-${i}`;
 
-        const createTransform = (dx, dy, row, col, w, h, scale) => {
-            return {
-                dx: dx, dy: dy, row: row, col: col, w: w, h: h, scale: scale || 1
-            };
-        }
-
         handler.set(handlerlabel, render => {
             const table = this.table;
             const p = table.pointOnTable(i);
+            const w = table.cardpixelwidth;
+            const h = table.cardpixelheight;
 
-            const t1 = createTransform(p.x, p.y, a.value, a.suite, table.cardpixelwidth, table.cardpixelheight);
-            const t2 = createTransform(p.x + table.cardpixelwidth, p.y, b.value, b.suite, table.cardpixelwidth, table.cardpixelheight);
+            const t1 = SpriteRenderer.createTransform(w, h, p.x, p.y, a.value, a.suite);
+            const t2 = SpriteRenderer.createTransform(w, h, p.x + w, p.y, b.value, b.suite);
 
-            const c1 = this.cardsSPRITERENDERER.get(`${a.suite}::${a.value}`);
-            const c2 = this.cardsSPRITERENDERER.get(`${b.suite}::${b.value}`);
+            const c1 = this.deckOfCards.get(`${a.suite}::${a.value}`);
+            const c2 = this.deckOfCards.get(`${b.suite}::${b.value}`);
 
             if (tint) {
                 const tnt = { color: this.colors.mediumgray };
@@ -328,34 +322,44 @@ class TableView {
                 }
 
                 const p = table.pointOnTable(s, 0);
+                const t = SpriteRenderer.createTransform(269, 188, p.x, p.y, 0, 0, 0.25);
 
                 if (!this.cardbacks.has(s)) {
-                    this.cardbacks.set(s, new Sprite(table.cardcanvas, './asset/cards-hand-card-back.png'));
+                    // this.cardbacks.set(s, new Sprite(table.cardcanvas, './asset/cards-hand-card-back.png'));
+                    this.cardbacks.set(s, new SpriteRenderer(table.cardcanvas, './asset/cards-hand-card-back.png'));
                 }
 
-                this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
+                // this.cardbacks.get(s).renderScaled(p.x, p.y, 0, 0, 269, 188, 0.25, 0.25);
+                this.cardbacks.get(s).render(t);
             }
         });
 
         return handlerlabel;
     }
 
-    registerCommunityCardsDrawHandler(...ccCards) {
+    registerCommunityCardsDrawHandler(...communityCards) {
         const handler = this.handlers.get('card');
         const handlerlabel = 'community';
 
         handler.set(handlerlabel, render => {
             const table = this.table;
             const p = table.pointOnTable(-2);
+            const w = table.cardpixelwidth;
+            const h = table.cardpixelheight;
 
-            const numCards = ccCards.length;
-            const totalWidth = table.cardpixelwidth * 3;
+            const numCards = communityCards.length;
+            const totalWidth = w * 3;
 
             let start = p.x - (totalWidth / 2);
             let shift = 0;
 
-            for (const c of ccCards) {
-                this.cards.get(table.cardByKey(c)).render(start + shift, p.y, c.value, c.suite, table.cardpixelwidth, table.cardpixelheight);
+            for (const c of communityCards) {
+                const key = table.cardByKey(c);
+                const cur = this.deckOfCards.get(key);
+                const transform = SpriteRenderer.createTransform(w, h, start + shift, p.y, c.value, c.suite);
+
+                cur.render(transform);
+
                 shift += table.cardpixelwidth;
             }
         });
@@ -379,5 +383,18 @@ class TableView {
         handler.clear();
 
         this.handlers.set(handlerid, handler);
+    }
+
+    static createTransform(w, h, x, y, row, col, scale) {
+        // static createTransform(dx, dy, row, col, w, h, scale) {
+        return {
+            w: w,
+            h: h,
+            dx: x,
+            dy: y,
+            row: row || 0,
+            col: col || 0,
+            scale: scale || 1
+        };
     }
 }

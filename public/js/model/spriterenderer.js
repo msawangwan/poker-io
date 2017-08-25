@@ -10,6 +10,7 @@ class SpriteRenderer {
 
     render(transform, tint) {
         const { dx, dy, row, col, w, h, scale } = transform;
+
         if (!tint && this.img && this.img.complete) {
             this.img.onload();
         } else {
@@ -65,5 +66,17 @@ class SpriteRenderer {
 
             this.img = img;
         }
+    }
+
+    static createTransform(w, h, x, y, row, col, scale) {
+        return {
+            w: w,
+            h: h,
+            dx: x,
+            dy: y,
+            row: row || 0,
+            col: col || 0,
+            scale: scale || 1
+        };
     }
 }
