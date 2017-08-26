@@ -34,7 +34,7 @@ class ClientController {
         this.$betrangesliderbtnplus = $('#bet-range-slider-btn-plus');
 
         this.$betrangeslider.on('change', () => {
-            const v = this.$betrangeslider.val();
+            const v = this.parseValue(this.$betrangeslider);
 
             if (this.callbackHandlers.get('bet-range-slider').size) {
                 for (const [id, h] of this.callbackHandlers.get('bet-range-slider')) {
@@ -44,7 +44,7 @@ class ClientController {
         });
 
         this.$betrangesliderbtnminus.on('click', () => {
-            const v = this.$betrangeslider.val();
+            const v = this.parseValue(this.$betrangeslider);
 
             if (this.callbackHandlers.get('bet-range-slider-btn-minus').size) {
                 for (const [id, h] of this.callbackHandlers.get('bet-range-slider-btn-minus')) {
@@ -54,7 +54,7 @@ class ClientController {
         });
 
         this.$betrangesliderbtnplus.on('click', () => {
-            const v = this.$betrangeslider.val();
+            const v = this.parseValue(this.$betrangeslider);
 
             if (this.callbackHandlers.get('bet-range-slider-btn-plus').size) {
                 for (const [id, h] of this.callbackHandlers.get('bet-range-slider-btn-plus')) {
@@ -63,6 +63,10 @@ class ClientController {
                 }
             }
         });
+    }
+
+    parseValue($e, isFloat) {
+        return isFloat ? parseFloat($e.val()) : parseInt($e.val());
     }
 
     setActive($b) {

@@ -59,22 +59,13 @@ $(document).ready(() => {
     });
 
     clientController.callbackHandlers.get('bet-range-slider-btn-minus').set('calc-minus', v => {
-        console.log('val before minus', v);
         clientController.$betrangeslider.val(v - slideincr);
-        console.log('after', clientController.$betrangeslider.val());
+        clientController.$betrangeslider.trigger('change');
     });
 
     clientController.callbackHandlers.get('bet-range-slider-btn-plus').set('calc-plus', v => {
-        // console.log('val before add', v);
-        // clientController.$betrangeslider.val(v + slideincr);
-        // console.log('after', clientController.$betrangeslider.val());
-        const arg = v;
-        console.log('arg parameter sent from cb handler:', v);
-        const target = v + 5;
-        console.log('arg parameter modified witrh incr:', target);
-        console.log('current v actual before:', clientConttroller.$betrangeslider.val());
-        const inplace = clientController.$betrangeslider.val() + 5;
-        console.log('in place mod',inplace);
+        clientController.$betrangeslider.val(v + slideincr);
+        clientController.$betrangeslider.trigger('change');
     });
 
     const parseBetAmountFromText = (t) => {
