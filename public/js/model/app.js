@@ -33,6 +33,9 @@ const current = {
     bet: 0
 };
 
+const convert = v => v * 0.01;
+const slideincr = 5;
+
 $(document).ready(() => {
     const clientController = new ClientController();
     const canvasView = new CanvasView('container-canvas');
@@ -49,11 +52,23 @@ $(document).ready(() => {
     clientController.deactiveGroup($ui);
 
     clientController.callbackHandlers.get('bet-range-slider').set('update-button-txt', val => {
-        current.bet = current.player.balance * (val * 0.01);
+        current.bet = current.player.balance * convert(val);
         current.bet = mns.app.round(current.bet, 2);
 
         clientController.$btnsendbet.val(`bet ${current.bet}`);
         clientController.$btnsendraise.val(`raise ${current.bet}`);
+    });
+
+    clientController.callbackHandlers.get('bet-range-slider-btn-minus').set('calc-minus', v => {
+        console.log('val before minux', v);
+        clientController.$betrangeslider.val(v - slideincr);
+        console.log('after', clientController.$betrangeslider.val());
+    });
+
+    clientController.callbackHandlers.get('bet-range-slider-btn-plus').set('calc-plus', v => {
+        // console.log('val before add', v);
+        // clientController.$betrangeslider.val(v + slideincr);
+        // console.log('after', clientController.$betrangeslider.val());
     });
 
     const parseBetAmountFromText = (t) => {

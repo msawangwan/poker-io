@@ -25,16 +25,41 @@ class ClientController {
 
         this.callbackHandlers = new Map([
             ['bet-range-slider', new Map()],
+            ['bet-range-slider-btn-minus', new Map()],
+            ['bet-range-slider-btn-plus', new Map()]
         ]);
 
         this.$betrangeslider = $('#bet-range-slider');
+        this.$betrangesliderbtnminus = $('#bet-range-slider-btn-minus');
+        this.$betrangesliderbtnplus = $('#bet-range-slider-btn-plus');
 
         this.$betrangeslider.on('change', () => {
-            const val = this.$betrangeslider.val();
+            const v = this.$betrangeslider.val();
 
             if (this.callbackHandlers.get('bet-range-slider').size) {
                 for (const [id, h] of this.callbackHandlers.get('bet-range-slider')) {
-                    h(val);
+                    h(v);
+                }
+            }
+        });
+
+        this.$betrangesliderbtnminus.on('click', () => {
+            const v = this.$betrangeslider.val();
+
+            if (this.callbackHandlers.get('bet-range-slider-btn-minus').size) {
+                for (const [id, h] of this.callbackHandlers.get('bet-range-slider-btn-minus')) {
+                    h(v);
+                }
+            }
+        });
+
+        this.$betrangesliderbtnplus.on('click', () => {
+            const v = this.$betrangeslider.val();
+
+            if (this.callbackHandlers.get('bet-range-slider-btn-plus').size) {
+                for (const [id, h] of this.callbackHandlers.get('bet-range-slider-btn-plus')) {
+                    console.log('calling', id);
+                    h(v);
                 }
             }
         });
