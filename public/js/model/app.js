@@ -54,8 +54,15 @@ $(document).ready(() => {
         current.bet = current.player.balance * convert(val);
         current.bet = mns.app.round(current.bet, 2);
 
-        clientController.$btnsendbet.val(`bet ${current.bet}`);
-        clientController.$btnsendraise.val(`raise ${current.bet}`);
+        let locbet = `bet ${current.bet}`;
+        let locraise = `raise ${current.bet}`;
+
+        if (current.bet >= current.balance) {
+            locbet = locraise = 'all-in';
+        }
+
+        clientController.$btnsendbet.val(`${locbet}`);
+        clientController.$btnsendraise.val(`${locraise}`);
     });
 
     clientController.callbackHandlers.get('bet-range-slider-btn-minus').set('calc-minus', v => {
@@ -69,7 +76,7 @@ $(document).ready(() => {
     });
 
     const parseBetAmountFromText = (t) => {
-        return parseFloat(t.split(' ')[1]);
+        return t === 'all-in' ? current.balance : parseFloat(t.split(' ')[1]);
     };
 
     const validateBalance = (local, remote) => {
@@ -222,7 +229,9 @@ $(document).ready(() => {
                         clientController.setActive(clientController.$btnsendraise);
                         clientController.setActive(clientController.$formbetrangeslider);
 
-                        clientController.$btnsendraise.val(`raise ${minbet * 2}`);
+                        const raiseloc = `raise ${minbet * 2}`;
+
+                        clientController.$btnsendraise.val(`${minbet >= current.balance ? 'all-in' : raiseloc}`);
                         clientController.$btnsendraise.on('click', e => {
                             bet = parseBetAmountFromText(clientController.$btnsendraise.val());
 
