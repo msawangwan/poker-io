@@ -7,16 +7,17 @@ class ClientController {
         this.$btnsendcall = $('#btn-send-call');
         this.$btnsendraise = $('#btn-send-raise');
 
-        this.$allbtns = [
+        this.$formbetrangeslider = $('#form-betting-slider');
+
+        this.$toggledUi = [
             this.$btnsendbet,
             this.$btnsendblind,
             this.$btnsendcheck,
             this.$btnsendfold,
             this.$btnsendcall,
-            this.$btnsendraise
+            this.$btnsendraise,
+            this.$formbetrangeslider
         ];
-
-        this.$formbetrangeslider = $('#form-betting-slider');
 
         this.ids = {
             inactive: 'inactive'
@@ -37,16 +38,6 @@ class ClientController {
                 }
             }
         });
-    }
-
-    hideAllButtons(hideform) {
-        for (const $b of this.$allbtns) {
-            this.setActive($b);
-        }
-
-        if (hideform) {
-            this.setActive(this.$formbetrangeslider);
-        }
     }
 
     setActive($b) {
@@ -70,6 +61,12 @@ class ClientController {
     deactiveGroup($r) {
         for (const $e of $r) {
             this.setInactive($e);
+        }
+    }
+
+    activeGroup($r) {
+        for (const $e of $r) {
+            this.setActive($e);
         }
     }
 }
