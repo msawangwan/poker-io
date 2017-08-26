@@ -5,6 +5,8 @@ mns.app.round = (n, precision) => {
     return Math.round(n * factor) / factor;
 };
 
+const convert = v => v * 0.01;
+const slideincr = 5;
 const tickrate = 1000 / 2;
 const startupt = 800;
 
@@ -33,9 +35,6 @@ const current = {
     bet: 0
 };
 
-const convert = v => v * 0.01;
-const slideincr = 5;
-
 $(document).ready(() => {
     const clientController = new ClientController();
     const canvasView = new CanvasView('container-canvas');
@@ -60,7 +59,7 @@ $(document).ready(() => {
     });
 
     clientController.callbackHandlers.get('bet-range-slider-btn-minus').set('calc-minus', v => {
-        console.log('val before minux', v);
+        console.log('val before minus', v);
         clientController.$betrangeslider.val(v - slideincr);
         console.log('after', clientController.$betrangeslider.val());
     });
@@ -69,6 +68,13 @@ $(document).ready(() => {
         // console.log('val before add', v);
         // clientController.$betrangeslider.val(v + slideincr);
         // console.log('after', clientController.$betrangeslider.val());
+        const arg = v;
+        console.log('arg parameter sent from cb handler:', v);
+        const target = v + 5;
+        console.log('arg parameter modified witrh incr:', target);
+        console.log('current v actual before:', clientConttroller.$betrangeslider.val());
+        const inplace = clientController.$betrangeslider.val() + 5;
+        console.log('in place mod',inplace);
     });
 
     const parseBetAmountFromText = (t) => {
