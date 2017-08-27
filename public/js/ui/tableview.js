@@ -379,6 +379,7 @@ class TableView {
         handler.set(handlerlabel, render => {
             const table = this.table;
             const p = table.pointOnTable(-2);
+            const scale = 0.65;
             const w = table.cardpixelwidth;
             const h = table.cardpixelheight;
 
@@ -391,11 +392,11 @@ class TableView {
             for (const c of communityCards) {
                 const key = table.cardByKey(c);
                 const cur = this.deckOfCards.get(key);
-                const transform = SpriteRenderer.createTransform(w, h, start + shift, p.y, c.value, c.suite);
+                const transform = SpriteRenderer.createTransform(w, h, start + shift, p.y, c.value, c.suite, scale);
 
                 cur.render(transform);
 
-                shift += table.cardpixelwidth;
+                shift += w * scale;
             }
         });
 

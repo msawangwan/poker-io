@@ -11,7 +11,9 @@ class SpriteRenderer {
     render(transform, tint) {
         const { dx, dy, row, col, w, h, scale } = transform;
 
-        if (!tint && this.img && this.img.complete) {
+        // todo: figure this out but it doesnt redraw properly
+        // if (!tint && this.img && this.img.complete) {
+        if (false) {
             this.img.onload();
         } else {
             const img = new Image();

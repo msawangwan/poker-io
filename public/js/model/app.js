@@ -50,6 +50,11 @@ $(document).ready(() => {
 
     const $ui = clientController.$toggledUi;
 
+    const redraw = () => {
+        canvasView.clearAndResizeAll();
+        current.table.redraw();
+    };
+
     canvasView.clearAndResizeAll();
 
     clientController.deactiveGroup($ui);
@@ -308,8 +313,6 @@ $(document).ready(() => {
                 current.table.tableView.registerCardBackDrawHandler(current.player.id, ...foldedIds);
             }
 
-            canvasView.clearAndResizeAll();
-
             current.balance = validateBalance(current.balance, data.player.client.balance);
 
             for (const p of data.player.other.balances) {
@@ -322,7 +325,8 @@ $(document).ready(() => {
 
             current.table.tableView.registerTableCenterLabelDrawHandler(`Pot: ${data.pot.size} Current Hand: ${data.pot.current}`);
             current.table.tableView.registerActivePlayerSeatOutline(data.player.acting.order);
-            current.table.redraw();
+
+            redraw();
         });
 
         socket.on('best-hand', data => {
@@ -346,6 +350,8 @@ $(document).ready(() => {
 
             current.table.tableView.registerCardDrawHandler(current.seat, c1, c2);
             current.table.tableView.registerCardBackDrawHandler(current.player.id);
+
+            redraw();
         });
 
         socket.on('deal-community-cards', data => {
@@ -399,7 +405,7 @@ $(document).ready(() => {
                 community.push(current.community.e);
             }
 
-            canvasView.clearAndResizeAll();
+            redraw();
 
             current.table.tableView.registerActivePlayerSeatOutline(0);
             current.table.tableView.registerCommunityCardsDrawHandler(...community);
