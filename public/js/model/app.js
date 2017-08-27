@@ -327,7 +327,7 @@ $(document).ready(() => {
 
         socket.on('best-hand', data => {
             actionConsole.write(`best hand: ${data.hand}`);
-            document.getElementById('txt-best-hand').innerHTML(`BEST HAND: ${data.hand}`);
+            document.getElementById('txt-best-hand').innerHTML = `BEST HAND: ${data.hand}`;
         });
 
         socket.on('deal-player-cards', data => {
