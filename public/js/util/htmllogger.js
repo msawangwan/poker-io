@@ -11,6 +11,14 @@ class HTMLLogger {
         lines.map(l => this.toHtml(l));
     };
 
+    write(...lines) {
+        for (const l of lines) {
+            this.log(l);
+        }
+
+        this.log('\n');
+    }
+
     logobject(o) {
         const props = [];
 
@@ -26,7 +34,7 @@ class HTMLLogger {
         );
     };
 
-    toHtml(m) {
+    toHtml(m, br) {
         let t = `<small><b>|</b></small>`;
 
         if (m !== '\n') {

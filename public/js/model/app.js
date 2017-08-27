@@ -5,6 +5,10 @@ mns.app.round = (n, precision) => {
     return Math.round(n * factor) / factor;
 };
 
+mns.app.debug = {
+    log: 'verbose',
+};
+
 const convert = v => v * 0.01;
 const slideincr = 5;
 const tickrate = 1000 / 2;
@@ -140,14 +144,15 @@ $(document).ready(() => {
 
             current.table.tableView.registerTableCenterLabelDrawHandler('game starting ...');
 
-            actionConsole.log(
+            if (mns.app.debug.log === 'verbose') {
+                console.log(`client id: ${socket.id}`);
+                console.log(`game id: ${data.gameId}`);
+            }
+
+            actionConsole.write(
                 'game started',
-                `id: ${data.gameId}`,
                 `name: ${current.player.name}`,
-                `seat: ${current.seat}`,
-                `id: ${socket.id}`,
-                `dealer button index: ${current.table.buttonIndex}`,
-                nullchar,
+                `seat: ${current.seat}`
             );
         });
 
@@ -163,13 +168,12 @@ $(document).ready(() => {
 
             current.balance = validateBalance(current.balance, balance);
 
-            actionConsole.log(
+            actionConsole.write(
                 `${current.player.name}'s turn`,
                 `turn id: ${turnid}`,
                 `bet order index: ${orderIndex}`,
                 `available actions ${actions}`,
-                `match amount: ${minbet}`,
-                nullchar
+                `match amount: ${minbet}`
             );
 
             let bet = minbet;
@@ -286,10 +290,10 @@ $(document).ready(() => {
             }
         });
 
-        socket.on('state', (data) => {
+        socket.on('state', data => {
             const foldedIds = data.player.other.foldedIds;
 
-            actionConsole.log(
+            actionConsole.write(
                 `game state`,
                 `turn id: ${data.game.turnId}`,
                 `round: ${data.game.state}`,
@@ -297,8 +301,7 @@ $(document).ready(() => {
                 `pot current: ${data.pot.current}`,
                 `acting: ${data.player.acting.id}`,
                 `acting seat: ${data.player.acting.order}`,
-                `folded players: ${foldedIds.length ? foldedIds : 'none'}`,
-                nullchar
+                `folded players: ${foldedIds.length ? foldedIds : 'none'}`
             );
 
             if (foldedIds.length && (current.hand.a || current.hand.b)) {
@@ -309,9 +312,22 @@ $(document).ready(() => {
 
             current.balance = validateBalance(current.balance, data.player.client.balance);
 
+            for (const p of data.player.other.balances) {
+                const s = current.table.seats.get(p[0]);
+
+                if (s.player.id === p[1]) {
+                    s.player.balance = p[2];
+                }
+            }
+
             current.table.tableView.registerTableCenterLabelDrawHandler(`Pot: ${data.pot.size} Current Hand: ${data.pot.current}`);
             current.table.tableView.registerActivePlayerSeatOutline(data.player.acting.order);
             current.table.redraw();
+        });
+
+        socket.on('best-hand', data => {
+            actionConsole.write(`best hand: ${data.hand}`);
+            document.getElementById('txt-best-hand').innerHTML(`BEST HAND: ${data.hand}`);
         });
 
         socket.on('deal-player-cards', data => {
